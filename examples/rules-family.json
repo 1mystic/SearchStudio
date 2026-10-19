@@ -1,0 +1,47 @@
+{
+ "id": "rules-family",
+ "type": "rules",
+ "name": "Family relations",
+ "note": "Facts about parents; rules derive grandparents, fathers and grandfathers.",
+ "facts": [
+  "(parent tom bob)",
+  "(parent bob ann)",
+  "(parent bob pat)",
+  "(parent pat jim)",
+  "(male tom)",
+  "(male bob)",
+  "(male jim)"
+ ],
+ "rules": [
+  {
+   "name": "R1",
+   "if": [
+    "(parent ?x ?y)",
+    "(parent ?y ?z)"
+   ],
+   "then": [
+    "(grandparent ?x ?z)"
+   ]
+  },
+  {
+   "name": "R2",
+   "if": [
+    "(parent ?x ?y)",
+    "(male ?x)"
+   ],
+   "then": [
+    "(father ?x ?y)"
+   ]
+  },
+  {
+   "name": "R3",
+   "if": [
+    "(grandparent ?x ?z)",
+    "(male ?x)"
+   ],
+   "then": [
+    "(grandfather ?x ?z)"
+   ]
+  }
+ ]
+}

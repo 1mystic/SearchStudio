@@ -1,0 +1,143 @@
+{
+ "id": "csp-australia",
+ "type": "csp",
+ "name": "Map colouring: Australia",
+ "note": "Seven regions, three colours, neighbours must differ.",
+ "variables": [
+  {
+   "id": "WA",
+   "domain": [
+    "r",
+    "g",
+    "b"
+   ],
+   "x": 0,
+   "y": 1.2
+  },
+  {
+   "id": "NT",
+   "domain": [
+    "r",
+    "g",
+    "b"
+   ],
+   "x": 1.4,
+   "y": 0.3
+  },
+  {
+   "id": "SA",
+   "domain": [
+    "r",
+    "g",
+    "b"
+   ],
+   "x": 1.7,
+   "y": 1.5
+  },
+  {
+   "id": "Q",
+   "domain": [
+    "r",
+    "g",
+    "b"
+   ],
+   "x": 2.9,
+   "y": 0.5
+  },
+  {
+   "id": "NSW",
+   "domain": [
+    "r",
+    "g",
+    "b"
+   ],
+   "x": 3.2,
+   "y": 1.6
+  },
+  {
+   "id": "V",
+   "domain": [
+    "r",
+    "g",
+    "b"
+   ],
+   "x": 2.7,
+   "y": 2.4
+  },
+  {
+   "id": "T",
+   "domain": [
+    "r",
+    "g",
+    "b"
+   ],
+   "x": 3.0,
+   "y": 3.1
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "WA",
+    "NT"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "WA",
+    "SA"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "NT",
+    "SA"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "NT",
+    "Q"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "SA",
+    "Q"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "SA",
+    "NSW"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "SA",
+    "V"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "Q",
+    "NSW"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "NSW",
+    "V"
+   ],
+   "rel": "neq"
+  }
+ ]
+}

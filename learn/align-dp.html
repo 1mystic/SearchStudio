@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sequence alignment (dynamic programming) — step by step · Search Studio</title>
+<meta name="description" content="Comparing two DNA strings means lining them up with as few mismatches and gaps as possible. Every alignment is a path through a grid, so the best alignment is a shortest path, and dynamic programming finds it by filling a table.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/align-dp.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Sequence alignment (dynamic programming) — step by step · Search Studio"><meta property="og:description" content="Comparing two DNA strings means lining them up with as few mismatches and gaps as possible. Every alignment is a path through a grid, so the best alignment is a shortest path, and dynamic programming finds it by filling a table."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/align-dp.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Sequence alignment (dynamic programming)","description":"Comparing two DNA strings means lining them up with as few mismatches and gaps as possible. Every alignment is a path through a grid, so the best alignment is a shortest path, and dynamic programming finds it by filling a table.","url":"https://1mystic.github.io/search-studio/learn/align-dp.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Sequence alignment (dynamic programming)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/alignment/dynamic-programming.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 6 · Sequence alignment</p><h1>Sequence alignment (dynamic programming)</h1></div><a class="btn primary" href="../#try-align-dp">Run it step by step</a></div>
+<p class="intro">Comparing two DNA strings means lining them up with as few mismatches and gaps as possible. Every alignment is a path through a grid, so the best alignment is a shortest path, and dynamic programming finds it by filling a table.</p>
+<h2><small>01</small>Definition</h2><p>D(i,j) is the cheapest alignment of the first i letters of a with the first j letters of b. Fill the table from D(0,0) = 0 using three moves: diagonal (pair two letters), down (a letter of a against a gap), right (a letter of b against a gap). Trace back from D(m,n).</p>
+<h2><small>02</small>Pseudocode</h2><pre>D(0,0) ← 0;  D(i,0) ← i·gap;  D(0,j) ← j·gap
+for i ← 1..m, for j ← 1..n
+    D(i,j) ← min( D(i−1,j−1) + cost(aᵢ, bⱼ),     # diagonal: match or mismatch
+                  D(i−1,j)   + gap,               # down: aᵢ against a gap
+                  D(i,j−1)   + gap )              # right: bⱼ against a gap
+trace back from (m,n) choosing a move that produced each value</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>D(i,0) = i·gap, D(0,j) = j·gap</td><td>Aligning a prefix against nothing costs only gaps.</td></tr><tr><td>D(i,j) = min of three moves</td><td>Diagonal, down or right, each adding its cost.</td></tr><tr><td>trace back from (m,n)</td><td>Follow the move that produced each value to read the alignment.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">D(i,j) = min{ D(i−1,j−1) + c(aᵢ,bⱼ), D(i−1,j) + gap, D(i,j−1) + gap }</div><p class="read">best of: pair the letters, gap in b, gap in a</p><p class="why">Every alignment of the prefixes ends in exactly one of these three ways, so the minimum over them is optimal (optimal substructure).</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Exact and O(m·n). The same lattice can be searched by A* with an admissible heuristic, or with frontier ideas to cut memory, which is how the course connects alignment to search.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes</div><div class="prop"><span>time</span>O(m·n)</div><div class="prop"><span>space</span>O(m·n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Costs are minimised here; scoring versions maximise similarity instead.</li><li>Off-by-one: row i refers to letter aᵢ, i.e. a[i−1] in code.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-astar.html"><span>← Previous</span><b>A*</b></a><a class="pg next" href="align-astar.html"><span>Next →</span><b>Sequence alignment (A*)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

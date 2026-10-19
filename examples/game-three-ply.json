@@ -1,0 +1,24 @@
+{
+ "id": "game-three-ply",
+ "type": "game",
+ "name": "Two-ply tree (3 × 3)",
+ "note": "The classic textbook tree: MAX moves, then MIN. Minimax value 3; alpha-beta prunes two leaves.",
+ "root": "MAX",
+ "tree": [
+  [
+   3,
+   12,
+   8
+  ],
+  [
+   2,
+   4,
+   6
+  ],
+  [
+   14,
+   5,
+   2
+  ]
+ ]
+}

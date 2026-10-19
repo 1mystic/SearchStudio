@@ -1,0 +1,86 @@
+<article class="prose">
+  <p class="eyebrow">Guide</p>
+  <h1>How to use Search Studio</h1>
+  <p class="lede">Three places matter: the library, where you learn an algorithm; the studio, where you run it; and the export panel, where you take the trace away.</p>
+
+  <h2>1. Learn the algorithm first</h2>
+  <p>Open the <a href="#library">library</a> and pick an algorithm. Its page has:</p>
+  <ul>
+    <li><b>Introduction</b> in plain language, and a precise <b>definition</b>.</li>
+    <li><b>Pseudocode</b> with a sentence on what each line does and why.</li>
+    <li><b>Formulas</b>: each written out, read aloud in words, and justified.</li>
+    <li><b>Properties</b> (complete? optimal? time and space) and common <b>traps</b>.</li>
+  </ul>
+  <p>Press <b>Try it</b> to open the studio with that algorithm and a suitable example already loaded.</p>
+
+  <h2>2. Run it in the studio</h2>
+  <h3>Choose a problem</h3>
+  <ul>
+    <li><b>Examples</b> come with the site: the six-city instance from the TSP deck, two five-city practice matrices, and three graphs for uninformed and informed search.</li>
+    <li><b>Random</b> makes a new TSP or graph from a size and a seed. The same seed always gives the same problem, so you can share it.</li>
+    <li><b>Edit</b> shows the problem as text you can change (format below) and saves it under <i>My problems</i> in this browser.</li>
+    <li><b>Import</b> accepts a problem as JSON (paste it or choose a file); <b>Export problem</b> gives you that JSON back.</li>
+  </ul>
+  <h3>Choose an algorithm and its settings</h3>
+  <p>Only algorithms that fit the problem type are listed. Settings such as start city, beam width, tabu tenure, temperature or random seed appear below. Changing anything re-runs the algorithm from the start.</p>
+  <h3>Step through</h3>
+  <ul>
+    <li><kbd>←</kbd> <kbd>→</kbd> step back and forward, <kbd>Space</kbd> plays or pauses, <kbd>Home</kbd> / <kbd>End</kbd> jump to the first or last step.</li>
+    <li>The slider scrubs; the speed menu sets seconds per step.</li>
+    <li>The <b>Trace</b> tab lists every step's caption; click one to jump to it.</li>
+  </ul>
+
+  <h2>3. Read the stage</h2>
+  <p>Left: the graph. Right: the working table for this algorithm, with the current row highlighted, and a small chart where one helps (temperature runs, restarts, roulette wheels). Below: the lists, such as OPEN and CLOSED written as node pairs <code>(node, parent, value)</code>. At the bottom, in yellow, one sentence says what just happened.</p>
+  <div class="tbl-plain"><table>
+    <thead><tr><th>you see</th><th>it means</th></tr></thead>
+    <tbody>
+      <tr><td>yellow ring</td><td>the node being expanded or the city the tour is at</td></tr>
+      <tr><td>orange ring</td><td>on OPEN (generated, waiting), or a candidate being considered</td></tr>
+      <tr><td>grey node</td><td>on CLOSED (already expanded)</td></tr>
+      <tr><td>green</td><td>path found, accepted edge, optimum, goal (double ring)</td></tr>
+      <tr><td>red dashes</td><td>an edge being removed or a choice being rejected</td></tr>
+      <tr><td>orange dashes</td><td>candidate edges from the current city</td></tr>
+      <tr><td>blue dashes</td><td>the second parent tour, or an out-and-back trip in the savings heuristic</td></tr>
+      <tr><td>thick orange edges (ACO)</td><td>pheromone: thicker means more</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>4. Problem text formats</h2>
+  <h3>TSP: names, then the matrix</h3>
+<pre>A B C D E
+0 58 92 34 81
+58 0 20 46 70
+92 20 0 28 53
+34 46 28 0 12
+81 70 53 12 0</pre>
+  <p>Use any whitespace or commas. The matrix may be asymmetric; the site tells you when it is.</p>
+  <h3>Graph: start, goal, heuristic, edges</h3>
+<pre>start S
+goal G
+undirected
+h S 7
+h A 5
+# edges: from to cost
+S A 2
+S B 5
+A G 6
+B G 1</pre>
+  <p>Write <code>directed</code> instead of <code>undirected</code> for one-way edges. Lines starting with <code>#</code> are comments. Nodes without a position are placed on a circle.</p>
+
+  <h2>5. Take it away</h2>
+  <ul>
+    <li><b>Printable trace</b>: a self-contained HTML page with a cover (problem, settings, pseudocode) and one step per printed page. Open it in a browser and print, or save as PDF.</li>
+    <li><b>Trace JSON / CSV</b>: every step's caption, table and lists, for notes or spreadsheets.</li>
+    <li><b>Current step as SVG</b>: the graph drawing, for slides.</li>
+  </ul>
+
+  <h2>Conventions used everywhere</h2>
+  <ul>
+    <li>Ties are broken alphabetically unless a setting says otherwise; MoveGen lists neighbours alphabetically.</li>
+    <li>Tours are written in path representation; the edge back to the start is always included in the cost.</li>
+    <li>Graph search is graph search: a node already on OPEN or CLOSED is not added again; UCS and A* update it when they find a cheaper path.</li>
+    <li>The goal test happens when a node is <i>picked</i> from OPEN, as in the course.</li>
+    <li>Random choices use a seeded generator, so a run can always be repeated exactly.</li>
+  </ul>
+</article>

@@ -1,0 +1,99 @@
+<article class="prose">
+  <p class="eyebrow">Contribute</p>
+  <h1>Add an algorithm or an example</h1>
+  <p class="lede">The library is the <code>algorithms/</code> folder. Add a file, run the build, and it appears on the site with its own learn page and studio entry.</p>
+
+  <h2>Project layout</h2>
+<pre>search-studio/
+├── algorithms/          one file per algorithm, grouped by family
+│   ├── _template.js     copy this to start (files starting with _ are skipped)
+│   ├── search/          bfs.js, dfs.js, dfid.js, ucs.js, best-first.js, a-star.js
+│   └── tsp/             nearest-neighbour.js, greedy.js, savings.js, …
+├── examples/            one JSON file per built-in problem
+├── src/
+│   ├── core/            registry, problem model, search engine, TSP helpers
+│   ├── ui/              stage renderer and the app
+│   ├── pages/           home, guide, about, contribute (plain HTML)
+│   └── styles/          studio.css
+├── tools/
+│   ├── build.mjs        scans the folders and builds the site
+│   └── test.mjs         runs every algorithm on every example
+├── index.html           generated: the site, loading files from the folders
+└── dist/search-studio.html   generated: the whole site in one file</pre>
+
+  <h2>Add an algorithm in four steps</h2>
+  <ol>
+    <li>Copy <code>algorithms/_template.js</code> to <code>algorithms/&lt;family&gt;/&lt;name&gt;.js</code>.</li>
+    <li>Fill in the metadata (<code>id</code>, <code>name</code>, <code>family</code>, <code>problem</code>), the <code>learn</code> block and <code>run</code>.</li>
+    <li>Run <code>node tools/build.mjs</code>. The build loads every file, checks that it registers, runs it on the examples, and regenerates <code>index.html</code>, the manifest and the single-file build. Use <code>node tools/build.mjs --watch</code> while you work.</li>
+    <li>Open <code>index.html</code> (or serve the folder with <code>npx serve</code>) and find your algorithm in the library.</li>
+  </ol>
+
+  <h2>The algorithm file</h2>
+<pre>Studio.register({
+  id: "tsp-my-method",            // unique, used in links: #algo-tsp-my-method
+  name: "My method",
+  family: "TSP · local search",   // the library groups by this
+  problem: "tsp",                 // tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment
+  week: 3,                        // course week 1–11: places it on the course map
+  order: 200,                     // position inside the family
+  summary: "One sentence for the library card.",
+  pseudocode: `...`,
+  complexity: "O(n²) per step",
+  learn: {
+    intro: "Plain-language introduction.",
+    definition: "Precise definition.",
+    steps: [["pseudocode line", "what it does and why"]],
+    formulas: [{ f: "formula", read: "in words", why: "why it holds" }],
+    why: "When it works and when it fails.",
+    traps: ["Common mistake"],
+    props: { complete: "no", optimal: "no", time: "…", space: "…" }
+  },
+  params: [
+    { key: "start", label: "Start city", type: "city", default: P => P.ids[0] },
+    { key: "w", label: "Beam width", type: "int", default: 2 },
+    Studio.seedParam(1)
+  ],
+  run(P, params) {
+    // P.ids, P.d(a, b), P.cost(tour) for TSP; P.adj, P.h, P.start, P.goal for graphs
+    return { steps: [ /* one object per snapshot */ ], result: { tour, cost } };
+  }
+});</pre>
+
+  <h3>What a step can contain</h3>
+  <div class="tbl-plain"><table>
+    <thead><tr><th>field</th><th>shape</th><th>shown as</th></tr></thead>
+    <tbody>
+      <tr><td><code>caption</code></td><td>string</td><td>the yellow sentence under the stage (required)</td></tr>
+      <tr><td><code>nodes</code></td><td><code>{ A: { state, badge } }</code></td><td>node colours; states: plain, current, open, closed, visited, path, goal, start</td></tr>
+      <tr><td><code>edges</code></td><td><code>[{ u, v, state, label }]</code></td><td>edges; states: faint, tour, path, candidate, added, removed, rejected, alt, tree, pheromone</td></tr>
+      <tr><td><code>table</code></td><td><code>{ title, columns, rows, rowStates }</code></td><td>the working table; row states: ok, bad, warn, cur, dim</td></tr>
+      <tr><td><code>lists</code></td><td><code>[{ label, items: [{ text, state }] }]</code></td><td>OPEN / CLOSED style rows</td></tr>
+      <tr><td><code>stats</code></td><td><code>[{ label, value, state }]</code></td><td>small figures under the graph</td></tr>
+      <tr><td><code>chart</code></td><td><code>{ kind: "walk" | "drops" | "bars" | "pie", … }</code></td><td>a small chart beside the table</td></tr>
+    </tbody>
+  </table></div>
+  <p>Helpers in <code>src/core</code> do most of the work: <code>Studio.search.run</code> for OPEN/CLOSED searches, <code>Studio.tsp.moveGens</code> for 2-city, 2-edge, Or-opt and 3-edge neighbourhoods, <code>Studio.tspSteps.hillClimb</code> for traced hill climbing, <code>Studio.tsp.crossovers</code> for every crossover, and <code>Studio.rng(seed)</code> for repeatable randomness.</p>
+
+  <h2>Add an example problem</h2>
+  <p>Drop a JSON file into <code>examples/</code> and rebuild. In the studio, <b>Export problem</b> gives you a file in exactly this shape.</p>
+<pre>{ "id": "graph-my-maze", "type": "graph", "name": "My maze",
+  "note": "One line shown under the problem selector.",
+  "nodes": [{ "id": "S", "x": 0, "y": 0, "h": 4 }, …],
+  "edges": [["S", "A", 2], …], "start": "S", "goal": "G", "directed": false }
+
+{ "id": "tsp-my-cities", "type": "tsp", "name": "My cities",
+  "cities": [{ "id": "A", "x": 1, "y": 2 }, …],
+  "matrix": [[0, 12, …], …] }          // optional: without it, 10 × Euclidean distance</pre>
+
+  <h2>Checklist before you share</h2>
+  <ul>
+    <li><code>node tools/test.mjs</code> passes: every step has a caption, edges and nodes exist, tours are permutations with correct costs.</li>
+    <li>Ties are broken the course's way (alphabetically) or a setting says otherwise.</li>
+    <li>The learn block explains every formula you use and at least one trap.</li>
+    <li>Random choices go through <code>Studio.rng(seed)</code> so runs repeat exactly.</li>
+  </ul>
+
+  <h2>Source and license</h2>
+  <p>The code is on <a href="https://github.com/1mystic/search-studio" rel="noopener" target="_blank">GitHub</a>, with a <code>CONTRIBUTING.md</code> that repeats this page. Everything is released into the public domain under <a href="https://unlicense.org/" rel="noopener" target="_blank">the Unlicense</a>: copy, change, teach with or sell it, no attribution needed. By contributing you release your work the same way.</p>
+</article>

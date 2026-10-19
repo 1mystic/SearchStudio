@@ -1,0 +1,54 @@
+{
+ "id": "csp-chain",
+ "type": "csp",
+ "name": "Ordering chain X < Y < Z",
+ "note": "Arc consistency alone pins every variable down.",
+ "variables": [
+  {
+   "id": "X",
+   "domain": [
+    1,
+    2,
+    3
+   ],
+   "x": 0,
+   "y": 0
+  },
+  {
+   "id": "Y",
+   "domain": [
+    1,
+    2,
+    3
+   ],
+   "x": 1,
+   "y": 0.4
+  },
+  {
+   "id": "Z",
+   "domain": [
+    1,
+    2,
+    3
+   ],
+   "x": 2,
+   "y": 0
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "X",
+    "Y"
+   ],
+   "rel": "lt"
+  },
+  {
+   "scope": [
+    "Y",
+    "Z"
+   ],
+   "rel": "lt"
+  }
+ ]
+}

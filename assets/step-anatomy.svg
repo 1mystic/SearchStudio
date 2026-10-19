@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 260" width="1000" height="260" role="img" aria-label="Anatomy of one step: algorithm run returns steps, each drawn as graph, table and OPEN/CLOSED rows">
+  <style>
+    .box{fill:#181818;stroke:#46443f;stroke-width:1.5}
+    .h{font-family:Georgia,serif;font-size:18px;fill:#edebe6}
+    .s{font-family:"JetBrains Mono",Consolas,monospace;font-size:12px;fill:#a8a49b}
+    .y{fill:#f2cd4b}.o{fill:#f0a23b}.g{fill:#7fcb6a}
+    .blink{animation:b 2.4s infinite}
+    @keyframes b{0%,100%{opacity:.35}50%{opacity:1}}
+    @media (prefers-reduced-motion:reduce){.blink{animation:none}}
+  </style>
+  <rect width="1000" height="260" fill="#121212"/>
+  <rect class="box" x="24" y="24" width="300" height="212" rx="10"/>
+  <text class="h" x="42" y="56">run(P, params)</text>
+  <text class="s" x="42" y="86">steps.push({</text>
+  <text class="s" x="58" y="108"><tspan class="y">caption</tspan>: "Expand A …",</text>
+  <text class="s" x="58" y="130"><tspan class="o">nodes</tspan>: { A: {state:"current"} },</text>
+  <text class="s" x="58" y="152"><tspan class="g">edges</tspan>: [{u,v,state:"path"}],</text>
+  <text class="s" x="58" y="174">table, lists, stats</text>
+  <text class="s" x="42" y="196">})</text>
+  <text class="s blink" x="42" y="222">↻ one entry per decision</text>
+  <path d="M330,130 L380,130" stroke="#f0a23b" stroke-width="2.4" marker-end="url(#m)"/>
+  <defs><marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#f0a23b"/></marker></defs>
+  <rect class="box" x="390" y="24" width="586" height="212" rx="10"/>
+  <text class="h" x="608" y="54" text-anchor="middle">Expand A: add C, D to OPEN</text>
+  <g stroke="#5a5853" stroke-width="2"><line x1="430" y1="110" x2="520" y2="90"/><line x1="430" y1="110" x2="470" y2="180"/><line x1="520" y1="90" x2="600" y2="110"/></g>
+  <line x1="520" y1="90" x2="560" y2="180" stroke="#7fcb6a" stroke-width="4.5"/>
+  <circle cx="430" cy="110" r="16" fill="#3a3d43" stroke="#6f6c66" stroke-width="2.5"/><text x="430" y="116" class="h" text-anchor="middle" font-size="15">S</text>
+  <circle class="blink" cx="520" cy="90" r="20" fill="none" stroke="#f2cd4b" stroke-width="3"/>
+  <circle cx="520" cy="90" r="16" fill="#4a3418" stroke="#f2cd4b" stroke-width="3.5"/><text x="520" y="96" class="h" text-anchor="middle" font-size="15">A</text>
+  <circle cx="470" cy="180" r="16" fill="#3a3d43" stroke="#6f6c66" stroke-width="2.5"/><text x="470" y="186" class="h" text-anchor="middle" font-size="15">B</text>
+  <circle cx="600" cy="110" r="16" fill="#4a3418" stroke="#f0a23b" stroke-width="3"/><text x="600" y="116" class="h" text-anchor="middle" font-size="15">C</text>
+  <circle cx="560" cy="180" r="16" fill="#4a3418" stroke="#f0a23b" stroke-width="3"/><text x="560" y="186" class="h" text-anchor="middle" font-size="15">D</text>
+  <text class="s y" x="538" y="70">1</text><text class="s y" x="616" y="92">2</text><text class="s y" x="576" y="162">2</text>
+  <text class="s" x="660" y="96" font-style="italic">#  expand  added</text>
+  <text class="s" x="660" y="118">1  S       A,B</text>
+  <rect x="654" y="126" width="300" height="20" fill="#f2cd4b" opacity=".14"/>
+  <text class="s" x="660" y="141" style="fill:#edebe6">2  A       C,D</text>
+  <text class="s" x="440" y="214"><tspan font-style="italic">OPEN</tspan>    <tspan class="o">(B,S,1) (C,A,2) (D,A,2)</tspan></text>
+  <text class="s" x="440" y="232"><tspan font-style="italic">CLOSED</tspan>  (A,S,1) (S,nil,0)</text>
+</svg>

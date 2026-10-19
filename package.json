@@ -1,0 +1,16 @@
+{
+  "name": "search-studio",
+  "version": "1.0.0",
+  "private": true,
+  "homepage": "https://1mystic.github.io/search-studio/",
+  "author": "1mystic (https://github.com/1mystic)",
+  "repository": "github:1mystic/search-studio",
+  "description": "Step-by-step visual traces of search and TSP algorithms (AI: Search Methods for Problem Solving notation).",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "watch": "node tools/build.mjs --watch",
+    "test": "node tools/test.mjs",
+    "serve": "npx --yes serve ."
+  },
+  "license": "Unlicense"
+}

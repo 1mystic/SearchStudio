@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tabu search — step by step · Search Studio</title>
+<meta name="description" content="Tabu search always moves, even downhill, to escape local optima. To avoid simply stepping back to where it came from, it keeps a short-term memory of recent moves that are forbidden (tabu) for a few iterations.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/tsp-tabu.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Tabu search — step by step · Search Studio"><meta property="og:description" content="Tabu search always moves, even downhill, to escape local optima. To avoid simply stepping back to where it came from, it keeps a short-term memory of recent moves that are forbidden (tabu) for a few iterations."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/tsp-tabu.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Tabu search","description":"Tabu search always moves, even downhill, to escape local optima. To avoid simply stepping back to where it came from, it keeps a short-term memory of recent moves that are forbidden (tabu) for a few iterations.","url":"https://1mystic.github.io/search-studio/learn/tsp-tabu.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Tabu search","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/tsp/tabu-search.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · TSP · local search</p><h1>Tabu search</h1></div><a class="btn primary" href="../#try-tsp-tabu">Run it step by step</a></div>
+<p class="intro">Tabu search always moves, even downhill, to escape local optima. To avoid simply stepping back to where it came from, it keeps a short-term memory of recent moves that are forbidden (tabu) for a few iterations.</p>
+<h2><small>01</small>Definition</h2><p>At each iteration, move to the best neighbour whose move is not tabu. Mark that move tabu for tt iterations (the tenure). A tabu move is allowed anyway if it gives a tour better than any seen (aspiration). Return the best tour seen.</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start;  bestSeen ← N
+repeat for k iterations
+    candidates ← MoveGen(N), best first
+    pick the first candidate that is not tabu,
+         or is tabu but better than bestSeen (aspiration)
+    make its key tabu for tt iterations
+    N ← candidate;  if N better than bestSeen: bestSeen ← N
+return bestSeen</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← start;  bestSeen ← N</td><td></td></tr><tr><td>candidates ← MoveGen(N), best first</td><td></td></tr><tr><td>first candidate that is not tabu (or beats bestSeen)</td><td>This can be worse than N: that is how tabu escapes local optima.</td></tr><tr><td>make its key tabu for tt iterations</td><td>Here the key is the swapped pair of cities.</td></tr><tr><td>N ← candidate; update bestSeen</td><td>Return bestSeen at the end.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">tabu(m) ⇔ t &lt; expiry(m),  expiry(m) = t(used) + tt</div><p class="read">a move stays forbidden for tt iterations</p><p class="why">Short tenure risks cycling; long tenure can block good moves.</p></div><div class="formula"><div class="f">aspiration: allow m if cost(m(N)) &lt; cost(bestSeen)</div><p class="read">a forbidden move is fine if it finds a new best</p><p class="why">Tabu exists to stop cycling, not to block real improvements.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Memory turns a greedy walk into a systematic one. On small instances a short tenure leads to cycles; a frequency memory (prefer rarely-used moves) further diversifies the search.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>iterations × |N|</div><div class="prop"><span>space</span>O(tt)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Tabu takes the best non-tabu move even if it is worse than the current tour.</li><li>Apply aspiration before rejecting a tabu move.</li><li>Return bestSeen, not the final current tour.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-beam.html"><span>← Previous</span><b>Beam search</b></a><a class="pg next" href="tsp-ihc.html"><span>Next →</span><b>Iterated hill climbing</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

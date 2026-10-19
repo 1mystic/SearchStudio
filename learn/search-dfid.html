@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Depth First Iterative Deepening — step by step · Search Studio</title>
+<meta name="description" content="Depth First Iterative Deepening runs DFS with a depth limit of 0, then 1, then 2, … It finds the same shallow path as BFS while using only DFS's memory.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/search-dfid.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Depth First Iterative Deepening — step by step · Search Studio"><meta property="og:description" content="Depth First Iterative Deepening runs DFS with a depth limit of 0, then 1, then 2, … It finds the same shallow path as BFS while using only DFS's memory."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/search-dfid.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Depth First Iterative Deepening","description":"Depth First Iterative Deepening runs DFS with a depth limit of 0, then 1, then 2, … It finds the same shallow path as BFS while using only DFS's memory.","url":"https://1mystic.github.io/search-studio/learn/search-dfid.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Depth First Iterative Deepening","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/dfid.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 2 · Graph search · uninformed</p><h1>Depth First Iterative Deepening</h1></div><a class="btn primary" href="../#try-search-dfid">Run it step by step</a></div>
+<p class="intro">Depth First Iterative Deepening runs DFS with a depth limit of 0, then 1, then 2, … It finds the same shallow path as BFS while using only DFS's memory.</p>
+<h2><small>01</small>Definition</h2><p>Repeat depth-bounded DFS (DB-DFS) with an increasing bound until the goal is found. DB-DFS does not expand nodes at depth equal to the bound.</p>
+<h2><small>02</small>Pseudocode</h2><pre>for bound ← 0, 1, 2, …
+    result ← DB-DFS(S, bound)      # DFS that does not expand nodes at depth = bound
+    if result ≠ failure: return result
+    if no node was cut off by the bound: return failure</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>for bound ← 0, 1, 2, …</td><td></td></tr><tr><td>DB-DFS(S, bound)</td><td>A full DFS that stops descending at the bound.</td></tr><tr><td>if found: return</td><td>The first bound that works is the shallowest goal depth.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">N(DFID) ≈ N(BFS) · b/(b−1)</div><p class="read">extra work is a small factor of BFS</p><p class="why">Most nodes of a tree are on the last level, so repeating the upper levels is cheap.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Combines BFS's optimal depth with DFS's small memory; the repeated work is small for branching factors above 2.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes for unit costs</div><div class="prop"><span>time</span>O(b^d)</div><div class="prop"><span>space</span>O(b·d)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Count expansions over all rounds, not just the last.</li><li>With CLOSED checking, DB-DFS can miss a shallower route to a node seen earlier via a deeper path.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-dfs.html"><span>← Previous</span><b>Depth First Search</b></a><a class="pg next" href="tsp-brute-force.html"><span>Next →</span><b>Brute force (exact)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

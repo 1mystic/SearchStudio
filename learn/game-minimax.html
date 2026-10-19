@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Minimax — step by step · Search Studio</title>
+<meta name="description" content="In a two-player game one player (MAX) wants a high score and the other (MIN) a low one. Minimax looks ahead to the end of the tree and assumes both play perfectly: MAX picks the child with the largest value, MIN the smallest.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/game-minimax.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Minimax — step by step · Search Studio"><meta property="og:description" content="In a two-player game one player (MAX) wants a high score and the other (MIN) a low one. Minimax looks ahead to the end of the tree and assumes both play perfectly: MAX picks the child with the largest value, MIN the smallest."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/game-minimax.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Minimax","description":"In a two-player game one player (MAX) wants a high score and the other (MIN) a low one. Minimax looks ahead to the end of the tree and assumes both play perfectly: MAX picks the child with the largest value, MIN the smallest.","url":"https://1mystic.github.io/search-studio/learn/game-minimax.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Minimax","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/games/minimax.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 7 · Game playing</p><h1>Minimax</h1></div><a class="btn primary" href="../#try-game-minimax">Run it step by step</a></div>
+<p class="intro">In a two-player game one player (MAX) wants a high score and the other (MIN) a low one. Minimax looks ahead to the end of the tree and assumes both play perfectly: MAX picks the child with the largest value, MIN the smallest.</p>
+<h2><small>01</small>Definition</h2><p>Evaluate leaves with the evaluation function e. Back values up the tree: a MAX node's value is the maximum of its children, a MIN node's value is the minimum. The root's value is the guaranteed outcome.</p>
+<h2><small>02</small>Pseudocode</h2><pre>Minimax(N):
+    if N is a leaf: return e(N)
+    if N is MAX: return max over children C of Minimax(C)
+    if N is MIN: return min over children C of Minimax(C)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>leaf: return e(N)</td><td>The static evaluation from MAX's point of view.</td></tr><tr><td>MAX node: max of children</td><td>MAX chooses the move that is best for MAX.</td></tr><tr><td>MIN node: min of children</td><td>MIN chooses the move that is worst for MAX.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">v(N) = max over C of v(C) at MAX,  min over C of v(C) at MIN</div><p class="read">back up the best reply at every level</p><p class="why">Assuming the opponent replies optimally, this is the best value MAX can guarantee.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Correct but exhaustive: it evaluates every leaf, b^d of them.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes (finite tree)</div><div class="prop"><span>optimal</span>yes against an optimal opponent</div><div class="prop"><span>time</span>O(b^d)</div><div class="prop"><span>space</span>O(b·d)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Values are always from MAX's point of view.</li><li>Evaluate left to right; the order matters for alpha-beta, not for minimax.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-dcfs.html"><span>← Previous</span><b>Divide &amp; Conquer Frontier Search</b></a><a class="pg next" href="game-alpha-beta.html"><span>Next →</span><b>Alpha-Beta pruning</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

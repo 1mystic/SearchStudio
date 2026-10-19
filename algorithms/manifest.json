@@ -1,0 +1,517 @@
+{
+ "generated": "2026-10-19T08:30:03.063Z",
+ "algorithms": [
+  {
+   "id": "csp-backtracking",
+   "name": "Backtracking",
+   "family": "Constraint processing",
+   "problem": "csp",
+   "file": "algorithms/csp/backtracking.js",
+   "summary": "Assign variables one at a time in a fixed order, trying values in order. If a value conflicts with an earlier assignment try the next; if none is left, go back to the previous variable (chronological backtracking)."
+  },
+  {
+   "id": "csp-forward-checking",
+   "name": "Forward checking",
+   "family": "Constraint processing",
+   "problem": "csp",
+   "file": "algorithms/csp/forward-checking.js",
+   "summary": "Combine search and reasoning: after assigning a variable, delete the values of its future neighbours that conflict with it. If some future domain becomes empty, backtrack at once instead of discovering the failure later."
+  },
+  {
+   "id": "csp-ac3",
+   "name": "Arc consistency (AC-1, AC-3)",
+   "family": "Constraint processing",
+   "problem": "csp",
+   "file": "algorithms/csp/arc-consistency.js",
+   "summary": "Delete every value that has no supporting value in a neighbouring variable. Revise(X, Y) removes unsupported values of X with respect to Y. AC-1 sweeps all arcs until nothing changes; AC-3 keeps a queue and re-examines only the arcs into a variable whose domain shrank."
+  },
+  {
+   "id": "csp-waltz",
+   "name": "Waltz algorithm",
+   "family": "Constraint processing",
+   "problem": "linedrawing",
+   "file": "algorithms/csp/waltz.js",
+   "summary": "Interpret a line drawing of a polyhedral scene. Each junction starts with every labelling its type allows (L, fork, arrow, T); a labelling survives only if each of its lines can get the same label from the junction at the other end. Propagate with an AC-3 style queue."
+  },
+  {
+   "id": "csp-diagnosis",
+   "name": "Model-based diagnosis",
+   "family": "Constraint processing",
+   "problem": "circuit",
+   "file": "algorithms/csp/model-based-diagnosis.js",
+   "summary": "Assume components work as their models say and propagate values through the circuit. A contradiction with an observation implicates the components whose models were used: a conflict set. A diagnosis is a minimal set of components that hits every conflict."
+  },
+  {
+   "id": "game-minimax",
+   "name": "Minimax",
+   "family": "Game playing",
+   "problem": "game",
+   "file": "algorithms/games/minimax.js",
+   "summary": "Evaluate the game tree depth-first from left to right: a MAX node takes the largest child value, a MIN node the smallest. The root's value is the outcome with best play from both sides."
+  },
+  {
+   "id": "game-alpha-beta",
+   "name": "Alpha-Beta pruning",
+   "family": "Game playing",
+   "problem": "game",
+   "file": "algorithms/games/alpha-beta.js",
+   "summary": "Carry a window (α, β): α is the best value MAX can already guarantee, β the best MIN can guarantee. When α ≥ β at a node, the remaining children cannot matter and are pruned."
+  },
+  {
+   "id": "game-sss-star",
+   "name": "SSS*",
+   "family": "Game playing",
+   "problem": "game",
+   "file": "algorithms/games/sss-star.js",
+   "summary": "A best-first algorithm for game trees. OPEN holds triples (node, LIVE or SOLVED, merit h). It refines the most promising strategy first and never evaluates a leaf that Alpha-Beta would prune; it can skip leaves Alpha-Beta evaluates."
+  },
+  {
+   "id": "search-best-first",
+   "name": "Best First Search",
+   "family": "Graph search · informed",
+   "problem": "graph",
+   "file": "algorithms/search/best-first.js",
+   "summary": "OPEN is a priority queue on h(N), the heuristic estimate of distance to the goal. Fast when h is good, not optimal."
+  },
+  {
+   "id": "search-hill-climbing",
+   "name": "Hill Climbing",
+   "family": "Graph search · informed",
+   "problem": "graph",
+   "file": "algorithms/search/hill-climbing.js",
+   "summary": "Move to the best-looking neighbour (lowest h) as long as it improves on the current node. Constant memory, but it stops at the first local optimum, which need not be the goal."
+  },
+  {
+   "id": "search-beam",
+   "name": "Beam Search",
+   "family": "Graph search · informed",
+   "problem": "graph",
+   "file": "algorithms/search/beam-search.js",
+   "summary": "Generate the children of every node in the beam and keep only the w best by h. Memory is bounded by w; a narrow beam can discard the only way to the goal."
+  },
+  {
+   "id": "search-ucs",
+   "name": "Uniform Cost Search",
+   "family": "Graph search · optimal",
+   "problem": "graph",
+   "file": "algorithms/search/ucs.js",
+   "summary": "OPEN is a priority queue on g(N), the cost so far. A cheaper path to a node on OPEN or CLOSED updates its parent. Optimal for non-negative costs."
+  },
+  {
+   "id": "search-astar",
+   "name": "A*",
+   "family": "Graph search · optimal",
+   "problem": "graph",
+   "file": "algorithms/search/a-star.js",
+   "summary": "OPEN is a priority queue on f(N) = g(N) + w·h(N). With w = 1 and an admissible h (h ≤ h*) the first goal picked is optimal. w > 1 is weighted A*: faster, not guaranteed optimal."
+  },
+  {
+   "id": "search-monotone-check",
+   "name": "Admissibility & monotone check",
+   "family": "Graph search · optimal",
+   "problem": "graph",
+   "file": "algorithms/search/monotone-check.js",
+   "summary": "Compute the true remaining cost h* by a backward Dijkstra from the goal, then test every node for admissibility (h ≤ h*) and every edge for the monotone condition h(m) ≤ k(m,n) + h(n)."
+  },
+  {
+   "id": "search-ida-star",
+   "name": "IDA*",
+   "family": "Graph search · space saving",
+   "problem": "graph",
+   "file": "algorithms/search/ida-star.js",
+   "summary": "Depth-first search that never expands a node with f = g + h above a bound. Start with bound f(S); after a failed pass, raise the bound to the smallest f that was cut off. Optimal with admissible h, memory linear in depth."
+  },
+  {
+   "id": "search-rbfs",
+   "name": "Recursive Best-First Search",
+   "family": "Graph search · space saving",
+   "problem": "graph",
+   "file": "algorithms/search/rbfs.js",
+   "summary": "Explore the best child while its f stays below the best alternative elsewhere; when it exceeds that limit, back up its f value and switch. Keeps only the current path and its siblings."
+  },
+  {
+   "id": "search-dcfs",
+   "name": "Divide & Conquer Frontier Search",
+   "family": "Graph search · space saving",
+   "problem": "graph",
+   "file": "algorithms/search/dcfs.js",
+   "summary": "Frontier search drops CLOSED: each OPEN node remembers which neighbours already used an edge to it, so expanded nodes are never regenerated. A relay node halfway along each path lets the path be rebuilt by two smaller searches."
+  },
+  {
+   "id": "search-bfs",
+   "name": "Breadth First Search",
+   "family": "Graph search · uninformed",
+   "problem": "graph",
+   "file": "algorithms/search/bfs.js",
+   "summary": "OPEN is a queue: new children are appended, so the shallowest node is expanded first. Finds a path with the fewest edges."
+  },
+  {
+   "id": "search-dfs",
+   "name": "Depth First Search",
+   "family": "Graph search · uninformed",
+   "problem": "graph",
+   "file": "algorithms/search/dfs.js",
+   "summary": "OPEN is a stack: new children are prepended, so the deepest node is expanded first. Little memory, no optimality."
+  },
+  {
+   "id": "search-dfid",
+   "name": "Depth First Iterative Deepening",
+   "family": "Graph search · uninformed",
+   "problem": "graph",
+   "file": "algorithms/search/dfid.js",
+   "summary": "Run depth-bounded DFS with bound 0, 1, 2, … until the goal is found. The path of BFS with the memory of DFS, at the price of repeated work."
+  },
+  {
+   "id": "plan-forward",
+   "name": "Forward state-space planning",
+   "family": "Planning",
+   "problem": "planning",
+   "file": "algorithms/planning/forward-state-space.js",
+   "summary": "Search forward from the initial state: every applicable operator gives a successor state. Breadth-first search returns a shortest plan, but the branching factor is the number of applicable actions."
+  },
+  {
+   "id": "plan-backward",
+   "name": "Backward state-space planning",
+   "family": "Planning",
+   "problem": "planning",
+   "file": "algorithms/planning/backward-state-space.js",
+   "summary": "Search backwards from the goal. An operator is relevant if it adds a goal and deletes none; regressing the goal set G through it gives (G − add) ∪ pre. Stop when the initial state satisfies the current goal set."
+  },
+  {
+   "id": "plan-gsp",
+   "name": "Goal Stack Planning",
+   "family": "Planning",
+   "problem": "planning",
+   "file": "algorithms/planning/goal-stack-planning.js",
+   "summary": "Keep a stack of goals and actions. Pop satisfied goals; replace an unsatisfied goal by an action that achieves it plus that action's preconditions; when an action reaches the top its preconditions hold, so apply it. Goals are solved one at a time, which is why the Sussman anomaly makes it undo its own work."
+  },
+  {
+   "id": "plan-pop",
+   "name": "Partial Order Planning",
+   "family": "Planning",
+   "problem": "planning",
+   "file": "algorithms/planning/partial-order-planning.js",
+   "summary": "Search in the space of partial plans. Start with steps Start (effects = initial state) and Finish (preconditions = goal). Repeatedly pick an open precondition, support it with an existing or a new step via a causal link, and resolve threats by promotion or demotion. Backtrack when stuck."
+  },
+  {
+   "id": "andor-ao-star",
+   "name": "AO*",
+   "family": "Problem decomposition",
+   "problem": "andor",
+   "file": "algorithms/andor/ao-star.js",
+   "summary": "Follow the marked (currently best) connectors from the start to an unexpanded node, expand it, then revise costs upwards: each node's cost is its cheapest connector, an AND connector costs the sum over its children. A node is solved when all children of its marked connector are solved."
+  },
+  {
+   "id": "rules-forward-chaining",
+   "name": "Forward chaining",
+   "family": "Rule-based systems",
+   "problem": "rules",
+   "file": "algorithms/rules/forward-chaining.js",
+   "summary": "Repeat the recognise–act cycle: match every rule against working memory to build the conflict set, choose one instantiation by a conflict-resolution strategy, fire it (add or remove facts), until no new instantiation remains."
+  },
+  {
+   "id": "rules-rete",
+   "name": "Rete algorithm",
+   "family": "Rule-based systems",
+   "problem": "rules",
+   "file": "algorithms/rules/rete.js",
+   "summary": "Compile the conditions into a network. Alpha nodes test one pattern and remember the facts that pass; beta (join) nodes combine partial matches with consistent variable bindings; terminal nodes feed the conflict set. A new fact only travels the paths it affects, so nothing is re-matched."
+  },
+  {
+   "id": "align-dp",
+   "name": "Sequence alignment (dynamic programming)",
+   "family": "Sequence alignment",
+   "problem": "alignment",
+   "file": "algorithms/alignment/dynamic-programming.js",
+   "summary": "Fill a table D(i,j) = cheapest alignment of the first i letters of a with the first j letters of b, one row at a time, then trace back the optimal path through the lattice."
+  },
+  {
+   "id": "align-astar",
+   "name": "Sequence alignment (A*)",
+   "family": "Sequence alignment",
+   "problem": "alignment",
+   "file": "algorithms/alignment/a-star-alignment.js",
+   "summary": "Treat each lattice point (i,j) as a state and search from (0,0) to (m,n) with A*. h(i,j) = gap × |(m−i) − (n−j)| never overestimates, because that many gaps are unavoidable."
+  },
+  {
+   "id": "tsp-nearest-neighbour",
+   "name": "Nearest Neighbour",
+   "family": "TSP · constructive",
+   "problem": "tsp",
+   "file": "algorithms/tsp/nearest-neighbour.js",
+   "summary": "Grow one path from a start city, always moving to the closest unvisited city; return home at the end."
+  },
+  {
+   "id": "tsp-greedy",
+   "name": "Greedy heuristic",
+   "family": "TSP · constructive",
+   "problem": "tsp",
+   "file": "algorithms/tsp/greedy.js",
+   "summary": "Scan edges shortest first; accept an edge unless a city would get degree 3 or a cycle shorter than n would close."
+  },
+  {
+   "id": "tsp-savings",
+   "name": "Savings heuristic",
+   "family": "TSP · constructive",
+   "problem": "tsp",
+   "file": "algorithms/tsp/savings.js",
+   "summary": "Start with an out-and-back trip from the base to every city, then merge trips in decreasing order of savings S(i,j) = C(base,i) + C(base,j) − C(i,j)."
+  },
+  {
+   "id": "tsp-brute-force",
+   "name": "Brute force (exact)",
+   "family": "TSP · exact",
+   "problem": "tsp",
+   "file": "algorithms/tsp/brute-force.js",
+   "summary": "Fix the first city and try every ordering of the rest; for a symmetric TSP each tour appears twice, so (n−1)!/2 distinct tours."
+  },
+  {
+   "id": "tsp-ga",
+   "name": "Genetic algorithm",
+   "family": "TSP · genetic",
+   "problem": "tsp",
+   "file": "algorithms/tsp/genetic-algorithm.js",
+   "summary": "Population of tours. Roulette-wheel selection (fitness = K / cost), pairwise crossover, swap mutation, then the weakest members are replaced by the strongest offspring."
+  },
+  {
+   "id": "tsp-crossover-lab",
+   "name": "Crossover lab",
+   "family": "TSP · genetic",
+   "problem": "tsp",
+   "file": "algorithms/tsp/crossover-lab.js",
+   "summary": "Apply one TSP crossover to two parents: cycle, PMX, order (path representation), alternating edges and heuristic (adjacency), ordinal + single-point, or naive single-point to see why it fails."
+  },
+  {
+   "id": "tsp-vnd",
+   "name": "Variable neighbourhood descent",
+   "family": "TSP · local search",
+   "problem": "tsp",
+   "file": "algorithms/tsp/vnd.js",
+   "summary": "Hill climb with a sparse neighbourhood, then continue from its local optimum with denser ones. A local optimum of one MoveGen need not be one of the next."
+  },
+  {
+   "id": "tsp-beam",
+   "name": "Beam search",
+   "family": "TSP · local search",
+   "problem": "tsp",
+   "file": "algorithms/tsp/beam-search.js",
+   "summary": "Keep the w best neighbours of all beam members at every level; stop when the best of the level is no better than the best so far. w = 1 is hill climbing."
+  },
+  {
+   "id": "tsp-tabu",
+   "name": "Tabu search",
+   "family": "TSP · local search",
+   "problem": "tsp",
+   "file": "algorithms/tsp/tabu-search.js",
+   "summary": "Always move to the best neighbour that is not tabu, even if it is worse. A move's key (the swapped pair / removed edges) stays tabu for tt iterations; aspiration allows a tabu move that beats bestSeen."
+  },
+  {
+   "id": "tsp-ihc",
+   "name": "Iterated hill climbing",
+   "family": "TSP · local search",
+   "problem": "tsp",
+   "file": "algorithms/tsp/iterated-hill-climbing.js",
+   "summary": "Repeat: random start tour, steepest-descent hill climbing to a local optimum. Return the best local optimum found."
+  },
+  {
+   "id": "tsp-random-walk",
+   "name": "Random walk",
+   "family": "TSP · local search",
+   "problem": "tsp",
+   "file": "algorithms/tsp/random-walk.js",
+   "summary": "Pure exploration: ignore the evaluation function and step to a random neighbour each time, remembering the best tour seen."
+  },
+  {
+   "id": "tsp-sa",
+   "name": "Simulated annealing",
+   "family": "TSP · local search",
+   "problem": "tsp",
+   "file": "algorithms/tsp/simulated-annealing.js",
+   "summary": "Pick a random neighbour and move to it with probability P = 1/(1 + e^(−ΔE/T)), ΔE = cost(current) − cost(next). T falls geometrically: high T ≈ coin flip, T → 0 ≈ hill climbing."
+  },
+  {
+   "id": "tsp-two-city-exchange",
+   "name": "2-city exchange",
+   "family": "TSP · perturbation",
+   "problem": "tsp",
+   "file": "algorithms/tsp/two-city-exchange.js",
+   "summary": "Swap the positions of any two cities: n(n−1)/2 neighbours. Steepest-descent hill climbing until no swap helps."
+  },
+  {
+   "id": "tsp-two-edge-exchange",
+   "name": "2-edge exchange (2-opt)",
+   "family": "TSP · perturbation",
+   "problem": "tsp",
+   "file": "algorithms/tsp/two-edge-exchange.js",
+   "summary": "Remove two non-adjacent edges and reconnect the other way, which reverses the block between them: n(n−3)/2 neighbours."
+  },
+  {
+   "id": "tsp-or-opt",
+   "name": "Or-opt (move a city)",
+   "family": "TSP · perturbation",
+   "problem": "tsp",
+   "file": "algorithms/tsp/or-opt.js",
+   "summary": "Take one city out and insert it between two other neighbours: a special 3-edge exchange."
+  },
+  {
+   "id": "tsp-three-edge-exchange",
+   "name": "3-edge exchange",
+   "family": "TSP · perturbation",
+   "problem": "tsp",
+   "file": "algorithms/tsp/three-edge-exchange.js",
+   "summary": "Remove three edges and reconnect the three segments in a new way (pure 3-opt moves)."
+  },
+  {
+   "id": "tsp-aco",
+   "name": "Ant colony optimisation",
+   "family": "TSP · swarm",
+   "problem": "tsp",
+   "file": "algorithms/tsp/ant-colony.js",
+   "summary": "Each ant builds a tour city by city with P(i→j) ∝ τ^α (1/d)^β over unvisited cities. Then pheromone evaporates, τ ← (1−ρ)τ, and every ant deposits Q/L on the edges of its tour."
+  }
+ ],
+ "examples": [
+  {
+   "id": "align-gattaca",
+   "name": "GATTACA vs GCATGCU (edit distance)",
+   "type": "alignment"
+  },
+  {
+   "id": "align-short",
+   "name": "ACGTC vs AGTC, gap 2, mismatch 3",
+   "type": "alignment"
+  },
+  {
+   "id": "andor-revision",
+   "name": "AND–OR graph with a change of mind",
+   "type": "andor"
+  },
+  {
+   "id": "circuit-polybox",
+   "name": "Polybox (three multipliers, two adders)",
+   "type": "circuit"
+  },
+  {
+   "id": "csp-australia",
+   "name": "Map colouring: Australia",
+   "type": "csp"
+  },
+  {
+   "id": "csp-chain",
+   "name": "Ordering chain X < Y < Z",
+   "type": "csp"
+  },
+  {
+   "id": "game-four-ply",
+   "name": "Four-ply binary tree",
+   "type": "game"
+  },
+  {
+   "id": "game-three-ply",
+   "name": "Two-ply tree (3 × 3)",
+   "type": "game"
+  },
+  {
+   "id": "graph-g1",
+   "name": "G1: dry-run graph",
+   "type": "graph"
+  },
+  {
+   "id": "graph-inadmissible",
+   "name": "Same graph, inadmissible h(B) = 12",
+   "type": "graph"
+  },
+  {
+   "id": "graph-weighted",
+   "name": "Weighted graph for UCS and A*",
+   "type": "graph"
+  },
+  {
+   "id": "plan-reverse",
+   "name": "Reverse a tower of three",
+   "type": "planning"
+  },
+  {
+   "id": "plan-sussman",
+   "name": "Sussman anomaly",
+   "type": "planning"
+  },
+  {
+   "id": "rules-animals",
+   "name": "Animal identification",
+   "type": "rules"
+  },
+  {
+   "id": "rules-family",
+   "name": "Family relations",
+   "type": "rules"
+  },
+  {
+   "id": "tsp-pyq-five-a",
+   "name": "Five cities, practice set A",
+   "type": "tsp"
+  },
+  {
+   "id": "tsp-pyq-five-b",
+   "name": "Five cities, practice set B",
+   "type": "tsp"
+  },
+  {
+   "id": "tsp-six-cities",
+   "name": "Six cities (TSP Search Atlas)",
+   "type": "tsp"
+  },
+  {
+   "id": "waltz-cube-free",
+   "name": "Cube, boundary not fixed",
+   "type": "linedrawing"
+  },
+  {
+   "id": "waltz-cube",
+   "name": "Cube",
+   "type": "linedrawing"
+  }
+ ],
+ "problemTypes": [
+  {
+   "type": "tsp",
+   "label": "TSP"
+  },
+  {
+   "type": "graph",
+   "label": "graph"
+  },
+  {
+   "type": "alignment",
+   "label": "sequence alignment"
+  },
+  {
+   "type": "andor",
+   "label": "AND–OR graph"
+  },
+  {
+   "type": "circuit",
+   "label": "circuit"
+  },
+  {
+   "type": "csp",
+   "label": "constraint problem"
+  },
+  {
+   "type": "game",
+   "label": "game tree"
+  },
+  {
+   "type": "linedrawing",
+   "label": "line drawing"
+  },
+  {
+   "type": "planning",
+   "label": "planning (blocks world)"
+  },
+  {
+   "type": "rules",
+   "label": "rule base"
+  }
+ ]
+}

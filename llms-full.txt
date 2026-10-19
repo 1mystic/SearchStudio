@@ -1,0 +1,1370 @@
+# Search Studio — full explanations
+
+## Breadth First Search (week 2, Graph search · uninformed)
+
+URL: https://1mystic.github.io/search-studio/learn/search-bfs.html
+
+Breadth First Search explores in rings: first everything one step from the start, then two steps, and so on. It finds the path with the fewest edges.
+
+Definition: A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. BFS treats OPEN as a queue: new children go to the back.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, 0)];  CLOSED ← [ ]
+while OPEN not empty
+    (N, parent, d) ← head(OPEN);  remove it
+    if GoalTest(N): return the path via parent pointers
+    CLOSED ← (N, parent, d) : CLOSED
+    children ← MoveGen(N) minus nodes on OPEN or CLOSED
+    OPEN ← OPEN ++ [(C, N, d+1) for C in children]     # append = queue
+return failure
+```
+
+- nodes ≈ b^d: branching factor to the power of the goal depth. BFS must hold an entire level of the tree in OPEN: memory, not time, is its bottleneck.
+
+Complete on finite graphs and optimal when every edge costs the same. Uses a lot of memory.
+
+Complete: yes. Optimal: yes for unit costs. Time: O(b^d). Space: O(b^d).
+
+- Trap: Optimal in number of edges, not in total cost when edge costs differ.
+- Trap: Children are added in MoveGen order (alphabetical here).
+
+## Depth First Search (week 2, Graph search · uninformed)
+
+URL: https://1mystic.github.io/search-studio/learn/search-dfs.html
+
+Depth First Search goes as deep as possible along one path before backing up. It needs little memory but can wander far from a nearby goal.
+
+Definition: A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. DFS treats OPEN as a stack: new children go to the front.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, 0)];  CLOSED ← [ ]
+while OPEN not empty
+    (N, parent, d) ← head(OPEN);  remove it
+    if GoalTest(N): return the path
+    CLOSED ← (N, parent, d) : CLOSED
+    children ← MoveGen(N) minus nodes on OPEN or CLOSED
+    OPEN ← [(C, N, d+1) for C in children] ++ OPEN     # prepend = stack
+return failure
+```
+
+- space ≈ b · m: branching factor times maximum depth. Only the current path and the siblings along it are stored.
+
+Memory-light, but neither optimal nor guaranteed to finish on infinite or very deep spaces.
+
+Complete: finite graphs only. Optimal: no. Time: O(b^m). Space: O(b·m).
+
+- Trap: The path found depends heavily on MoveGen order.
+- Trap: Do not confuse the order children are pushed with the order they are expanded.
+
+## Depth First Iterative Deepening (week 2, Graph search · uninformed)
+
+URL: https://1mystic.github.io/search-studio/learn/search-dfid.html
+
+Depth First Iterative Deepening runs DFS with a depth limit of 0, then 1, then 2, … It finds the same shallow path as BFS while using only DFS's memory.
+
+Definition: Repeat depth-bounded DFS (DB-DFS) with an increasing bound until the goal is found. DB-DFS does not expand nodes at depth equal to the bound.
+
+Pseudocode:
+
+```
+for bound ← 0, 1, 2, …
+    result ← DB-DFS(S, bound)      # DFS that does not expand nodes at depth = bound
+    if result ≠ failure: return result
+    if no node was cut off by the bound: return failure
+```
+
+- N(DFID) ≈ N(BFS) · b/(b−1): extra work is a small factor of BFS. Most nodes of a tree are on the last level, so repeating the upper levels is cheap.
+
+Combines BFS's optimal depth with DFS's small memory; the repeated work is small for branching factors above 2.
+
+Complete: yes. Optimal: yes for unit costs. Time: O(b^d). Space: O(b·d).
+
+- Trap: Count expansions over all rounds, not just the last.
+- Trap: With CLOSED checking, DB-DFS can miss a shallower route to a node seen earlier via a deeper path.
+
+## Brute force (exact) (week 3, TSP · exact)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-brute-force.html
+
+The travelling salesperson problem (TSP) asks for the shortest round trip that visits every city exactly once. Brute force simply tries every possible round trip and keeps the shortest. It is the only method here that is guaranteed to find the best tour, and it is how every other method's answer is checked.
+
+Definition: Fix the first city (a round trip can start anywhere), list every ordering of the remaining n−1 cities, compute each tour's cost, and return the cheapest.
+
+Pseudocode:
+
+```
+best ← ∞
+for every permutation p of cities 2..n   (symmetric: skip p with p[first] > p[last])
+    if cost(city1 + p) < best: best ← that tour
+return best
+```
+
+- number of tours = (n−1)! / 2  (symmetric): fix one city, order the rest, halve for direction. Rotations of a cycle are the same tour, and so is the reversed cycle when C(i,j) = C(j,i).
+- cost(T) = Σ C(tᵢ, tᵢ₊₁) + C(tₙ, t₁): add up every edge on the cycle. The closing edge back to the start is part of the tour; forgetting it is the most common arithmetic slip.
+
+It works because it leaves nothing out. It fails in practice because (n−1)!/2 explodes: 60 tours for 6 cities, 181,440 for 10, about 10^155 for 100.
+
+Complete: yes. Optimal: yes. Time: O(n!). Space: O(n).
+
+- Trap: Forgetting the closing edge.
+- Trap: Counting (n−1)! instead of (n−1)!/2 for a symmetric instance.
+- Trap: Using brute force on large n: the studio limits it to 9 cities.
+
+## Nearest Neighbour (week 3, TSP · constructive)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-nearest-neighbour.html
+
+Nearest Neighbour is what most people do by hand: from where you are, go to the closest place you have not visited yet. It builds a tour quickly but can paint itself into a corner and pay for a long trip home at the end.
+
+Definition: A constructive (synthesis) heuristic: start at a given city, repeatedly append the nearest unvisited city, and finally return to the start.
+
+Pseudocode:
+
+```
+tour ← [start]
+while unvisited cities remain
+    c ← last city of tour
+    append the unvisited city nearest to c   (ties: alphabetical)
+return tour   (closing edge back to start is implied)
+```
+
+- next = argmin over unvisited j of C(c, j): pick the cheapest edge out of the current city that leads somewhere new. Each choice is locally best; nothing guarantees the sum of choices is globally best.
+- NN ≤ ½(⌈log₂ n⌉ + 1) · OPT  (metric TSP): in the worst case NN can be about log n times worse than optimal. Bad cases exist where greedy local moves strand far-away cities.
+
+Cheap and intuitive. Its weakness is the end game: the last cities are whatever is left over, often far apart, and the forced return edge can be the longest edge in the tour.
+
+Complete: always returns a tour. Optimal: no. Time: O(n²). Space: O(n).
+
+- Trap: The tour depends on the start city: run it from every city and keep the best.
+- Trap: Do not forget the forced return edge in the cost.
+- Trap: Write the answer in path representation starting from the asked city.
+
+## Greedy heuristic (week 3, TSP · constructive)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-greedy.html
+
+The Greedy heuristic builds the tour out of the shortest edges available anywhere on the map, like snapping together the closest pairs of cities first. Two rules keep the pieces from becoming something other than one big loop.
+
+Definition: Sort all edges by length. Accept an edge unless it would give a city a third edge (degree 3) or close a loop before all cities are included (premature cycle). Stop at n edges.
+
+Pseudocode:
+
+```
+sort all edges by length (ties: alphabetical)
+for each edge (a,b)
+    if degree(a) = 2 or degree(b) = 2: reject
+    if a, b already connected and fewer than n−1 edges chosen: reject (premature cycle)
+    else accept
+read the tour from the chosen edges, starting at the given city
+```
+
+- accept (a,b) ⇔ deg(a) < 2 ∧ deg(b) < 2 ∧ (find(a) ≠ find(b) ∨ |E| = n−1): both ends have a free slot, and they are in different fragments unless this is the closing edge. These are exactly the conditions for the chosen edges to still be part of some Hamiltonian cycle.
+- cost = Σ of accepted edge lengths: the tour cost is just the accepted edges. Greedy accepts exactly n edges.
+
+Short edges are likely to belong to good tours, so Greedy usually beats Nearest Neighbour. But fragments are joined late, and the final edges are whatever remains legal, which can be very long.
+
+Complete: always returns a tour. Optimal: no. Time: O(n² log n). Space: O(n²).
+
+- Trap: Track degrees and fragments carefully; most exam errors are an illegal acceptance.
+- Trap: The last accepted edge is forced and may be long.
+- Trap: 'Greedy from city X' only changes where you start writing the tour.
+
+## Savings heuristic (week 3, TSP · constructive)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-savings.html
+
+Imagine a delivery van that returns to the depot after every single delivery. The Savings heuristic starts there and asks: which two trips can I combine to save the most driving? It keeps combining trips until there is just one round trip.
+
+Definition: Choose a base (fulcrum) city b. For each pair of other cities compute the saving S(i,j) of visiting i and j on one trip instead of two. Process pairs from the largest saving down, linking i and j whenever both are still ends of different sub-tours.
+
+Pseudocode:
+
+```
+for every pair i, j ≠ base:  S(i,j) ← C(base,i) + C(base,j) − C(i,j)
+sort pairs by S, largest first (ties: alphabetical)
+start with n−1 sub-tours base–x–base
+for each pair (i,j) in that order
+    if i and j are ends of different sub-tours: link i–j (merge)
+    else: skip (same sub-tour, or an interior city)
+return the single tour
+```
+
+- S(i,j) = C(b,i) + C(b,j) − C(i,j): trip b→i→b plus b→j→b, minus going i→j directly. Merging two out-and-back trips replaces the two edges i–b and b–j with one edge i–j; the difference is the distance saved.
+- cost = 2·Σₓ C(b,x) − Σ accepted S(i,j): start with all out-and-back trips, subtract each saving you used. Every merge removes exactly its saving from the total, which is a quick way to check your final tour cost.
+
+Savings rewards pairs that are far from the base but close to each other, which avoids stranding remote cities. It is usually the best of the three constructive heuristics, but the result depends on the base city and on tie-breaking.
+
+Complete: always returns a tour. Optimal: no. Time: O(n² log n). Space: O(n²).
+
+- Trap: The savings formula has a minus on C(i,j), not on the base distances.
+- Trap: A pair is refused if either city is interior, even if they are in different sub-tours.
+- Trap: Know which pairs merged and which did not: exams ask for the first three of each.
+
+## 2-city exchange (week 3, TSP · perturbation)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-two-city-exchange.html
+
+Perturbative methods start from a complete tour and improve it by small changes. 2-city exchange is one such change: swap the positions of two cities. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.
+
+Definition: MoveGen(2-city exchange) lists every tour reachable by one 2-city exchange move (n(n−1)/2 neighbours). Steepest-descent hill climbing moves to the best neighbour while it is strictly better than the current tour.
+
+Pseudocode:
+
+```
+node ← start tour
+loop
+    neighbours ← MoveGen(node)          # swap two cities (4 edges change; 2 if adjacent)
+    best ← cheapest neighbour
+    if cost(best) ≥ cost(node): return node   (local optimum)
+    node ← best
+```
+
+- |N₂c| = n(n−1)/2: choose any two positions to swap. Swapping cities i and j changes up to 4 edges; if they are adjacent only 2 change.
+
+Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A denser neighbourhood has fewer such traps but costs more per step.
+
+Complete: no. Optimal: no (local optimum). Time: n(n−1)/2 evaluations per step. Space: O(n).
+
+- Trap: Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).
+- Trap: Count neighbours with the right formula for the operator.
+- Trap: In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change.
+
+## Best First Search (week 3, Graph search · informed)
+
+URL: https://1mystic.github.io/search-studio/learn/search-best-first.html
+
+Best First Search uses a heuristic h(N), a guess of the distance from N to the goal, and always expands the node that looks closest to the goal.
+
+Definition: A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. OPEN is ordered by h(N).
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, h(S))] ordered by h
+while OPEN not empty
+    N ← node with least h;  remove it
+    if GoalTest(N): return the path
+    move N to CLOSED
+    add children not on OPEN or CLOSED, ordered by h
+```
+
+- pick argmin h on OPEN: most promising-looking node first. Fast when h is accurate, but it ignores g, so the path found can be expensive.
+
+Often reaches the goal quickly, but is not optimal and can be misled by a poor heuristic.
+
+Complete: finite graphs. Optimal: no. Time: O(b^m) worst case. Space: O(b^m).
+
+- Trap: Best First ignores g; A* adds it.
+- Trap: Ties in h decide the path: state your tie-breaking.
+
+## 2-edge exchange (2-opt) (week 3, TSP · perturbation)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-two-edge-exchange.html
+
+Perturbative methods start from a complete tour and improve it by small changes. 2-edge exchange is one such change: remove two non-adjacent edges and reconnect. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.
+
+Definition: MoveGen(2-edge exchange) lists every tour reachable by one 2-edge exchange move (n(n−3)/2 neighbours). Steepest-descent hill climbing moves to the best neighbour while it is strictly better than the current tour.
+
+Pseudocode:
+
+```
+node ← start tour
+loop
+    neighbours ← MoveGen(node)          # remove (a,b),(c,d); add (a,c),(b,d); reverse the block
+    best ← cheapest neighbour
+    if cost(best) ≥ cost(node): return node   (local optimum)
+    node ← best
+```
+
+- |N₂e| = n(n−3)/2: pairs of edges that do not share a city. Each of n edges can pair with n−3 non-adjacent edges; each pair is counted twice.
+- Δ = C(a,c) + C(b,d) − C(a,b) − C(c,d): new edges minus removed edges. Only four edges change, so a move is evaluated in O(1) without recomputing the whole tour.
+
+Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A denser neighbourhood has fewer such traps but costs more per step.
+
+Complete: no. Optimal: no (local optimum). Time: n(n−3)/2 evaluations per step. Space: O(n).
+
+- Trap: Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).
+- Trap: Count neighbours with the right formula for the operator.
+- Trap: In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change.
+
+## Hill Climbing (week 3, Graph search · informed)
+
+URL: https://1mystic.github.io/search-studio/learn/search-hill-climbing.html
+
+Hill climbing is the simplest way to use a heuristic: always step to the neighbour that looks closest to the goal, and stop when no neighbour looks better than where you are. It needs almost no memory, but it can stop on a hilltop that is not the summit.
+
+Definition: From the current node move to the child with the smallest h, provided it is strictly smaller than h(current). Otherwise stop and return the current node.
+
+Pseudocode:
+
+```
+node ← start
+newNode ← head(sort_h(MoveGen(node)))
+while h(newNode) < h(node)
+    node ← newNode
+    newNode ← head(sort_h(MoveGen(node)))
+return node
+```
+
+- next = argmin over children C of h(C), accepted only if h(next) < h(current): go to the best-looking child only if it is better than here. Greedy local improvement; there is no memory to back up from a dead end.
+
+Constant memory and very fast, but incomplete: local optima, plateaus and ridges stop it. The fixes are exactly the Week 3 ideas: beam search, random restarts, tabu memory, simulated annealing.
+
+Complete: no. Optimal: no. Time: O(b) per step. Space: O(1).
+
+- Trap: Hill climbing never backtracks.
+- Trap: A plateau (equal h) stops the course version.
+- Trap: Reaching a node with h = 0 that is not the goal means h is misleading there.
+
+## Or-opt (move a city) (week 3, TSP · perturbation)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-or-opt.html
+
+Perturbative methods start from a complete tour and improve it by small changes. Or-opt is one such change: move one city to another place in the tour. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.
+
+Definition: MoveGen(Or-opt) lists every tour reachable by one Or-opt move (about n² neighbours). Steepest-descent hill climbing moves to the best neighbour while it is strictly better than the current tour.
+
+Pseudocode:
+
+```
+node ← start tour
+loop
+    neighbours ← MoveGen(node)          # remove a city, reinsert it elsewhere
+    best ← cheapest neighbour
+    if cost(best) ≥ cost(node): return node   (local optimum)
+    node ← best
+```
+
+- Δ = C(p,q) − C(p,c) − C(c,q) + C(x,c) + C(c,y) − C(x,y): take c out from between p and q, put it between x and y. Moving one city removes three edges and adds three, so Or-opt moves are a subset of 3-edge exchanges.
+
+Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A denser neighbourhood has fewer such traps but costs more per step.
+
+Complete: no. Optimal: no (local optimum). Time: about n² evaluations per step. Space: O(n).
+
+- Trap: Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).
+- Trap: Count neighbours with the right formula for the operator.
+- Trap: In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change.
+
+## Beam Search (week 3, Graph search · informed)
+
+URL: https://1mystic.github.io/search-studio/learn/search-beam.html
+
+Beam search is breadth-first search on a diet: at every level it keeps only the w most promising nodes by h and forgets the rest. A wider beam is safer, a narrower one is cheaper.
+
+Definition: Level by level, generate the children of every node in the beam, discard those seen before, and keep the w with the smallest h. Succeed when the goal enters the beam; fail when no new children remain.
+
+Pseudocode:
+
+```
+OPEN ← [start]
+while goal not in OPEN
+    children ← MoveGen of every node in OPEN, minus nodes seen before
+    if children is empty: return failure
+    OPEN ← the w best of children by h
+return the goal's path
+```
+
+- memory ≤ w per level: the beam width bounds the frontier. That is the whole point: predictable memory. w = 1 is hill climbing that may move uphill; w = ∞ is breadth-first search.
+
+Keeps several alternatives alive, so one bad estimate does not end the search, but anything outside the beam is lost forever.
+
+Complete: no. Optimal: no. Time: O(w · b · d). Space: O(w · d).
+
+- Trap: Beam search is incomplete: the only path to the goal can fall outside the beam.
+- Trap: Ties in h decide which nodes survive.
+
+## 3-edge exchange (week 3, TSP · perturbation)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-three-edge-exchange.html
+
+Perturbative methods start from a complete tour and improve it by small changes. 3-edge exchange is one such change: remove three edges and reconnect the segments. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.
+
+Definition: MoveGen(3-edge exchange) lists every tour reachable by one 3-edge exchange move (O(n³) neighbours). Steepest-descent hill climbing moves to the best neighbour while it is strictly better than the current tour.
+
+Pseudocode:
+
+```
+node ← start tour
+loop
+    neighbours ← MoveGen(node)          # remove three edges, reconnect segments
+    best ← cheapest neighbour
+    if cost(best) ≥ cost(node): return node   (local optimum)
+    node ← best
+```
+
+- |N₃e| = O(n³): choose three edges, then a reconnection. Denser than 2-edge exchange: fewer local optima, more work per step.
+
+Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A denser neighbourhood has fewer such traps but costs more per step.
+
+Complete: no. Optimal: no (local optimum). Time: O(n³) evaluations per step. Space: O(n).
+
+- Trap: Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).
+- Trap: Count neighbours with the right formula for the operator.
+- Trap: In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change.
+
+## Variable neighbourhood descent (week 3, TSP · local search)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-vnd.html
+
+If hill climbing gets stuck, one fix is to look further: use a bigger neighbourhood. Variable Neighbourhood Descent does this in order, from cheap and sparse to expensive and dense, so most of the improvement comes cheaply.
+
+Definition: Given MoveGen functions ordered by density, hill climb with MoveGen(1) to a local optimum, then continue from there with MoveGen(2), and so on.
+
+Pseudocode:
+
+```
+node ← start
+for i ← 1 to n
+    moveGen ← MoveGen(i)            # sparse → dense
+    node ← HillClimbing(node, moveGen)
+return node
+```
+
+- LocalOpt(N₁) ⊉ LocalOpt(N₂): being stuck in one neighbourhood does not mean being stuck in another. Different moves reach different tours; a denser neighbourhood contains moves the sparse one lacks.
+
+Sparse neighbourhoods are cheap and do most of the work; dense ones are used only near the end, where they escape the sparse operator's traps.
+
+Complete: no. Optimal: no. Time: sum of the phases' hill climbs. Space: O(n).
+
+- Trap: The course version runs each MoveGen once, in order; some variants restart from MoveGen(1) after any improvement.
+- Trap: A phase can make no progress at all: that is fine.
+
+## Beam search (week 3, TSP · local search)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-beam.html
+
+Hill climbing follows one path. Beam search keeps a few of the best candidates at each level, a beam of width w, so a slightly worse option that leads somewhere better is not thrown away immediately.
+
+Definition: OPEN holds w tours. Each level, generate the neighbours of all tours in OPEN, keep the w best as the new OPEN, and stop when the best of the level is no better than the best seen before.
+
+Pseudocode:
+
+```
+OPEN ← [start];  N ← start
+do
+    bestEver ← N
+    neighbours ← MoveGen(OPEN)        # of every node in OPEN, duplicates merged
+    OPEN ← the w best of neighbours
+    N ← head(OPEN)
+while cost(N) < cost(bestEver)
+return bestEver
+```
+
+- memory = w, work per level ≈ w · |N|: width times neighbourhood size. Beam search trades memory for robustness; w = 1 is hill climbing, w = ∞ approaches breadth-first search.
+
+Keeping alternatives lets the search survive one bad step. A narrow beam can still miss the path to the optimum; a wide one costs more.
+
+Complete: no. Optimal: no. Time: w · |N| per level. Space: O(w).
+
+- Trap: w = 1 behaves exactly like hill climbing.
+- Trap: Merge duplicate tours when generating neighbours of several beam members.
+- Trap: Stopping is on the level's best, not on any member improving.
+
+## Tabu search (week 3, TSP · local search)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-tabu.html
+
+Tabu search always moves, even downhill, to escape local optima. To avoid simply stepping back to where it came from, it keeps a short-term memory of recent moves that are forbidden (tabu) for a few iterations.
+
+Definition: At each iteration, move to the best neighbour whose move is not tabu. Mark that move tabu for tt iterations (the tenure). A tabu move is allowed anyway if it gives a tour better than any seen (aspiration). Return the best tour seen.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N
+repeat for k iterations
+    candidates ← MoveGen(N), best first
+    pick the first candidate that is not tabu,
+         or is tabu but better than bestSeen (aspiration)
+    make its key tabu for tt iterations
+    N ← candidate;  if N better than bestSeen: bestSeen ← N
+return bestSeen
+```
+
+- tabu(m) ⇔ t < expiry(m),  expiry(m) = t(used) + tt: a move stays forbidden for tt iterations. Short tenure risks cycling; long tenure can block good moves.
+- aspiration: allow m if cost(m(N)) < cost(bestSeen): a forbidden move is fine if it finds a new best. Tabu exists to stop cycling, not to block real improvements.
+
+Memory turns a greedy walk into a systematic one. On small instances a short tenure leads to cycles; a frequency memory (prefer rarely-used moves) further diversifies the search.
+
+Complete: no. Optimal: no. Time: iterations × |N|. Space: O(tt).
+
+- Trap: Tabu takes the best non-tabu move even if it is worse than the current tour.
+- Trap: Apply aspiration before rejecting a tabu move.
+- Trap: Return bestSeen, not the final current tour.
+
+## Iterated hill climbing (week 3, TSP · local search)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-ihc.html
+
+If one hill climb gets stuck, start again from somewhere else. Iterated hill climbing repeats hill climbing from random starting tours and keeps the best local optimum found.
+
+Definition: Repeat r times: generate a random tour, hill climb to a local optimum, remember it if it is the best so far.
+
+Pseudocode:
+
+```
+best ← none
+repeat r times
+    N ← random tour
+    N ← HillClimbing(N)
+    if N better than best: best ← N
+return best
+```
+
+- P(success) ≈ 1 − (1 − p)^r: with r restarts, each landing in the optimum's basin with probability p. More restarts make it more likely that at least one starts in the right basin.
+
+Simple and effective when local optima are many but hill climbing is cheap. It wastes effort if most random starts lead to the same poor basin.
+
+Complete: no. Optimal: no. Time: r × hill climb. Space: O(n).
+
+- Trap: Each restart is independent: nothing is learned between restarts.
+- Trap: Random starts are usually much worse than constructive tours.
+
+## Random walk (week 3, TSP · local search)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-random-walk.html
+
+A random walk is the opposite extreme of hill climbing: it ignores costs entirely and steps to a random neighbour each time. It is a baseline that shows how much the evaluation function helps.
+
+Definition: From the current tour move to a uniformly random neighbour; record the best tour seen.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N
+repeat k times
+    N ← random neighbour of N
+    if N better than bestSeen: bestSeen ← N
+return bestSeen
+```
+
+- P(next = X) = 1 / |N(current)|: every neighbour is equally likely. No bias toward better tours, so the walk drifts toward wherever most tours are: mostly bad ones.
+
+Pure exploration can in principle reach anything, but without guidance it rarely finds good tours in reasonable time.
+
+Complete: no. Optimal: no. Time: k samples. Space: O(n).
+
+- Trap: Simulated annealing at very high temperature behaves almost like this (a coin flip per move).
+
+## Simulated annealing (week 3, TSP · local search)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-sa.html
+
+Simulated annealing borrows from metalworking: hot metal moves freely, then settles into a strong structure as it cools. The search accepts worse moves often while the 'temperature' is high, and becomes stricter as it cools.
+
+Definition: Pick a random neighbour X of the current tour N. Compute ΔE = cost(N) − cost(X) (positive means X is better) and move with probability P = 1/(1 + e^(−ΔE/T)). Lower T after each step.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N;  T ← T0
+repeat k times
+    X ← random neighbour of N
+    ΔE ← cost(N) − cost(X)            # positive = improvement
+    P ← 1 / (1 + e^(−ΔE / T))
+    if random u < P: N ← X
+    if N better than bestSeen: bestSeen ← N
+    T ← α · T
+return bestSeen
+```
+
+- P = 1 / (1 + e^(−ΔE/T)): a sigmoid of ΔE scaled by temperature. ΔE > 0 gives P > ½, ΔE < 0 gives P < ½; larger |ΔE| pushes P toward 1 or 0.
+- T → ∞: P → ½;   T → 0: P → 1 if ΔE > 0, 0 if ΔE < 0: hot = coin flip, cold = hill climbing. Temperature controls the balance between exploration and exploitation.
+- Tₖ = T₀ · αᵏ: temperature after k steps. Slow cooling (α close to 1) gives more time to escape local optima.
+
+Accepting some worse moves lets SA leave local optima; cooling makes it settle. With this sigmoid rule even a better move can be rejected (P < 1), so always keep the best tour seen.
+
+Complete: no. Optimal: only with impractically slow cooling. Time: k samples. Space: O(n).
+
+- Trap: ΔE sign: define it so that positive means better for the problem at hand.
+- Trap: With the sigmoid rule, P(better move) < 1 at finite T.
+- Trap: Return bestSeen: the current tour can wander off the best one.
+
+## Genetic algorithm (week 4, TSP · genetic)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-ga.html
+
+A genetic algorithm evolves a population of tours. Better tours are more likely to be chosen as parents, parents are combined by crossover, children are occasionally mutated, and the population slowly improves.
+
+Definition: Repeat for g generations: compute fitness, select N parents by roulette wheel (probability proportional to fitness), cross pairs, mutate with a small probability, and replace the weakest members with the strongest offspring.
+
+Pseudocode:
+
+```
+P ← N random tours
+repeat for g generations
+    fitness(x) ← K / cost(x)
+    S ← N roulette-wheel spins over P         (probability ∝ fitness)
+    pair S as (1,2), (3,4), …; crossover each pair → offspring
+    with probability pm mutate an offspring (swap two cities)
+    replace the k weakest of P with the k strongest offspring
+return best member of P
+```
+
+- pᵢ = fᵢ / Σⱼ fⱼ,   fᵢ = K / costᵢ: share of the wheel for member i. Fitter members get bigger slices, but every member keeps some chance.
+- angleᵢ = 360° · pᵢ;   pick i if cumᵢ₋₁ < u ≤ cumᵢ: spin u in [0,1) and see which slice it lands in. This is how the course traces roulette selection by hand.
+
+Selection pushes toward good tours, crossover mixes their good parts, and mutation keeps exploring. Too much selection pressure makes the population identical too soon (premature convergence).
+
+Complete: no. Optimal: no. Time: O(g · N · n). Space: O(N · n).
+
+- Trap: Fitness must be inverted for a minimisation problem.
+- Trap: If the population converges early: raise mutation, lower selection pressure, enlarge the population.
+- Trap: Cumulative probabilities decide roulette picks; recompute them carefully.
+
+## Crossover lab (week 4, TSP · genetic)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-crossover-lab.html
+
+Genetic algorithms combine two good tours into a child. For the TSP that is tricky: cutting two city lists and gluing the halves usually repeats some cities and loses others. TSP crossovers are designed to always produce valid tours.
+
+Definition: A crossover takes parent tours P1, P2 and builds a child that inherits structure from both: positions (cycle crossover), a segment plus positions (PMX), a segment plus relative order (order crossover), edges (alternating edges, heuristic crossover), or a prefix in ordinal code (ordinal crossover).
+
+Pseudocode:
+
+```
+CX:  follow P1[i] → city P2[i] → its position in P1 …; odd cycles from P1, even from P2
+PMX: copy P1[a..b]; elsewhere take P2's city, following the a..b mapping while it is taken
+OX:  copy P1[a..b]; fill the blanks left to right with P2's order minus those cities
+AEX: next city from P1, then P2, then P1 …; on a cycle use the other parent, else first unvisited
+HX:  from each city take the shorter of the two parents' next edges
+Ordinal: encode each tour by indices into the shrinking city list; single-point crossover; decode
+```
+
+- ordinal gene i ∈ {1, …, n−i+1}: the i-th index points into the n−i+1 cities still unvisited. Any mix of two such sequences is still a legal sequence, so single-point crossover is always valid.
+- adjacency: a[X] = city after X: store who comes next instead of the order. Tour cost depends on edges, so operators that pass on edges pass on the useful information.
+
+Each operator preserves a different property of the parents. Since cost depends on edges, edge- and order-preserving operators usually produce better children than position-preserving ones.
+
+Complete: n/a. Optimal: n/a. Time: O(n) to O(n²) per child. Space: O(n).
+
+- Trap: Know the exact fill convention for OX in your course (left to right here).
+- Trap: PMX: keep following the mapping chain until the city is not already placed.
+- Trap: Naive single-point crossover on paths is invalid in general.
+
+## Ant colony optimisation (week 4, TSP · swarm)
+
+URL: https://1mystic.github.io/search-studio/learn/tsp-aco.html
+
+Real ants find short paths by leaving pheromone: short routes are travelled more often, collect more pheromone, and attract more ants. Ant colony optimisation copies this with artificial ants building tours on a pheromone map.
+
+Definition: Each ant builds a tour, choosing the next city j from i with probability proportional to τᵢⱼ^α · (1/dᵢⱼ)^β. After all ants finish, pheromone evaporates by a factor (1−ρ) and each ant adds Q/L on the edges of its tour.
+
+Pseudocode:
+
+```
+τ ← τ0 on every edge;  bestTour ← nil
+repeat for t iterations
+    place m ants on cities
+    each ant: repeat n−1 times
+        choose next j with P(i→j) = τij^α ηij^β / Σ τih^α ηih^β,  η = 1/d
+    update bestTour
+    τ ← (1 − ρ) τ                         # evaporation
+    for each ant, for each edge of its tour: τ += Q / L(ant)
+return bestTour
+```
+
+- P(i→j) = τᵢⱼ^α ηᵢⱼ^β / Σ over unvisited h of τᵢₕ^α ηᵢₕ^β,   η = 1/d: pheromone strength times visibility, normalised. α weighs learned experience, β weighs the greedy distance heuristic.
+- τᵢⱼ ← (1 − ρ) τᵢⱼ + Σₖ Q / Lₖ: evaporate, then deposit in proportion to tour quality. Edges shared by many short tours grow; unused edges fade.
+
+Combines a greedy heuristic with experience shared through the environment. Large α can lock in early choices; large ρ forgets quickly and keeps exploring.
+
+Complete: no. Optimal: no. Time: O(m · n²) per iteration. Space: O(n²).
+
+- Trap: Normalise only over unvisited cities.
+- Trap: Evaporate before depositing (course order).
+- Trap: β = 0 ignores distance; α = 0 ignores pheromone and gives a randomised nearest neighbour.
+
+## Uniform Cost Search (week 5, Graph search · optimal)
+
+URL: https://1mystic.github.io/search-studio/learn/search-ucs.html
+
+Uniform Cost Search always expands the cheapest path found so far. With different edge costs it finds the cheapest route, not just the one with the fewest steps.
+
+Definition: A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. OPEN is ordered by g(N), the cost from S to N. If a cheaper path to a node already seen is found, its parent and g are updated.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, 0)] ordered by g
+while OPEN not empty
+    N ← node with least g;  remove it
+    if GoalTest(N): return the path
+    move N to CLOSED
+    for each child C of N with g' = g(N) + k(N,C)
+        new: add (C, N, g') to OPEN
+        on OPEN/CLOSED with larger g: update parent and g (reopen if on CLOSED)
+```
+
+- g(C) = g(N) + k(N, C): cost so far plus the edge. Paths are extended one edge at a time.
+- pick argmin g on OPEN: cheapest frontier node first. With non-negative costs this expands nodes in order of their true distance from S.
+
+Optimal for non-negative edge costs; it is Dijkstra's algorithm stopped at the goal. It explores in all directions because it has no idea where the goal is.
+
+Complete: yes. Optimal: yes. Time: O(b^(1+C*/ε)). Space: same.
+
+- Trap: Apply the goal test when the goal is removed from OPEN, not when it is generated.
+- Trap: Remember to update g and the parent on cheaper paths.
+
+## A* (week 5, Graph search · optimal)
+
+URL: https://1mystic.github.io/search-studio/learn/search-astar.html
+
+A* combines the cost already paid with an estimate of the cost remaining. With an estimate that never overestimates, it finds the cheapest path and usually expands far fewer nodes than Uniform Cost Search.
+
+Definition: A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. OPEN is ordered by f(N) = g(N) + w·h(N). With w = 1 and an admissible h this is A*; with w > 1 it is weighted A*.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, g=0)] ordered by f = g + w·h
+while OPEN not empty
+    N ← node with least f;  remove it
+    if GoalTest(N): return the path
+    move N to CLOSED
+    for each child C with g' = g(N) + k(N,C)
+        new: add to OPEN
+        cheaper than its pair on OPEN/CLOSED: update parent and g (reopen if CLOSED)
+```
+
+- f(N) = g(N) + h(N): paid so far plus estimated remainder. Balances progress (g) against promise (h).
+- admissible: h(N) ≤ h*(N) for all N: never overestimate the true remaining cost. Then f never overestimates the true cost of a path through N, so the optimal path is never skipped.
+- consistent: h(N) ≤ k(N,M) + h(M): the triangle inequality for h. Then f never decreases along a path and closed nodes never need reopening.
+- weighted A*: f = g + w·h, w > 1: trust the heuristic more. Faster, but the path can be up to w times the optimum.
+
+A* is optimal with an admissible h and is as efficient as any algorithm using the same h. Overestimating h (inadmissible) can make it return a worse path: try the 'inadmissible' example.
+
+Complete: yes. Optimal: yes with admissible h. Time: exponential in general. Space: same.
+
+- Trap: Admissible ≠ consistent: consistency implies admissibility, not the reverse.
+- Trap: h = 0 makes A* behave like UCS.
+- Trap: With an inadmissible h the first goal found may not be optimal.
+
+## Sequence alignment (dynamic programming) (week 6, Sequence alignment)
+
+URL: https://1mystic.github.io/search-studio/learn/align-dp.html
+
+Comparing two DNA strings means lining them up with as few mismatches and gaps as possible. Every alignment is a path through a grid, so the best alignment is a shortest path, and dynamic programming finds it by filling a table.
+
+Definition: D(i,j) is the cheapest alignment of the first i letters of a with the first j letters of b. Fill the table from D(0,0) = 0 using three moves: diagonal (pair two letters), down (a letter of a against a gap), right (a letter of b against a gap). Trace back from D(m,n).
+
+Pseudocode:
+
+```
+D(0,0) ← 0;  D(i,0) ← i·gap;  D(0,j) ← j·gap
+for i ← 1..m, for j ← 1..n
+    D(i,j) ← min( D(i−1,j−1) + cost(aᵢ, bⱼ),     # diagonal: match or mismatch
+                  D(i−1,j)   + gap,               # down: aᵢ against a gap
+                  D(i,j−1)   + gap )              # right: bⱼ against a gap
+trace back from (m,n) choosing a move that produced each value
+```
+
+- D(i,j) = min{ D(i−1,j−1) + c(aᵢ,bⱼ), D(i−1,j) + gap, D(i,j−1) + gap }: best of: pair the letters, gap in b, gap in a. Every alignment of the prefixes ends in exactly one of these three ways, so the minimum over them is optimal (optimal substructure).
+
+Exact and O(m·n). The same lattice can be searched by A* with an admissible heuristic, or with frontier ideas to cut memory, which is how the course connects alignment to search.
+
+Complete: yes. Optimal: yes. Time: O(m·n). Space: O(m·n).
+
+- Trap: Costs are minimised here; scoring versions maximise similarity instead.
+- Trap: Off-by-one: row i refers to letter aᵢ, i.e. a[i−1] in code.
+
+## Sequence alignment (A*) (week 6, Sequence alignment)
+
+URL: https://1mystic.github.io/search-studio/learn/align-astar.html
+
+Dynamic programming fills the whole table. A* treats alignment as a shortest-path search on the same lattice and, with a good heuristic, explores only the part of the table near the best alignment.
+
+Definition: States are lattice points (i,j); moves are diagonal, down and right with their costs. h(i,j) = gap × |(m−i) − (n−j)| because the remaining length difference must be covered by gaps.
+
+Pseudocode:
+
+```
+start (0,0), goal (m,n)
+moves: diagonal cost(aᵢ,bⱼ), down gap, right gap
+h(i,j) = gap · |(m − i) − (n − j)|           # admissible: the length difference must be covered by gaps
+run A*: pick least f = g + h from OPEN; update cheaper paths; stop when (m,n) is picked
+```
+
+- h(i,j) = gap · |(m − i) − (n − j)|: at least this many gaps are unavoidable. Each gap shortens the length difference by one, so this many gap moves remain in any completion: h never overestimates.
+
+Optimal like dynamic programming, usually with fewer states. With large sequences, frontier search and DCFS keep its memory small.
+
+Complete: yes. Optimal: yes. Time: ≤ O(m·n log). Space: ≤ O(m·n).
+
+- Trap: A weak h (such as 0) makes A* behave like Dijkstra and expand most of the table.
+
+## Admissibility & monotone check (week 6, Graph search · optimal)
+
+URL: https://1mystic.github.io/search-studio/learn/search-monotone-check.html
+
+A* is only as good as its heuristic. Two properties matter: admissibility (never overestimate the remaining cost) and the monotone or consistency condition (the estimate never drops by more than the cost of an edge). This tool checks both on any graph.
+
+Definition: Compute the true remaining cost h*(n) to the goal by Dijkstra's algorithm from the goal. h is admissible if h(n) ≤ h*(n) everywhere. h is monotone if h(m) ≤ k(m,n) + h(n) for every edge (m,n).
+
+Pseudocode:
+
+```
+h* ← Dijkstra from the goal (true cost to the goal)
+for each node n: admissible at n  ⇔  h(n) ≤ h*(n)
+for each edge (m, n) with cost k: monotone  ⇔  h(m) ≤ k + h(n)   (both directions if undirected)
+monotone everywhere and h(goal) = 0  ⇒  admissible
+```
+
+- admissible: h(n) ≤ h*(n): never overestimate. A* then never discards the optimal path.
+- monotone: h(m) − h(n) ≤ k(m,n): the estimate drops by at most the edge cost. Then f(n) = g(n) + h(n) ≥ g(m) + h(m) = f(m): f never decreases, so a node is closed with its optimal g and never reopened.
+- monotone ∧ h(goal) = 0 ⇒ admissible: consistency is the stronger property. Summing the edge inequalities along the optimal path gives h(n) ≤ h*(n).
+
+Knowing which property holds tells you whether A* is optimal (admissible) and whether it may need to reopen closed nodes (not monotone).
+
+Complete: n/a. Optimal: n/a. Time: O(E log V). Space: O(V).
+
+- Trap: Admissible does not imply monotone.
+- Trap: Check both directions of an undirected edge.
+
+## IDA* (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/search-studio/learn/search-ida-star.html
+
+A* is optimal but can run out of memory because OPEN grows exponentially. IDA* gets the same answer using memory proportional to the path length, by running depth-first searches with a growing cost limit.
+
+Definition: Repeat depth-first search from the start, refusing to go past any node whose f = g + h exceeds the current bound. The first bound is h(start); each next bound is the smallest f that was cut off in the previous pass.
+
+Pseudocode:
+
+```
+bound ← f(S) = h(S)
+loop
+    t ← DFS(S, g = 0, bound)          # depth-first, nodes on the current path are not revisited
+    if t = FOUND: return the path
+    if t = ∞: return failure
+    bound ← t                          # smallest f that exceeded the bound
+
+DFS(N, g, bound):
+    f ← g + h(N);  if f > bound: return f
+    if GoalTest(N): return FOUND
+    min ← ∞
+    for each child C not on the path: t ← DFS(C, g + k(N,C), bound); if FOUND: return FOUND; min ← min(min, t)
+    return min
+```
+
+- bound₀ = h(S),  boundₖ₊₁ = min { f(N) : f(N) > boundₖ }: raise the limit just enough to let in the next cheapest nodes. Never skipping a cost level means the first solution found is the cheapest.
+- f(N) = g(N) + h(N): cost so far plus estimated remainder. Same evaluation as A*.
+
+Optimal with admissible h and linear memory. It repeats work in every pass, which is cheap when f takes few distinct values and expensive when many nodes have different f.
+
+Complete: yes. Optimal: yes with admissible h. Time: A* × number of bounds (worst case). Space: O(b·d).
+
+- Trap: Count expansions across all passes.
+- Trap: IDA* has no CLOSED list, so on graphs it may revisit nodes by different paths.
+
+## Recursive Best-First Search (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/search-studio/learn/search-rbfs.html
+
+Recursive Best-First Search behaves like A* but stores only the current path. When the path it is exploring becomes worse than the best alternative elsewhere, it remembers how good that path turned out to be and switches.
+
+Definition: At each node, expand the child with the lowest backed-up value F while it stays below a limit (the best alternative higher up). When it exceeds the limit, return and replace the child's F by the best value found below it.
+
+Pseudocode:
+
+```
+RBFS(N, F(N), limit):
+    if GoalTest(N): return SUCCESS
+    children ← MoveGen(N) not on the current path
+    for each child C: F(C) ← max(g(C) + h(C), F(N))     # inherit a backed-up value
+    loop
+        best ← child with least F;  if F(best) > limit: return FAIL, F(best)
+        alt ← second least F (∞ if none)
+        result, F(best) ← RBFS(best, F(best), min(limit, alt))
+        if result = SUCCESS: return SUCCESS
+call RBFS(S, h(S), ∞)
+```
+
+- F(N) = backed-up minimum of f over N's explored subtree: the best f value seen below N. Lets RBFS return to a forgotten subtree knowing exactly how promising it was.
+
+Linear space and optimal with admissible h. It may re-expand the same nodes many times when the best path keeps switching.
+
+Complete: yes. Optimal: yes with admissible h. Time: can exceed A*. Space: O(b·d).
+
+- Trap: The limit passed down is the second-best F, not the parent's f.
+- Trap: Keep backed-up values; recomputing g + h throws the information away.
+
+## Divide & Conquer Frontier Search (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/search-studio/learn/search-dcfs.html
+
+Most of A*'s memory is the CLOSED list, kept only to avoid regenerating expanded nodes and to rebuild the path. Frontier search drops CLOSED altogether; Divide and Conquer Frontier Search then rebuilds the path from a node remembered halfway along it.
+
+Definition: Run best-first search keeping only OPEN. Each OPEN node records which neighbours already used an edge into it, so expanded nodes are never regenerated. Each node also carries a relay node from the middle of its path. Once the goal is reached, solve start→relay and relay→goal the same way, recursively.
+
+Pseudocode:
+
+```
+DCFS(S, G):
+    run frontier search from S to G           # OPEN only; each node keeps a 'used' set of neighbours
+        each node carries relay = the first node on its path with g ≥ C/2   (C = estimate f(S))
+    if G is next to S: return [S, G]
+    R ← relay of G
+    return DCFS(S, R) ++ DCFS(R, G)       # (dropping the repeated R)
+```
+
+- memory ≈ |frontier|, not |frontier| + |expanded|: only the boundary of the search is stored. For grid-like spaces (such as sequence alignment) the frontier is much smaller than the expanded region.
+
+Trades extra time (the recursive searches) for a large memory saving. It is the basis of memory-efficient sequence alignment.
+
+Complete: yes. Optimal: yes with admissible h. Time: a small multiple of one search. Space: frontier only.
+
+- Trap: Frontier search alone gives the cost, not the path: the relay recursion recovers it.
+- Trap: The 'used' bookkeeping is what replaces the CLOSED check.
+
+## Minimax (week 7, Game playing)
+
+URL: https://1mystic.github.io/search-studio/learn/game-minimax.html
+
+In a two-player game one player (MAX) wants a high score and the other (MIN) a low one. Minimax looks ahead to the end of the tree and assumes both play perfectly: MAX picks the child with the largest value, MIN the smallest.
+
+Definition: Evaluate leaves with the evaluation function e. Back values up the tree: a MAX node's value is the maximum of its children, a MIN node's value is the minimum. The root's value is the guaranteed outcome.
+
+Pseudocode:
+
+```
+Minimax(N):
+    if N is a leaf: return e(N)
+    if N is MAX: return max over children C of Minimax(C)
+    if N is MIN: return min over children C of Minimax(C)
+```
+
+- v(N) = max over C of v(C) at MAX,  min over C of v(C) at MIN: back up the best reply at every level. Assuming the opponent replies optimally, this is the best value MAX can guarantee.
+
+Correct but exhaustive: it evaluates every leaf, b^d of them.
+
+Complete: yes (finite tree). Optimal: yes against an optimal opponent. Time: O(b^d). Space: O(b·d).
+
+- Trap: Values are always from MAX's point of view.
+- Trap: Evaluate left to right; the order matters for alpha-beta, not for minimax.
+
+## Alpha-Beta pruning (week 7, Game playing)
+
+URL: https://1mystic.github.io/search-studio/learn/game-alpha-beta.html
+
+Alpha-beta gives the same answer as minimax while skipping parts of the tree that cannot change the decision. If you already know a move gives you 3, you can stop examining another move as soon as you see the opponent can hold you to 2 there.
+
+Definition: Pass a window (α, β) down the tree. α is the best value MAX is already guaranteed, β the best value MIN is guaranteed. At a MAX node raise α; at a MIN node lower β; as soon as α ≥ β, prune the remaining children.
+
+Pseudocode:
+
+```
+AlphaBeta(N, α, β):
+    if N is a leaf: return e(N)
+    if N is MAX:
+        for each child C: α ← max(α, AlphaBeta(C, α, β)); if α ≥ β: prune the rest (β cut-off)
+        return α
+    if N is MIN:
+        for each child C: β ← min(β, AlphaBeta(C, α, β)); if α ≥ β: prune the rest (α cut-off)
+        return β
+call AlphaBeta(root, −∞, +∞)
+```
+
+- prune when α ≥ β: the window is empty. MIN above will never allow a value ≥ β, and MAX above already has α: nothing in this subtree can affect the root.
+- best case ≈ b^(d/2) leaves: with perfect move ordering. Good ordering lets each MIN node be refuted by its first child, effectively doubling the search depth for the same work.
+
+Always returns the minimax value. How much it prunes depends on move ordering: try the 'best first' and 'worst first' settings.
+
+Complete: yes. Optimal: same value as minimax. Time: O(b^(d/2)) best, O(b^d) worst. Space: O(b·d).
+
+- Trap: Pruned subtrees are never evaluated: count leaves carefully.
+- Trap: The value returned at a pruned node is a bound, not an exact value; only the root's value is exact.
+
+## SSS* (week 7, Game playing)
+
+URL: https://1mystic.github.io/search-studio/learn/game-sss-star.html
+
+SSS* treats game-tree search as best-first search over strategies. It keeps an OPEN list of node triples and always refines the most promising one, so it never looks at a leaf that alpha-beta would skip, and sometimes skips leaves alpha-beta looks at.
+
+Definition: OPEN holds triples (node, status, merit) where status is LIVE (not yet examined) or SOLVED. Starting from (root, LIVE, +∞), repeatedly take the triple with the highest merit and apply one of the six cases until the root is SOLVED; its merit is the minimax value.
+
+Pseudocode:
+
+```
+OPEN ← [(root, LIVE, +∞)]
+loop
+    (J, s, h) ← triple with the highest merit (ties: leftmost)
+    if J = root and s = SOLVED: return h
+    if s = LIVE:
+        leaf      → insert (J, SOLVED, min(h, e(J)))
+        MAX node  → insert (C, LIVE, h) for every child C
+        MIN node  → insert (first child, LIVE, h)
+    if s = SOLVED:
+        J's parent is MAX → insert (parent, SOLVED, h); purge every other descendant of the parent
+        J's parent is MIN → next sibling exists: insert (sibling, LIVE, h)
+                            else insert (parent, SOLVED, h)
+```
+
+- merit h = upper bound on the value of the best strategy through the node: how good this line could still be for MAX. Taking the highest merit first is best-first search; the first solved root has the true value.
+
+Dominates alpha-beta in leaves evaluated, at the cost of an OPEN list that can grow large.
+
+Complete: yes. Optimal: minimax value. Time: ≤ alpha-beta leaves. Space: O(b^(d/2)).
+
+- Trap: Ties in merit are broken by leftmost position.
+- Trap: When a MAX parent is solved, remove all its other descendants from OPEN.
+
+## Forward state-space planning (week 8, Planning)
+
+URL: https://1mystic.github.io/search-studio/learn/plan-forward.html
+
+A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Forward planning simply searches the state space from the initial state.
+
+Definition: Breadth-first search where a node is a state (a set of facts) and an edge applies an operator whose preconditions hold: S' = (S − delete) ∪ add.
+
+Pseudocode:
+
+```
+OPEN ← [(init, plan = [ ])];  seen ← {init}
+while OPEN not empty
+    (S, plan) ← head(OPEN)
+    if goal ⊆ S: return plan
+    for each operator O with pre(O) ⊆ S
+        S' ← (S − del(O)) ∪ add(O)
+        if S' not seen: append (S', plan + [O])
+return failure
+```
+
+- S' = (S − del(O)) ∪ add(O): remove the delete list, add the add list. The STRIPS assumption: an action changes only what it explicitly says.
+
+Simple and complete, but the branching factor is every applicable action, most of them irrelevant to the goal.
+
+Complete: yes. Optimal: shortest plan (BFS). Time: O(b^d). Space: O(b^d).
+
+- Trap: Applicable is not the same as relevant: forward search wastes effort on irrelevant actions.
+
+## Backward state-space planning (week 8, Planning)
+
+URL: https://1mystic.github.io/search-studio/learn/plan-backward.html
+
+A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Backward planning starts from the goal and asks which action could have achieved it last.
+
+Definition: Search over goal sets. An operator is relevant if it adds at least one goal and deletes none. Regressing goal set G through it gives (G − add) ∪ pre. Stop when the initial state satisfies the goal set.
+
+Pseudocode:
+
+```
+OPEN ← [(goal, plan = [ ])]
+while OPEN not empty
+    (G, plan) ← head(OPEN)
+    if G ⊆ init: return plan
+    for each operator O that adds some g ∈ G and deletes nothing in G
+        G' ← (G − add(O)) ∪ pre(O)
+        if G' is consistent and new: append (G', [O] + plan)
+```
+
+- regress(G, O) = (G − add(O)) ∪ pre(O): goals the action achieves are dropped, its preconditions are added. These are exactly the facts needed before O so that G holds after O.
+
+Focused on the goal, so the branching factor is small, but goal sets can be impossible (like holding a block with the arm empty) and must be pruned.
+
+Complete: yes. Optimal: shortest plan (BFS). Time: O(b^d) with smaller b. Space: O(b^d).
+
+- Trap: Discard inconsistent goal sets.
+- Trap: An operator that deletes a goal cannot be the last step.
+
+## Goal Stack Planning (week 8, Planning)
+
+URL: https://1mystic.github.io/search-studio/learn/plan-gsp.html
+
+A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Goal Stack Planning, the strategy of STRIPS, works through the goals one at a time using a stack.
+
+Definition: Push the conjunctive goal and its parts. Pop goals that hold. Replace an unsatisfied goal with an operator that achieves it and that operator's preconditions. When an operator reaches the top, apply it and add it to the plan. Re-check conjunctions, because later actions can undo earlier goals.
+
+Pseudocode:
+
+```
+push the conjunct goal, then each goal in it
+while the stack is not empty
+    x ← top
+    if x is a goal that holds in the state: pop
+    elif x is an unsatisfied goal: push an action O that achieves it, then O's preconditions (conjunct and each)
+    elif x is a conjunct: if all hold pop, else push its unsatisfied goals again
+    elif x is an action: pop, apply it to the state, append it to the plan
+```
+
+- linear planning: solve g₁, then g₂, … in order: one goal at a time. Fine for independent goals; interacting goals (Sussman anomaly) make it undo its own work.
+
+Fast and easy to trace, but not optimal and sensitive to goal order: on the Sussman anomaly it needs 10 steps where 6 suffice.
+
+Complete: no. Optimal: no. Time: linear in plan length (when it works). Space: O(plan length).
+
+- Trap: Push preconditions so that the one to achieve first is on top.
+- Trap: Always re-check the conjunct goal after its parts are popped.
+
+## Partial Order Planning (week 8, Planning)
+
+URL: https://1mystic.github.io/search-studio/learn/plan-pop.html
+
+A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Partial Order Planning searches the space of plans instead of states, adding steps and orderings only when it must.
+
+Definition: A partial plan has steps, ordering constraints, causal links (A achieves p for B) and open preconditions. Repeatedly support an open precondition with an existing or new step, then resolve threats (a step that deletes p and could fall between A and B) by ordering it before A (demotion) or after B (promotion). Backtrack on failure.
+
+Pseudocode:
+
+```
+plan ← {Start, Finish}, Start < Finish, agenda ← goal preconditions of Finish
+while agenda not empty
+    (p, S) ← pick an open precondition
+    choose an achiever A: an existing step that adds p and may precede S, or a new step from the operators
+    add causal link A →p→ S and ordering A < S;  if A is new: add A's preconditions to the agenda
+    for every step K that deletes p and could fall between A and S (a threat):
+        demote (K < A) or promote (S < K), keeping the orderings acyclic
+    if no choice works: backtrack
+return any linearisation of the steps
+```
+
+- threat: K deletes p and possibly A < K < B for link A →p→ B: a step that could undo a protected condition. Ordering K outside the interval keeps every causal link safe, which guarantees the plan works.
+- least commitment: order steps only when forced. Avoids the interaction problems that make linear planners fail on the Sussman anomaly.
+
+Finds the optimal 6-step plan for the Sussman anomaly by interleaving subgoals; the search can be expensive.
+
+Complete: yes (with systematic search). Optimal: shortest plan with iterative deepening. Time: exponential in the worst case. Space: O(plan size) per partial plan.
+
+- Trap: Check threats for new links and for new steps.
+- Trap: Never order a step before Start or after Finish.
+
+## AO* (week 9, Problem decomposition)
+
+URL: https://1mystic.github.io/search-studio/learn/andor-ao-star.html
+
+Some problems split into subproblems that must all be solved (AND), while others offer alternative ways to proceed (OR). AO* searches such AND–OR graphs for the cheapest solution graph, revising its choices as costs become known.
+
+Definition: Each node has connectors: a single-child connector is an OR option, a multi-child connector is an AND arc. Cost of a connector = its arc costs + sum of its children's costs. A node's cost is its cheapest connector, which is marked. AO* expands an unexpanded node on the marked partial solution, then revises costs and markings upwards.
+
+Pseudocode:
+
+```
+repeat until start is SOLVED (or its cost exceeds FUTILITY)
+    trace marked connectors from start; pick an unexpanded node n on that partial solution
+    expand n: add its connectors and children (cost h); no connectors → cost FUTILITY
+    S ← {n}
+    while S not empty
+        take m from S that has no descendant in S
+        for each connector c of m: cost(c) = k(c) + Σ cost(children of c)
+        cost(m) ← min over c;  mark the best connector
+        if every child of the marked connector is SOLVED: label m SOLVED
+        if cost(m) changed or m became SOLVED: add m's parents to S
+```
+
+- cost(c) = Σ over children t of (k + cost(t)): every arc of a connector costs k, plus its children. An AND arc needs all its children, so their costs add.
+- cost(n) = min over connectors c of n of cost(c): choose the cheapest way to solve n. OR alternatives: only the best one is needed.
+
+With admissible estimates AO* finds an optimal solution graph. The marked solution can change as estimates are corrected, which is visible in the trace.
+
+Complete: yes. Optimal: yes with admissible h. Time: exponential in general. Space: the explicit graph.
+
+- Trap: An AND connector costs the sum, not the minimum, of its children.
+- Trap: Propagate revisions to all ancestors whose marked connector uses the node.
+
+## Forward chaining (week 10, Rule-based systems)
+
+URL: https://1mystic.github.io/search-studio/learn/rules-forward-chaining.html
+
+A rule-based system holds facts in working memory and knowledge as if–then rules. Forward chaining starts from the facts and keeps firing rules whose conditions match until nothing new can be derived.
+
+Definition: The recognise–act cycle: match all rules against working memory to form the conflict set of rule instantiations; resolve the conflict by choosing one (rule order, recency, specificity); execute its actions; repeat. A fired instantiation is not fired again (refractoriness).
+
+Pseudocode:
+
+```
+repeat
+    MATCH:   conflict set ← every (rule, bindings) whose conditions hold in WM and that has not fired
+    if the conflict set is empty: stop
+    RESOLVE: pick one by the strategy (rule order, recency or specificity)
+    EXECUTE: apply its actions to WM (add / remove facts); remember it fired (refractoriness)
+```
+
+- instantiation = (rule, variable bindings): a rule with its ?variables filled in consistently. The same rule can fire several times with different bindings.
+
+Data-driven reasoning, natural for monitoring and configuration. Naive matching repeats work each cycle; Rete removes that cost.
+
+Complete: derives every consequence (add-only rules). Optimal: n/a. Time: match cost per cycle. Space: WM + conflict set.
+
+- Trap: A variable must bind to the same value in every condition of a rule.
+- Trap: Conflict resolution changes the order, not the final set of derived facts (for rules that only add).
+
+## Rete algorithm (week 10, Rule-based systems)
+
+URL: https://1mystic.github.io/search-studio/learn/rules-rete.html
+
+Most cycles of a rule system change only a few facts, yet naive matching re-checks every rule against everything. The Rete algorithm compiles the rules into a network that remembers partial matches, so each new fact is matched only where it matters.
+
+Definition: Alpha nodes test single patterns and store matching facts. Beta (join) nodes combine a stored partial match (token) from the left with a fact from the right when their variable bindings agree, and pass the result on. Terminal nodes add complete matches to the conflict set. Rules that share leading patterns share nodes.
+
+Pseudocode:
+
+```
+compile: one alpha memory per distinct pattern;
+         for each rule a chain of join nodes (shared when rules start with the same patterns) ending in a terminal
+add fact w:
+    for each alpha memory whose pattern matches w: store w, then
+        right-activate its join nodes: combine w with each token in the left memory whose bindings agree
+        each new token goes to the next join node, or to the terminal → add the instantiation to the conflict set
+fire instantiations (rule order); each new fact is added the same way
+```
+
+- work per new fact ∝ affected tokens, not |rules| × |WM|: incremental matching. Stored partial matches mean old facts are never matched again.
+
+Trades memory (all partial matches) for speed, which made large production systems practical.
+
+Complete: same matches as naive matching. Optimal: n/a. Time: proportional to change. Space: all partial matches.
+
+- Trap: Joins compare bindings of shared variables only.
+- Trap: Node sharing comes from identical condition prefixes.
+
+## Backtracking (week 11, Constraint processing)
+
+URL: https://1mystic.github.io/search-studio/learn/csp-backtracking.html
+
+A constraint satisfaction problem has variables, each with a domain of values, and constraints saying which combinations are allowed. A solution assigns every variable a value from its domain so that every constraint holds. Backtracking is depth-first search over partial assignments.
+
+Definition: Assign variables in a fixed order. Try each value; keep it if it is consistent with the earlier assignments and continue; if no value works, return to the previous variable and try its next value.
+
+Pseudocode:
+
+```
+Backtrack(assignment, i):
+    if i > n: return assignment
+    for each value a in D(Xᵢ)
+        if a is consistent with every assigned neighbour of Xᵢ
+            result ← Backtrack(assignment + {Xᵢ = a}, i + 1)
+            if result ≠ failure: return result
+    return failure                          # go back to Xᵢ₋₁
+```
+
+- search tree size ≤ d + d² + … + dⁿ: up to dⁿ complete assignments. Each level multiplies the branches by the domain size.
+
+Complete and simple, but it discovers failures late. Look-ahead (forward checking) and consistency (arc consistency) detect them earlier.
+
+Complete: yes. Optimal: n/a (any solution). Time: O(dⁿ). Space: O(n).
+
+- Trap: Count every value tried as a node.
+- Trap: Backtracking returns to the most recent variable, even if it is not the cause of the failure.
+
+## Forward checking (week 11, Constraint processing)
+
+URL: https://1mystic.github.io/search-studio/learn/csp-forward-checking.html
+
+A constraint satisfaction problem has variables, each with a domain of values, and constraints saying which combinations are allowed. A solution assigns every variable a value from its domain so that every constraint holds. Forward checking combines search with a little reasoning: it looks ahead after each assignment.
+
+Definition: After assigning X = a, remove from the domains of X's unassigned neighbours every value that conflicts with a. If a domain becomes empty, reject a immediately.
+
+Pseudocode:
+
+```
+FC(assignment, domains, i):
+    if i > n: return assignment
+    for each value a in D(Xᵢ)
+        D' ← copy of domains;  D'(Xᵢ) ← {a}
+        for each unassigned neighbour Y: remove from D'(Y) values inconsistent with Xᵢ = a
+        if no D'(Y) is empty: result ← FC(assignment + {Xᵢ = a}, D', i + 1); if result: return it
+    return failure
+```
+
+- D(Y) ← { b ∈ D(Y) : (a, b) allowed by C(X,Y) }: keep only values compatible with the new assignment. Any value removed could never be part of a solution extending X = a.
+
+Usually far fewer nodes than plain backtracking; pairs well with choosing the variable with the smallest remaining domain (MRV).
+
+Complete: yes. Optimal: n/a. Time: O(dⁿ) worst case. Space: O(n·d) for domain copies.
+
+- Trap: Forward checking does not check two future variables against each other; arc consistency does.
+
+## Arc consistency (AC-1, AC-3) (week 11, Constraint processing)
+
+URL: https://1mystic.github.io/search-studio/learn/csp-ac3.html
+
+A constraint satisfaction problem has variables, each with a domain of values, and constraints saying which combinations are allowed. A solution assigns every variable a value from its domain so that every constraint holds. Arc consistency removes values that cannot possibly be part of any solution, before or during search.
+
+Definition: An arc (X, Y) is consistent if every value of X has some supporting value in Y. Revise(X, Y) deletes unsupported values. AC-1 revises every arc until a whole pass changes nothing; AC-3 keeps a queue and re-examines only arcs pointing into a variable whose domain just shrank.
+
+Pseudocode:
+
+```
+Revise(X, Y):
+    for each a in D(X): if no b in D(Y) satisfies the constraint: delete a from D(X)
+    return whether D(X) changed
+
+AC-3:
+    Q ← every arc (X, Y)
+    while Q not empty
+        (X, Y) ← pop(Q)
+        if Revise(X, Y): add every arc (Z, X) with Z ≠ Y to Q
+AC-1: repeat Revise on all arcs until a full pass changes nothing
+```
+
+- a ∈ D(X) survives ⇔ ∃ b ∈ D(Y): (a, b) ∈ C(X, Y): a value needs a partner on every arc. A value with no partner can never satisfy that constraint, so it can be deleted safely.
+- AC-3: O(e · d³): each arc is re-queued at most d times, each revision costs d². Domains only shrink, so the work is bounded.
+
+Cheap reasoning that shrinks domains; sometimes it solves the problem outright (the chain example), sometimes it only prunes (map colouring).
+
+Complete: no (filtering only). Optimal: n/a. Time: O(e·d³). Space: O(e).
+
+- Trap: Arcs are directed: (X, Y) and (Y, X) are different.
+- Trap: Arc consistency does not guarantee a solution exists.
+
+## Waltz algorithm (week 11, Constraint processing)
+
+URL: https://1mystic.github.io/search-studio/learn/csp-waltz.html
+
+How do we see 3D shapes in a line drawing? Waltz showed that each junction of lines allows only a few physical interpretations, and that neighbouring junctions must agree. Propagating that agreement usually leaves a single interpretation.
+
+Definition: Lines get labels: + (convex edge), − (concave edge) or an arrow (occluding boundary, object on the right). Each junction type (L, fork, arrow, T) has a catalogue of allowed labellings (6, 5, 3, 4: the Huffman–Clowes catalogue). Waltz filtering is arc consistency between junctions that share a line.
+
+Pseudocode:
+
+```
+for each junction J: D(J) ← catalogue labellings for J's type (L 6, fork 5, arrow 3, T 4)
+if the background is known: keep only labellings with outer lines as arrows (object on the right)
+Q ← every pair of junctions sharing a line
+while Q not empty
+    (J, K) ← pop(Q)
+    delete from D(J) every labelling whose label on line J–K no labelling in D(K) agrees with
+    if D(J) shrank: push (I, J) for every other neighbour I of J
+labels agree: + with +, − with −, an arrow leaving J with the same arrow entering K
+```
+
+- 18 junction labellings: L 6, fork 5, arrow 3, T 4: the Huffman–Clowes catalogue for trihedral scenes. Only these arise from corners where three planes meet, viewed generically.
+- agree(+,+), agree(−,−), agree(→ leaving J, → entering K): a line has one label seen from both ends. This is the binary constraint propagated between junctions.
+
+Constraint propagation instead of search: the cube drawing becomes unambiguous once the background is fixed. Without that, several interpretations survive.
+
+Complete: filtering only. Optimal: n/a. Time: linear for planar drawings. Space: O(junctions).
+
+- Trap: Arrow labels are relative to direction: 'out' at one end is 'in' at the other.
+- Trap: Arc consistency can leave several labellings; a search step picks among them.
+
+## Model-based diagnosis (week 11, Constraint processing)
+
+URL: https://1mystic.github.io/search-studio/learn/csp-diagnosis.html
+
+When a device misbehaves, model-based diagnosis asks: which components, if broken, would explain what we observe? It uses models of how each component should behave and looks for contradictions.
+
+Definition: Assume a set of components works and propagate values through their models. A contradiction with an observation means that set cannot all be working: it is a conflict set. A diagnosis is a minimal set of components that intersects every minimal conflict.
+
+Pseudocode:
+
+```
+for each set S of components assumed OK
+    propagate values using only the models of S (forward and backward through + and ×)
+    if some wire gets two different values: S is inconsistent
+conflicts ← minimal inconsistent sets
+diagnoses ← minimal sets of components that intersect every conflict (minimal hitting sets)
+```
+
+- diagnosis D: D ∩ C ≠ ∅ for every conflict C, D minimal: blame at least one component in every conflict. If any conflict had no faulty member, the contradiction would remain.
+
+The polybox has conflicts {M1, M2, A1} and {M1, M3, A1, A2}, giving the diagnoses {M1}, {A1}, {M2, M3}, {M2, A2}.
+
+Complete: yes (all minimal diagnoses). Optimal: n/a. Time: exponential in components (direct form). Space: O(conflicts).
+
+- Trap: A conflict lists the components used to derive the contradiction, not just the one producing the wrong output.
+- Trap: Diagnoses are minimal: supersets also explain the symptoms but are less likely.

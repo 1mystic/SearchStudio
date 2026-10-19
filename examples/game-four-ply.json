@@ -1,0 +1,53 @@
+{
+ "id": "game-four-ply",
+ "type": "game",
+ "name": "Four-ply binary tree",
+ "note": "Sixteen leaves: compare how many alpha-beta and SSS* evaluate.",
+ "root": "MAX",
+ "tree": [
+  [
+   [
+    [
+     8,
+     7
+    ],
+    [
+     3,
+     9
+    ]
+   ],
+   [
+    [
+     9,
+     8
+    ],
+    [
+     2,
+     4
+    ]
+   ]
+  ],
+  [
+   [
+    [
+     1,
+     8
+    ],
+    [
+     8,
+     9
+    ]
+   ],
+   [
+    [
+     9,
+     9
+    ],
+    [
+     3,
+     4
+    ]
+   ]
+  ]
+ ]
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Breadth First Search — step by step · Search Studio</title>
+<meta name="description" content="Breadth First Search explores in rings: first everything one step from the start, then two steps, and so on. It finds the path with the fewest edges.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/search-bfs.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Breadth First Search — step by step · Search Studio"><meta property="og:description" content="Breadth First Search explores in rings: first everything one step from the start, then two steps, and so on. It finds the path with the fewest edges."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/search-bfs.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Breadth First Search","description":"Breadth First Search explores in rings: first everything one step from the start, then two steps, and so on. It finds the path with the fewest edges.","url":"https://1mystic.github.io/search-studio/learn/search-bfs.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Breadth First Search","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/bfs.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 2 · Graph search · uninformed</p><h1>Breadth First Search</h1></div><a class="btn primary" href="../#try-search-bfs">Run it step by step</a></div>
+<p class="intro">Breadth First Search explores in rings: first everything one step from the start, then two steps, and so on. It finds the path with the fewest edges.</p>
+<h2><small>01</small>Definition</h2><p>A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. BFS treats OPEN as a queue: new children go to the back.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, 0)];  CLOSED ← [ ]
+while OPEN not empty
+    (N, parent, d) ← head(OPEN);  remove it
+    if GoalTest(N): return the path via parent pointers
+    CLOSED ← (N, parent, d) : CLOSED
+    children ← MoveGen(N) minus nodes on OPEN or CLOSED
+    OPEN ← OPEN ++ [(C, N, d+1) for C in children]     # append = queue
+return failure</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>OPEN ← [(S, nil, 0)]</td><td></td></tr><tr><td>(N, parent, d) ← head(OPEN)</td><td>Oldest entry first (queue).</td></tr><tr><td>if GoalTest(N): return path</td><td>The goal test is applied when a node is picked from OPEN, as in the course.</td></tr><tr><td>CLOSED ← (N, parent, d) : CLOSED</td><td></td></tr><tr><td>children not on OPEN or CLOSED</td><td>Graph search: seen nodes are not added again.</td></tr><tr><td>OPEN ← OPEN ++ children</td><td>Append = queue = breadth first.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">nodes ≈ b^d</div><p class="read">branching factor to the power of the goal depth</p><p class="why">BFS must hold an entire level of the tree in OPEN: memory, not time, is its bottleneck.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Complete on finite graphs and optimal when every edge costs the same. Uses a lot of memory.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes for unit costs</div><div class="prop"><span>time</span>O(b^d)</div><div class="prop"><span>space</span>O(b^d)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Optimal in number of edges, not in total cost when edge costs differ.</li><li>Children are added in MoveGen order (alphabetical here).</li></ul>
+<nav class="pager bottom"><span class="pg empty"></span><a class="pg next" href="search-dfs.html"><span>Next →</span><b>Depth First Search</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

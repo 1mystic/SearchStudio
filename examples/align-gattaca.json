@@ -1,0 +1,11 @@
+{
+ "id": "align-gattaca",
+ "type": "alignment",
+ "name": "GATTACA vs GCATGCU (edit distance)",
+ "note": "Match 0, mismatch 1, gap 1: the cost is the edit distance.",
+ "a": "GATTACA",
+ "b": "GCATGCU",
+ "match": 0,
+ "mismatch": 1,
+ "gap": 1
+}

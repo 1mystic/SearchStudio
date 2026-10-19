@@ -1,0 +1,65 @@
+{
+ "id": "rules-animals",
+ "type": "rules",
+ "name": "Animal identification",
+ "note": "A small identification system in the style of Winston's zookeeper.",
+ "facts": [
+  "(has hair rex)",
+  "(eats meat rex)",
+  "(has tawny rex)",
+  "(has dark-spots rex)",
+  "(has feathers tweety)",
+  "(flies tweety)"
+ ],
+ "rules": [
+  {
+   "name": "Z1",
+   "if": [
+    "(has hair ?a)"
+   ],
+   "then": [
+    "(is mammal ?a)"
+   ]
+  },
+  {
+   "name": "Z2",
+   "if": [
+    "(has feathers ?a)"
+   ],
+   "then": [
+    "(is bird ?a)"
+   ]
+  },
+  {
+   "name": "Z3",
+   "if": [
+    "(is mammal ?a)",
+    "(eats meat ?a)"
+   ],
+   "then": [
+    "(is carnivore ?a)"
+   ]
+  },
+  {
+   "name": "Z4",
+   "if": [
+    "(is carnivore ?a)",
+    "(has tawny ?a)",
+    "(has dark-spots ?a)"
+   ],
+   "then": [
+    "(is cheetah ?a)"
+   ]
+  },
+  {
+   "name": "Z5",
+   "if": [
+    "(is bird ?a)",
+    "(flies ?a)"
+   ],
+   "then": [
+    "(can migrate ?a)"
+   ]
+  }
+ ]
+}

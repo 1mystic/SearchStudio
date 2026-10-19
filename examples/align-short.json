@@ -1,0 +1,11 @@
+{
+ "id": "align-short",
+ "type": "alignment",
+ "name": "ACGTC vs AGTC, gap 2, mismatch 3",
+ "note": "Costlier mismatches favour gaps.",
+ "a": "ACGTC",
+ "b": "AGTC",
+ "match": 0,
+ "mismatch": 3,
+ "gap": 2
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Partial Order Planning — step by step · Search Studio</title>
+<meta name="description" content="A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Partial Order Planning searches the space">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/plan-pop.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Partial Order Planning — step by step · Search Studio"><meta property="og:description" content="A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Partial Order Planning searches the space"><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/plan-pop.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Partial Order Planning","description":"A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Partial Order Planning searches the space","url":"https://1mystic.github.io/search-studio/learn/plan-pop.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Partial Order Planning","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/planning/partial-order-planning.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 8 · Planning</p><h1>Partial Order Planning</h1></div><a class="btn primary" href="../#try-plan-pop">Run it step by step</a></div>
+<p class="intro">A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Partial Order Planning searches the space of plans instead of states, adding steps and orderings only when it must.</p>
+<h2><small>01</small>Definition</h2><p>A partial plan has steps, ordering constraints, causal links (A achieves p for B) and open preconditions. Repeatedly support an open precondition with an existing or new step, then resolve threats (a step that deletes p and could fall between A and B) by ordering it before A (demotion) or after B (promotion). Backtrack on failure.</p>
+<h2><small>02</small>Pseudocode</h2><pre>plan ← {Start, Finish}, Start &lt; Finish, agenda ← goal preconditions of Finish
+while agenda not empty
+    (p, S) ← pick an open precondition
+    choose an achiever A: an existing step that adds p and may precede S, or a new step from the operators
+    add causal link A →p→ S and ordering A &lt; S;  if A is new: add A's preconditions to the agenda
+    for every step K that deletes p and could fall between A and S (a threat):
+        demote (K &lt; A) or promote (S &lt; K), keeping the orderings acyclic
+    if no choice works: backtrack
+return any linearisation of the steps</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>Start &lt; Finish</td><td>Start's effects are the initial state; Finish's preconditions are the goal.</td></tr><tr><td>pick an open precondition</td><td>Here: the most constrained one first.</td></tr><tr><td>add a causal link from an achiever</td><td>Existing steps first, then new steps.</td></tr><tr><td>resolve threats</td><td>Demotion or promotion, keeping the order acyclic.</td></tr><tr><td>no open preconditions → done</td><td>Any linearisation of the steps is a valid plan.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">threat: K deletes p and possibly A &lt; K &lt; B for link A →p→ B</div><p class="read">a step that could undo a protected condition</p><p class="why">Ordering K outside the interval keeps every causal link safe, which guarantees the plan works.</p></div><div class="formula"><div class="f">least commitment</div><p class="read">order steps only when forced</p><p class="why">Avoids the interaction problems that make linear planners fail on the Sussman anomaly.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Finds the optimal 6-step plan for the Sussman anomaly by interleaving subgoals; the search can be expensive.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes (with systematic search)</div><div class="prop"><span>optimal</span>shortest plan with iterative deepening</div><div class="prop"><span>time</span>exponential in the worst case</div><div class="prop"><span>space</span>O(plan size) per partial plan</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Check threats for new links and for new steps.</li><li>Never order a step before Start or after Finish.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="plan-gsp.html"><span>← Previous</span><b>Goal Stack Planning</b></a><a class="pg next" href="andor-ao-star.html"><span>Next →</span><b>AO*</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

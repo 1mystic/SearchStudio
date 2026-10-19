@@ -1,0 +1,88 @@
+# Search Studio
+
+> Free, open-source visual studio for AI search algorithms: BFS, DFS, DFID, A*, IDA*, hill climbing, simulated annealing, genetic algorithms, ant colony, TSP heuristics, Minimax, Alpha-Beta, SSS*, planning, AO*, Rete and constraint satisfaction. Step-by-step OPEN/CLOSED traces, beginner explanations and printable exports.
+
+Search Studio is a free, public-domain web app (made by 1mystic, https://github.com/1mystic) that accompanies the course "AI: Search Methods for Problem Solving" (NPTEL / IIT Madras, Prof. Deepak Khemani). It is an independent study aid. Every algorithm has a static explanation page and an interactive step-by-step trace at https://1mystic.github.io/search-studio/#try-<id>.
+
+Conventions used in every trace: OPEN and CLOSED hold node pairs (node, parent, depth or g); ties break alphabetically; the goal test happens when a node is picked from OPEN; simulated annealing accepts a worse move with probability 1/(1+e^(-ΔE/T)); savings are S(i,j) = C(b,i) + C(b,j) − C(i,j).
+
+## Week 2
+
+- [Breadth First Search](https://1mystic.github.io/search-studio/learn/search-bfs.html): OPEN is a queue: new children are appended, so the shallowest node is expanded first. Finds a path with the fewest edges.
+- [Depth First Search](https://1mystic.github.io/search-studio/learn/search-dfs.html): OPEN is a stack: new children are prepended, so the deepest node is expanded first. Little memory, no optimality.
+- [Depth First Iterative Deepening](https://1mystic.github.io/search-studio/learn/search-dfid.html): Run depth-bounded DFS with bound 0, 1, 2, … until the goal is found. The path of BFS with the memory of DFS, at the price of repeated work.
+
+## Week 3
+
+- [Brute force (exact)](https://1mystic.github.io/search-studio/learn/tsp-brute-force.html): Fix the first city and try every ordering of the rest; for a symmetric TSP each tour appears twice, so (n−1)!/2 distinct tours.
+- [Nearest Neighbour](https://1mystic.github.io/search-studio/learn/tsp-nearest-neighbour.html): Grow one path from a start city, always moving to the closest unvisited city; return home at the end.
+- [Greedy heuristic](https://1mystic.github.io/search-studio/learn/tsp-greedy.html): Scan edges shortest first; accept an edge unless a city would get degree 3 or a cycle shorter than n would close.
+- [Savings heuristic](https://1mystic.github.io/search-studio/learn/tsp-savings.html): Start with an out-and-back trip from the base to every city, then merge trips in decreasing order of savings S(i,j) = C(base,i) + C(base,j) − C(i,j).
+- [2-city exchange](https://1mystic.github.io/search-studio/learn/tsp-two-city-exchange.html): Swap the positions of any two cities: n(n−1)/2 neighbours. Steepest-descent hill climbing until no swap helps.
+- [Best First Search](https://1mystic.github.io/search-studio/learn/search-best-first.html): OPEN is a priority queue on h(N), the heuristic estimate of distance to the goal. Fast when h is good, not optimal.
+- [2-edge exchange (2-opt)](https://1mystic.github.io/search-studio/learn/tsp-two-edge-exchange.html): Remove two non-adjacent edges and reconnect the other way, which reverses the block between them: n(n−3)/2 neighbours.
+- [Hill Climbing](https://1mystic.github.io/search-studio/learn/search-hill-climbing.html): Move to the best-looking neighbour (lowest h) as long as it improves on the current node. Constant memory, but it stops at the first local optimum, which need not be the goal.
+- [Or-opt (move a city)](https://1mystic.github.io/search-studio/learn/tsp-or-opt.html): Take one city out and insert it between two other neighbours: a special 3-edge exchange.
+- [Beam Search](https://1mystic.github.io/search-studio/learn/search-beam.html): Generate the children of every node in the beam and keep only the w best by h. Memory is bounded by w; a narrow beam can discard the only way to the goal.
+- [3-edge exchange](https://1mystic.github.io/search-studio/learn/tsp-three-edge-exchange.html): Remove three edges and reconnect the three segments in a new way (pure 3-opt moves).
+- [Variable neighbourhood descent](https://1mystic.github.io/search-studio/learn/tsp-vnd.html): Hill climb with a sparse neighbourhood, then continue from its local optimum with denser ones. A local optimum of one MoveGen need not be one of the next.
+- [Beam search](https://1mystic.github.io/search-studio/learn/tsp-beam.html): Keep the w best neighbours of all beam members at every level; stop when the best of the level is no better than the best so far. w = 1 is hill climbing.
+- [Tabu search](https://1mystic.github.io/search-studio/learn/tsp-tabu.html): Always move to the best neighbour that is not tabu, even if it is worse. A move's key (the swapped pair / removed edges) stays tabu for tt iterations; aspiration allows a tabu move that beats bestSeen.
+- [Iterated hill climbing](https://1mystic.github.io/search-studio/learn/tsp-ihc.html): Repeat: random start tour, steepest-descent hill climbing to a local optimum. Return the best local optimum found.
+- [Random walk](https://1mystic.github.io/search-studio/learn/tsp-random-walk.html): Pure exploration: ignore the evaluation function and step to a random neighbour each time, remembering the best tour seen.
+- [Simulated annealing](https://1mystic.github.io/search-studio/learn/tsp-sa.html): Pick a random neighbour and move to it with probability P = 1/(1 + e^(−ΔE/T)), ΔE = cost(current) − cost(next). T falls geometrically: high T ≈ coin flip, T → 0 ≈ hill climbing.
+
+## Week 4
+
+- [Genetic algorithm](https://1mystic.github.io/search-studio/learn/tsp-ga.html): Population of tours. Roulette-wheel selection (fitness = K / cost), pairwise crossover, swap mutation, then the weakest members are replaced by the strongest offspring.
+- [Crossover lab](https://1mystic.github.io/search-studio/learn/tsp-crossover-lab.html): Apply one TSP crossover to two parents: cycle, PMX, order (path representation), alternating edges and heuristic (adjacency), ordinal + single-point, or naive single-point to see why it fails.
+- [Ant colony optimisation](https://1mystic.github.io/search-studio/learn/tsp-aco.html): Each ant builds a tour city by city with P(i→j) ∝ τ^α (1/d)^β over unvisited cities. Then pheromone evaporates, τ ← (1−ρ)τ, and every ant deposits Q/L on the edges of its tour.
+
+## Week 5
+
+- [Uniform Cost Search](https://1mystic.github.io/search-studio/learn/search-ucs.html): OPEN is a priority queue on g(N), the cost so far. A cheaper path to a node on OPEN or CLOSED updates its parent. Optimal for non-negative costs.
+- [A*](https://1mystic.github.io/search-studio/learn/search-astar.html): OPEN is a priority queue on f(N) = g(N) + w·h(N). With w = 1 and an admissible h (h ≤ h*) the first goal picked is optimal. w > 1 is weighted A*: faster, not guaranteed optimal.
+
+## Week 6
+
+- [Sequence alignment (dynamic programming)](https://1mystic.github.io/search-studio/learn/align-dp.html): Fill a table D(i,j) = cheapest alignment of the first i letters of a with the first j letters of b, one row at a time, then trace back the optimal path through the lattice.
+- [Sequence alignment (A*)](https://1mystic.github.io/search-studio/learn/align-astar.html): Treat each lattice point (i,j) as a state and search from (0,0) to (m,n) with A*. h(i,j) = gap × |(m−i) − (n−j)| never overestimates, because that many gaps are unavoidable.
+- [Admissibility & monotone check](https://1mystic.github.io/search-studio/learn/search-monotone-check.html): Compute the true remaining cost h* by a backward Dijkstra from the goal, then test every node for admissibility (h ≤ h*) and every edge for the monotone condition h(m) ≤ k(m,n) + h(n).
+- [IDA*](https://1mystic.github.io/search-studio/learn/search-ida-star.html): Depth-first search that never expands a node with f = g + h above a bound. Start with bound f(S); after a failed pass, raise the bound to the smallest f that was cut off. Optimal with admissible h, memory linear in depth.
+- [Recursive Best-First Search](https://1mystic.github.io/search-studio/learn/search-rbfs.html): Explore the best child while its f stays below the best alternative elsewhere; when it exceeds that limit, back up its f value and switch. Keeps only the current path and its siblings.
+- [Divide & Conquer Frontier Search](https://1mystic.github.io/search-studio/learn/search-dcfs.html): Frontier search drops CLOSED: each OPEN node remembers which neighbours already used an edge to it, so expanded nodes are never regenerated. A relay node halfway along each path lets the path be rebuilt by two smaller searches.
+
+## Week 7
+
+- [Minimax](https://1mystic.github.io/search-studio/learn/game-minimax.html): Evaluate the game tree depth-first from left to right: a MAX node takes the largest child value, a MIN node the smallest. The root's value is the outcome with best play from both sides.
+- [Alpha-Beta pruning](https://1mystic.github.io/search-studio/learn/game-alpha-beta.html): Carry a window (α, β): α is the best value MAX can already guarantee, β the best MIN can guarantee. When α ≥ β at a node, the remaining children cannot matter and are pruned.
+- [SSS*](https://1mystic.github.io/search-studio/learn/game-sss-star.html): A best-first algorithm for game trees. OPEN holds triples (node, LIVE or SOLVED, merit h). It refines the most promising strategy first and never evaluates a leaf that Alpha-Beta would prune; it can skip leaves Alpha-Beta evaluates.
+
+## Week 8
+
+- [Forward state-space planning](https://1mystic.github.io/search-studio/learn/plan-forward.html): Search forward from the initial state: every applicable operator gives a successor state. Breadth-first search returns a shortest plan, but the branching factor is the number of applicable actions.
+- [Backward state-space planning](https://1mystic.github.io/search-studio/learn/plan-backward.html): Search backwards from the goal. An operator is relevant if it adds a goal and deletes none; regressing the goal set G through it gives (G − add) ∪ pre. Stop when the initial state satisfies the current goal set.
+- [Goal Stack Planning](https://1mystic.github.io/search-studio/learn/plan-gsp.html): Keep a stack of goals and actions. Pop satisfied goals; replace an unsatisfied goal by an action that achieves it plus that action's preconditions; when an action reaches the top its preconditions hold, so apply it. Goals are solved one at a time, which is why the Sussman anomaly makes it undo its own work.
+- [Partial Order Planning](https://1mystic.github.io/search-studio/learn/plan-pop.html): Search in the space of partial plans. Start with steps Start (effects = initial state) and Finish (preconditions = goal). Repeatedly pick an open precondition, support it with an existing or a new step via a causal link, and resolve threats by promotion or demotion. Backtrack when stuck.
+
+## Week 9
+
+- [AO*](https://1mystic.github.io/search-studio/learn/andor-ao-star.html): Follow the marked (currently best) connectors from the start to an unexpanded node, expand it, then revise costs upwards: each node's cost is its cheapest connector, an AND connector costs the sum over its children. A node is solved when all children of its marked connector are solved.
+
+## Week 10
+
+- [Forward chaining](https://1mystic.github.io/search-studio/learn/rules-forward-chaining.html): Repeat the recognise–act cycle: match every rule against working memory to build the conflict set, choose one instantiation by a conflict-resolution strategy, fire it (add or remove facts), until no new instantiation remains.
+- [Rete algorithm](https://1mystic.github.io/search-studio/learn/rules-rete.html): Compile the conditions into a network. Alpha nodes test one pattern and remember the facts that pass; beta (join) nodes combine partial matches with consistent variable bindings; terminal nodes feed the conflict set. A new fact only travels the paths it affects, so nothing is re-matched.
+
+## Week 11
+
+- [Backtracking](https://1mystic.github.io/search-studio/learn/csp-backtracking.html): Assign variables one at a time in a fixed order, trying values in order. If a value conflicts with an earlier assignment try the next; if none is left, go back to the previous variable (chronological backtracking).
+- [Forward checking](https://1mystic.github.io/search-studio/learn/csp-forward-checking.html): Combine search and reasoning: after assigning a variable, delete the values of its future neighbours that conflict with it. If some future domain becomes empty, backtrack at once instead of discovering the failure later.
+- [Arc consistency (AC-1, AC-3)](https://1mystic.github.io/search-studio/learn/csp-ac3.html): Delete every value that has no supporting value in a neighbouring variable. Revise(X, Y) removes unsupported values of X with respect to Y. AC-1 sweeps all arcs until nothing changes; AC-3 keeps a queue and re-examines only the arcs into a variable whose domain shrank.
+- [Waltz algorithm](https://1mystic.github.io/search-studio/learn/csp-waltz.html): Interpret a line drawing of a polyhedral scene. Each junction starts with every labelling its type allows (L, fork, arrow, T); a labelling survives only if each of its lines can get the same label from the junction at the other end. Propagate with an AC-3 style queue.
+- [Model-based diagnosis](https://1mystic.github.io/search-studio/learn/csp-diagnosis.html): Assume components work as their models say and propagate values through the circuit. A contradiction with an observation implicates the components whose models were used: a conflict set. A diagnosis is a minimal set of components that hits every conflict.
+
+## Optional
+
+- [Full text of every explanation](https://1mystic.github.io/search-studio/llms-full.txt)
+- [Source code](https://github.com/1mystic/search-studio)

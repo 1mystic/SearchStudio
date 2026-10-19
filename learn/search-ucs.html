@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Uniform Cost Search — step by step · Search Studio</title>
+<meta name="description" content="Uniform Cost Search always expands the cheapest path found so far. With different edge costs it finds the cheapest route, not just the one with the fewest steps.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/search-ucs.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Uniform Cost Search — step by step · Search Studio"><meta property="og:description" content="Uniform Cost Search always expands the cheapest path found so far. With different edge costs it finds the cheapest route, not just the one with the fewest steps."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/search-ucs.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Uniform Cost Search","description":"Uniform Cost Search always expands the cheapest path found so far. With different edge costs it finds the cheapest route, not just the one with the fewest steps.","url":"https://1mystic.github.io/search-studio/learn/search-ucs.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Uniform Cost Search","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/ucs.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 5 · Graph search · optimal</p><h1>Uniform Cost Search</h1></div><a class="btn primary" href="../#try-search-ucs">Run it step by step</a></div>
+<p class="intro">Uniform Cost Search always expands the cheapest path found so far. With different edge costs it finds the cheapest route, not just the one with the fewest steps.</p>
+<h2><small>01</small>Definition</h2><p>A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. OPEN is ordered by g(N), the cost from S to N. If a cheaper path to a node already seen is found, its parent and g are updated.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, 0)] ordered by g
+while OPEN not empty
+    N ← node with least g;  remove it
+    if GoalTest(N): return the path
+    move N to CLOSED
+    for each child C of N with g' = g(N) + k(N,C)
+        new: add (C, N, g') to OPEN
+        on OPEN/CLOSED with larger g: update parent and g (reopen if on CLOSED)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>OPEN ordered by g</td><td>g(N) = cost of the best known path from S to N.</td></tr><tr><td>N ← least-g node</td><td></td></tr><tr><td>if GoalTest(N): return</td><td>When the goal is picked, no cheaper path to it can exist.</td></tr><tr><td>g' = g(N) + k(N, C)</td><td>k is the edge cost.</td></tr><tr><td>update a node if g' is smaller</td><td>Reopen it if it was on CLOSED.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">g(C) = g(N) + k(N, C)</div><p class="read">cost so far plus the edge</p><p class="why">Paths are extended one edge at a time.</p></div><div class="formula"><div class="f">pick argmin g on OPEN</div><p class="read">cheapest frontier node first</p><p class="why">With non-negative costs this expands nodes in order of their true distance from S.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Optimal for non-negative edge costs; it is Dijkstra's algorithm stopped at the goal. It explores in all directions because it has no idea where the goal is.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes</div><div class="prop"><span>time</span>O(b^(1+C*/ε))</div><div class="prop"><span>space</span>same</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Apply the goal test when the goal is removed from OPEN, not when it is generated.</li><li>Remember to update g and the parent on cheaper paths.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-aco.html"><span>← Previous</span><b>Ant colony optimisation</b></a><a class="pg next" href="search-astar.html"><span>Next →</span><b>A*</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

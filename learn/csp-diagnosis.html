@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Model-based diagnosis — step by step · Search Studio</title>
+<meta name="description" content="When a device misbehaves, model-based diagnosis asks: which components, if broken, would explain what we observe? It uses models of how each component should behave and looks for contradictions.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/csp-diagnosis.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Model-based diagnosis — step by step · Search Studio"><meta property="og:description" content="When a device misbehaves, model-based diagnosis asks: which components, if broken, would explain what we observe? It uses models of how each component should behave and looks for contradictions."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/csp-diagnosis.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Model-based diagnosis","description":"When a device misbehaves, model-based diagnosis asks: which components, if broken, would explain what we observe? It uses models of how each component should behave and looks for contradictions.","url":"https://1mystic.github.io/search-studio/learn/csp-diagnosis.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Model-based diagnosis","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/csp/model-based-diagnosis.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 11 · Constraint processing</p><h1>Model-based diagnosis</h1></div><a class="btn primary" href="../#try-csp-diagnosis">Run it step by step</a></div>
+<p class="intro">When a device misbehaves, model-based diagnosis asks: which components, if broken, would explain what we observe? It uses models of how each component should behave and looks for contradictions.</p>
+<h2><small>01</small>Definition</h2><p>Assume a set of components works and propagate values through their models. A contradiction with an observation means that set cannot all be working: it is a conflict set. A diagnosis is a minimal set of components that intersects every minimal conflict.</p>
+<h2><small>02</small>Pseudocode</h2><pre>for each set S of components assumed OK
+    propagate values using only the models of S (forward and backward through + and ×)
+    if some wire gets two different values: S is inconsistent
+conflicts ← minimal inconsistent sets
+diagnoses ← minimal sets of components that intersect every conflict (minimal hitting sets)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>propagate with every component assumed OK</td><td>Find the first contradiction.</td></tr><tr><td>find minimal conflicts</td><td>Smallest sets of components whose joint correctness contradicts the observations.</td></tr><tr><td>minimal hitting sets</td><td>Each must contain at least one component from every conflict.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">diagnosis D: D ∩ C ≠ ∅ for every conflict C, D minimal</div><p class="read">blame at least one component in every conflict</p><p class="why">If any conflict had no faulty member, the contradiction would remain.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>The polybox has conflicts {M1, M2, A1} and {M1, M3, A1, A2}, giving the diagnoses {M1}, {A1}, {M2, M3}, {M2, A2}.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes (all minimal diagnoses)</div><div class="prop"><span>optimal</span>n/a</div><div class="prop"><span>time</span>exponential in components (direct form)</div><div class="prop"><span>space</span>O(conflicts)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>A conflict lists the components used to derive the contradiction, not just the one producing the wrong output.</li><li>Diagnoses are minimal: supersets also explain the symptoms but are less likely.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="csp-waltz.html"><span>← Previous</span><b>Waltz algorithm</b></a><span class="pg empty"></span></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

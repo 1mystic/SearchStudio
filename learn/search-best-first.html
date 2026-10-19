@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Best First Search — step by step · Search Studio</title>
+<meta name="description" content="Best First Search uses a heuristic h(N), a guess of the distance from N to the goal, and always expands the node that looks closest to the goal.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/search-best-first.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Best First Search — step by step · Search Studio"><meta property="og:description" content="Best First Search uses a heuristic h(N), a guess of the distance from N to the goal, and always expands the node that looks closest to the goal."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/search-best-first.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Best First Search","description":"Best First Search uses a heuristic h(N), a guess of the distance from N to the goal, and always expands the node that looks closest to the goal.","url":"https://1mystic.github.io/search-studio/learn/search-best-first.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Best First Search","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/best-first.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · Graph search · informed</p><h1>Best First Search</h1></div><a class="btn primary" href="../#try-search-best-first">Run it step by step</a></div>
+<p class="intro">Best First Search uses a heuristic h(N), a guess of the distance from N to the goal, and always expands the node that looks closest to the goal.</p>
+<h2><small>01</small>Definition</h2><p>A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. OPEN is ordered by h(N).</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, h(S))] ordered by h
+while OPEN not empty
+    N ← node with least h;  remove it
+    if GoalTest(N): return the path
+    move N to CLOSED
+    add children not on OPEN or CLOSED, ordered by h</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>OPEN ordered by h</td><td>h is domain knowledge, e.g. straight-line distance.</td></tr><tr><td>N ← least-h node</td><td>Ignores the cost already paid.</td></tr><tr><td>add unseen children</td><td></td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">pick argmin h on OPEN</div><p class="read">most promising-looking node first</p><p class="why">Fast when h is accurate, but it ignores g, so the path found can be expensive.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Often reaches the goal quickly, but is not optimal and can be misled by a poor heuristic.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>finite graphs</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>O(b^m) worst case</div><div class="prop"><span>space</span>O(b^m)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Best First ignores g; A* adds it.</li><li>Ties in h decide the path: state your tie-breaking.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-two-city-exchange.html"><span>← Previous</span><b>2-city exchange</b></a><a class="pg next" href="tsp-two-edge-exchange.html"><span>Next →</span><b>2-edge exchange (2-opt)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

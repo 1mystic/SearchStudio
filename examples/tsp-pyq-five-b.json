@@ -1,0 +1,60 @@
+{
+ "id": "tsp-pyq-five-b",
+ "type": "tsp",
+ "name": "Five cities, practice set B",
+ "note": "Sorted edges AB 30, AC 32, BC 40, BE 45, AD 50, AE 55, CD 60, CE 65, BD 70, DE 80 (study-guide practice matrix).",
+ "cities": [
+  {
+   "id": "A"
+  },
+  {
+   "id": "B"
+  },
+  {
+   "id": "C"
+  },
+  {
+   "id": "D"
+  },
+  {
+   "id": "E"
+  }
+ ],
+ "matrix": [
+  [
+   0,
+   30,
+   32,
+   50,
+   55
+  ],
+  [
+   30,
+   0,
+   40,
+   70,
+   45
+  ],
+  [
+   32,
+   40,
+   0,
+   60,
+   65
+  ],
+  [
+   50,
+   70,
+   60,
+   0,
+   80
+  ],
+  [
+   55,
+   45,
+   65,
+   80,
+   0
+  ]
+ ]
+}

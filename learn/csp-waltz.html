@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Waltz algorithm — step by step · Search Studio</title>
+<meta name="description" content="How do we see 3D shapes in a line drawing? Waltz showed that each junction of lines allows only a few physical interpretations, and that neighbouring junctions must agree. Propagating that agreement usually leaves a single interpretation.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/csp-waltz.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Waltz algorithm — step by step · Search Studio"><meta property="og:description" content="How do we see 3D shapes in a line drawing? Waltz showed that each junction of lines allows only a few physical interpretations, and that neighbouring junctions must agree. Propagating that agreement usually leaves a single interpretation."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/csp-waltz.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Waltz algorithm","description":"How do we see 3D shapes in a line drawing? Waltz showed that each junction of lines allows only a few physical interpretations, and that neighbouring junctions must agree. Propagating that agreement usually leaves a single interpretation.","url":"https://1mystic.github.io/search-studio/learn/csp-waltz.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Waltz algorithm","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/csp/waltz.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 11 · Constraint processing</p><h1>Waltz algorithm</h1></div><a class="btn primary" href="../#try-csp-waltz">Run it step by step</a></div>
+<p class="intro">How do we see 3D shapes in a line drawing? Waltz showed that each junction of lines allows only a few physical interpretations, and that neighbouring junctions must agree. Propagating that agreement usually leaves a single interpretation.</p>
+<h2><small>01</small>Definition</h2><p>Lines get labels: + (convex edge), − (concave edge) or an arrow (occluding boundary, object on the right). Each junction type (L, fork, arrow, T) has a catalogue of allowed labellings (6, 5, 3, 4: the Huffman–Clowes catalogue). Waltz filtering is arc consistency between junctions that share a line.</p>
+<h2><small>02</small>Pseudocode</h2><pre>for each junction J: D(J) ← catalogue labellings for J's type (L 6, fork 5, arrow 3, T 4)
+if the background is known: keep only labellings with outer lines as arrows (object on the right)
+Q ← every pair of junctions sharing a line
+while Q not empty
+    (J, K) ← pop(Q)
+    delete from D(J) every labelling whose label on line J–K no labelling in D(K) agrees with
+    if D(J) shrank: push (I, J) for every other neighbour I of J
+labels agree: + with +, − with −, an arrow leaving J with the same arrow entering K</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>classify junctions by geometry</td><td>Two lines: L. Three: fork (all angles &lt; 180°), arrow (one angle &gt; 180°), T (two lines collinear).</td></tr><tr><td>start with full catalogues</td><td></td></tr><tr><td>background constraint</td><td>Outer boundary lines are arrows going clockwise around the object.</td></tr><tr><td>propagate</td><td>Delete labellings that no labelling at the other end of a line agrees with.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">18 junction labellings: L 6, fork 5, arrow 3, T 4</div><p class="read">the Huffman–Clowes catalogue for trihedral scenes</p><p class="why">Only these arise from corners where three planes meet, viewed generically.</p></div><div class="formula"><div class="f">agree(+,+), agree(−,−), agree(→ leaving J, → entering K)</div><p class="read">a line has one label seen from both ends</p><p class="why">This is the binary constraint propagated between junctions.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Constraint propagation instead of search: the cube drawing becomes unambiguous once the background is fixed. Without that, several interpretations survive.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>filtering only</div><div class="prop"><span>optimal</span>n/a</div><div class="prop"><span>time</span>linear for planar drawings</div><div class="prop"><span>space</span>O(junctions)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Arrow labels are relative to direction: 'out' at one end is 'in' at the other.</li><li>Arc consistency can leave several labellings; a search step picks among them.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="csp-ac3.html"><span>← Previous</span><b>Arc consistency (AC-1, AC-3)</b></a><a class="pg next" href="csp-diagnosis.html"><span>Next →</span><b>Model-based diagnosis</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

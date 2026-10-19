@@ -1,0 +1,23 @@
+{
+ "id": "plan-reverse",
+ "type": "planning",
+ "name": "Reverse a tower of three",
+ "note": "A tower with A at the bottom and C on top must be turned upside down.",
+ "blocks": [
+  "A",
+  "B",
+  "C"
+ ],
+ "init": [
+  [
+   "A",
+   "B",
+   "C"
+  ]
+ ],
+ "goal": [
+  "on(A,B)",
+  "on(B,C)",
+  "ontable(C)"
+ ]
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nearest Neighbour — step by step · Search Studio</title>
+<meta name="description" content="Nearest Neighbour is what most people do by hand: from where you are, go to the closest place you have not visited yet. It builds a tour quickly but can paint itself into a corner and pay for a long trip home at the end.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/tsp-nearest-neighbour.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Nearest Neighbour — step by step · Search Studio"><meta property="og:description" content="Nearest Neighbour is what most people do by hand: from where you are, go to the closest place you have not visited yet. It builds a tour quickly but can paint itself into a corner and pay for a long trip home at the end."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/tsp-nearest-neighbour.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Nearest Neighbour","description":"Nearest Neighbour is what most people do by hand: from where you are, go to the closest place you have not visited yet. It builds a tour quickly but can paint itself into a corner and pay for a long trip home at the end.","url":"https://1mystic.github.io/search-studio/learn/tsp-nearest-neighbour.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Nearest Neighbour","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/tsp/nearest-neighbour.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · TSP · constructive</p><h1>Nearest Neighbour</h1></div><a class="btn primary" href="../#try-tsp-nearest-neighbour">Run it step by step</a></div>
+<p class="intro">Nearest Neighbour is what most people do by hand: from where you are, go to the closest place you have not visited yet. It builds a tour quickly but can paint itself into a corner and pay for a long trip home at the end.</p>
+<h2><small>01</small>Definition</h2><p>A constructive (synthesis) heuristic: start at a given city, repeatedly append the nearest unvisited city, and finally return to the start.</p>
+<h2><small>02</small>Pseudocode</h2><pre>tour ← [start]
+while unvisited cities remain
+    c ← last city of tour
+    append the unvisited city nearest to c   (ties: alphabetical)
+return tour   (closing edge back to start is implied)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>tour ← [start]</td><td>The path starts at the chosen city.</td></tr><tr><td>while unvisited cities remain</td><td>n−1 choices are made in total.</td></tr><tr><td>c ← last city of tour</td><td>Only the current end of the path matters: NN never looks back.</td></tr><tr><td>append the unvisited city nearest to c</td><td>Ties go to the alphabetically first city (the course convention).</td></tr><tr><td>return tour</td><td>The edge from the last city back to the start is forced, whatever its length.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">next = argmin over unvisited j of C(c, j)</div><p class="read">pick the cheapest edge out of the current city that leads somewhere new</p><p class="why">Each choice is locally best; nothing guarantees the sum of choices is globally best.</p></div><div class="formula"><div class="f">NN ≤ ½(⌈log₂ n⌉ + 1) · OPT  (metric TSP)</div><p class="read">in the worst case NN can be about log n times worse than optimal</p><p class="why">Bad cases exist where greedy local moves strand far-away cities.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Cheap and intuitive. Its weakness is the end game: the last cities are whatever is left over, often far apart, and the forced return edge can be the longest edge in the tour.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>always returns a tour</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>O(n²)</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The tour depends on the start city: run it from every city and keep the best.</li><li>Do not forget the forced return edge in the cost.</li><li>Write the answer in path representation starting from the asked city.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-brute-force.html"><span>← Previous</span><b>Brute force (exact)</b></a><a class="pg next" href="tsp-greedy.html"><span>Next →</span><b>Greedy heuristic</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

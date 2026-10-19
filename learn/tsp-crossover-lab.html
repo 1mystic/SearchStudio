@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Crossover lab — step by step · Search Studio</title>
+<meta name="description" content="Genetic algorithms combine two good tours into a child. For the TSP that is tricky: cutting two city lists and gluing the halves usually repeats some cities and loses others. TSP crossovers are designed to always produce valid tours.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/tsp-crossover-lab.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Crossover lab — step by step · Search Studio"><meta property="og:description" content="Genetic algorithms combine two good tours into a child. For the TSP that is tricky: cutting two city lists and gluing the halves usually repeats some cities and loses others. TSP crossovers are designed to always produce valid tours."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/tsp-crossover-lab.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Crossover lab","description":"Genetic algorithms combine two good tours into a child. For the TSP that is tricky: cutting two city lists and gluing the halves usually repeats some cities and loses others. TSP crossovers are designed to always produce valid tours.","url":"https://1mystic.github.io/search-studio/learn/tsp-crossover-lab.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Crossover lab","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/tsp/crossover-lab.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 4 · TSP · genetic</p><h1>Crossover lab</h1></div><a class="btn primary" href="../#try-tsp-crossover-lab">Run it step by step</a></div>
+<p class="intro">Genetic algorithms combine two good tours into a child. For the TSP that is tricky: cutting two city lists and gluing the halves usually repeats some cities and loses others. TSP crossovers are designed to always produce valid tours.</p>
+<h2><small>01</small>Definition</h2><p>A crossover takes parent tours P1, P2 and builds a child that inherits structure from both: positions (cycle crossover), a segment plus positions (PMX), a segment plus relative order (order crossover), edges (alternating edges, heuristic crossover), or a prefix in ordinal code (ordinal crossover).</p>
+<h2><small>02</small>Pseudocode</h2><pre>CX:  follow P1[i] → city P2[i] → its position in P1 …; odd cycles from P1, even from P2
+PMX: copy P1[a..b]; elsewhere take P2's city, following the a..b mapping while it is taken
+OX:  copy P1[a..b]; fill the blanks left to right with P2's order minus those cities
+AEX: next city from P1, then P2, then P1 …; on a cycle use the other parent, else first unvisited
+HX:  from each city take the shorter of the two parents' next edges
+Ordinal: encode each tour by indices into the shrinking city list; single-point crossover; decode</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>CX: trace cycles</td><td>From position i, look at P2[i], find that city's position in P1, repeat until back at i. Odd cycles from P1, even from P2.</td></tr><tr><td>PMX: copy a segment, then map</td><td>Fill other positions from P2; if the city is already in the segment, follow the segment mapping until a free city appears.</td></tr><tr><td>OX: copy a segment, fill in P2's order</td><td>The remaining cities appear in the order they have in P2.</td></tr><tr><td>AEX: alternate parents' edges</td><td>Next city from P1, then P2, …; repair cycles.</td></tr><tr><td>HX: shorter parent edge</td><td>From each city take whichever parent's next city is closer.</td></tr><tr><td>Ordinal: encode, cut, decode</td><td>Index into the shrinking list of unvisited cities; any cut gives a valid child.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">ordinal gene i ∈ {1, …, n−i+1}</div><p class="read">the i-th index points into the n−i+1 cities still unvisited</p><p class="why">Any mix of two such sequences is still a legal sequence, so single-point crossover is always valid.</p></div><div class="formula"><div class="f">adjacency: a[X] = city after X</div><p class="read">store who comes next instead of the order</p><p class="why">Tour cost depends on edges, so operators that pass on edges pass on the useful information.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Each operator preserves a different property of the parents. Since cost depends on edges, edge- and order-preserving operators usually produce better children than position-preserving ones.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>n/a</div><div class="prop"><span>optimal</span>n/a</div><div class="prop"><span>time</span>O(n) to O(n²) per child</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Know the exact fill convention for OX in your course (left to right here).</li><li>PMX: keep following the mapping chain until the city is not already placed.</li><li>Naive single-point crossover on paths is invalid in general.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-ga.html"><span>← Previous</span><b>Genetic algorithm</b></a><a class="pg next" href="tsp-aco.html"><span>Next →</span><b>Ant colony optimisation</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

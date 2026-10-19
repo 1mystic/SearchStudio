@@ -1,0 +1,82 @@
+{
+ "id": "waltz-cube-free",
+ "type": "linedrawing",
+ "name": "Cube, boundary not fixed",
+ "note": "Without the background constraint arc consistency leaves several interpretations (cube floating, in a corner, …).",
+ "points": [
+  {
+   "id": "O",
+   "x": 0,
+   "y": 0
+  },
+  {
+   "id": "P",
+   "x": 0.0,
+   "y": -100.0
+  },
+  {
+   "id": "Q",
+   "x": 86.6,
+   "y": -50.0
+  },
+  {
+   "id": "R",
+   "x": 86.6,
+   "y": 50.0
+  },
+  {
+   "id": "S",
+   "x": 0.0,
+   "y": 100.0
+  },
+  {
+   "id": "T",
+   "x": -86.6,
+   "y": 50.0
+  },
+  {
+   "id": "U",
+   "x": -86.6,
+   "y": -50.0
+  }
+ ],
+ "edges": [
+  [
+   "O",
+   "P"
+  ],
+  [
+   "O",
+   "R"
+  ],
+  [
+   "O",
+   "T"
+  ],
+  [
+   "P",
+   "Q"
+  ],
+  [
+   "Q",
+   "R"
+  ],
+  [
+   "R",
+   "S"
+  ],
+  [
+   "S",
+   "T"
+  ],
+  [
+   "T",
+   "U"
+  ],
+  [
+   "U",
+   "P"
+  ]
+ ],
+ "useBoundary": false
+}

@@ -1,0 +1,24 @@
+<article class="prose">
+  <p class="eyebrow">About</p>
+  <h1>About Search Studio</h1>
+  <p class="lede">A study companion for search methods: the algorithms of state-space search, informed search and stochastic optimisation, traced exactly the way they are traced by hand.</p>
+  <h2>Why it exists</h2>
+  <p>Search algorithms are easy to describe and surprisingly easy to trace wrongly: a missed tie-break, a child added twice, a forgotten closing edge, a savings pair merged that should have been refused. Seeing every step, with the working table and the OPEN and CLOSED lists side by side, makes those mistakes visible.</p>
+  <h2>What it covers</h2>
+  <ul>
+    <li><b>State-space search</b>: Breadth First, Depth First, Depth First Iterative Deepening, Uniform Cost, Best First and A* (with weighted A*).</li>
+    <li><b>Travelling salesperson, constructive</b>: Nearest Neighbour, Greedy, Savings, and brute force as the exact reference.</li>
+    <li><b>Perturbation and local search</b>: 2-city exchange, 2-edge exchange, Or-opt, 3-edge exchange, Variable Neighbourhood Descent, Beam Search, Tabu Search, Iterated Hill Climbing, Random Walk, Simulated Annealing.</li>
+    <li><b>Population methods</b>: Genetic Algorithm with cycle, PMX, order, alternating-edges, heuristic and ordinal crossover, and Ant Colony Optimisation.</li>
+  </ul>
+  <h2>Notation</h2>
+  <p>The site follows the notation of <i>AI: Search Methods for Problem Solving</i> (Prof. Deepak Khemani, IIT Madras) and his book <i>A First Course in Artificial Intelligence</i>: MoveGen and GoalTest, OPEN and CLOSED as lists of node pairs, path representation for tours, the sigmoid acceptance rule for simulated annealing, and the course's crossover conventions. It is an independent study aid and is not affiliated with or endorsed by IIT Madras.</p>
+  <h2>How results are checked</h2>
+  <p>Every algorithm is run against every example and against random problems on each build. Tours must be permutations whose reported cost matches a recomputation; paths must run from start to goal with the reported cost. On the six-city instance the results are compared with an independent Python implementation (optimum 224, Nearest Neighbour 264, Greedy 238, Savings 224, and so on).</p>
+  <h2>Further reading</h2>
+  <ul>
+    <li>Deepak Khemani, <i>A First Course in Artificial Intelligence</i>, McGraw Hill Education.</li>
+    <li>D. S. Johnson and L. A. McGeoch, “The Traveling Salesman Problem: A Case Study in Local Optimization”, in <i>Local Search in Combinatorial Optimization</i> (1997): how far above optimal the classic TSP heuristics land in practice.</li>
+    <li>M. Dorigo and T. Stützle, <i>Ant Colony Optimization</i>, MIT Press (2004).</li>
+  </ul>
+</article>

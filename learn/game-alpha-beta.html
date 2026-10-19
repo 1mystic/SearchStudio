@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Alpha-Beta pruning — step by step · Search Studio</title>
+<meta name="description" content="Alpha-beta gives the same answer as minimax while skipping parts of the tree that cannot change the decision. If you already know a move gives you 3, you can stop examining another move as soon as you see the opponent can hold you to 2 there.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/game-alpha-beta.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Alpha-Beta pruning — step by step · Search Studio"><meta property="og:description" content="Alpha-beta gives the same answer as minimax while skipping parts of the tree that cannot change the decision. If you already know a move gives you 3, you can stop examining another move as soon as you see the opponent can hold you to 2 there."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/game-alpha-beta.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Alpha-Beta pruning","description":"Alpha-beta gives the same answer as minimax while skipping parts of the tree that cannot change the decision. If you already know a move gives you 3, you can stop examining another move as soon as you see the opponent can hold you to 2 there.","url":"https://1mystic.github.io/search-studio/learn/game-alpha-beta.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Alpha-Beta pruning","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/games/alpha-beta.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 7 · Game playing</p><h1>Alpha-Beta pruning</h1></div><a class="btn primary" href="../#try-game-alpha-beta">Run it step by step</a></div>
+<p class="intro">Alpha-beta gives the same answer as minimax while skipping parts of the tree that cannot change the decision. If you already know a move gives you 3, you can stop examining another move as soon as you see the opponent can hold you to 2 there.</p>
+<h2><small>01</small>Definition</h2><p>Pass a window (α, β) down the tree. α is the best value MAX is already guaranteed, β the best value MIN is guaranteed. At a MAX node raise α; at a MIN node lower β; as soon as α ≥ β, prune the remaining children.</p>
+<h2><small>02</small>Pseudocode</h2><pre>AlphaBeta(N, α, β):
+    if N is a leaf: return e(N)
+    if N is MAX:
+        for each child C: α ← max(α, AlphaBeta(C, α, β)); if α ≥ β: prune the rest (β cut-off)
+        return α
+    if N is MIN:
+        for each child C: β ← min(β, AlphaBeta(C, α, β)); if α ≥ β: prune the rest (α cut-off)
+        return β
+call AlphaBeta(root, −∞, +∞)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>call AlphaBeta(root, −∞, +∞)</td><td></td></tr><tr><td>MAX: α ← max(α, child value)</td><td>MAX's guarantee can only rise.</td></tr><tr><td>MIN: β ← min(β, child value)</td><td>MIN's guarantee can only fall.</td></tr><tr><td>α ≥ β: prune</td><td>β cut-off at a MAX node, α cut-off at a MIN node.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">prune when α ≥ β</div><p class="read">the window is empty</p><p class="why">MIN above will never allow a value ≥ β, and MAX above already has α: nothing in this subtree can affect the root.</p></div><div class="formula"><div class="f">best case ≈ b^(d/2) leaves</div><p class="read">with perfect move ordering</p><p class="why">Good ordering lets each MIN node be refuted by its first child, effectively doubling the search depth for the same work.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Always returns the minimax value. How much it prunes depends on move ordering: try the 'best first' and 'worst first' settings.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>same value as minimax</div><div class="prop"><span>time</span>O(b^(d/2)) best, O(b^d) worst</div><div class="prop"><span>space</span>O(b·d)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Pruned subtrees are never evaluated: count leaves carefully.</li><li>The value returned at a pruned node is a bound, not an exact value; only the root's value is exact.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="game-minimax.html"><span>← Previous</span><b>Minimax</b></a><a class="pg next" href="game-sss-star.html"><span>Next →</span><b>SSS*</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

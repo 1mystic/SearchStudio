@@ -1,0 +1,116 @@
+{
+ "id": "graph-inadmissible",
+ "type": "graph",
+ "name": "Same graph, inadmissible h(B) = 12",
+ "note": "h(B) = 12 overestimates the true remaining cost 9, so A* never looks through B and returns a worse path than UCS.",
+ "nodes": [
+  {
+   "id": "S",
+   "x": 0,
+   "y": 3,
+   "h": 11
+  },
+  {
+   "id": "A",
+   "x": 2,
+   "y": 1,
+   "h": 9
+  },
+  {
+   "id": "B",
+   "x": 2,
+   "y": 4.5,
+   "h": 12
+  },
+  {
+   "id": "C",
+   "x": 4,
+   "y": 2.5,
+   "h": 7
+  },
+  {
+   "id": "D",
+   "x": 4.5,
+   "y": 0.3,
+   "h": 7
+  },
+  {
+   "id": "E",
+   "x": 6,
+   "y": 4.5,
+   "h": 4
+  },
+  {
+   "id": "F",
+   "x": 7,
+   "y": 1.5,
+   "h": 3
+  },
+  {
+   "id": "G",
+   "x": 9,
+   "y": 3,
+   "h": 0
+  }
+ ],
+ "edges": [
+  [
+   "S",
+   "A",
+   3
+  ],
+  [
+   "S",
+   "B",
+   3
+  ],
+  [
+   "A",
+   "C",
+   3
+  ],
+  [
+   "A",
+   "D",
+   3
+  ],
+  [
+   "B",
+   "C",
+   3
+  ],
+  [
+   "B",
+   "E",
+   5
+  ],
+  [
+   "C",
+   "E",
+   3
+  ],
+  [
+   "C",
+   "F",
+   4
+  ],
+  [
+   "D",
+   "F",
+   4
+  ],
+  [
+   "E",
+   "G",
+   4
+  ],
+  [
+   "F",
+   "G",
+   3
+  ]
+ ],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}

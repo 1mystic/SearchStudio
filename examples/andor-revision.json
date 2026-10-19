@@ -1,0 +1,142 @@
+{
+ "id": "andor-revision",
+ "type": "andor",
+ "name": "AND–OR graph with a change of mind",
+ "note": "Unit cost per arc. AO* first prefers the AND arc C+D, then switches back to B when C turns out costly.",
+ "start": "A",
+ "edgeCost": 1,
+ "nodes": [
+  {
+   "id": "A",
+   "h": 6,
+   "x": 3,
+   "y": 0
+  },
+  {
+   "id": "B",
+   "h": 5,
+   "x": 1,
+   "y": 1
+  },
+  {
+   "id": "C",
+   "h": 2,
+   "x": 3.5,
+   "y": 1
+  },
+  {
+   "id": "D",
+   "h": 4,
+   "x": 5,
+   "y": 1
+  },
+  {
+   "id": "E",
+   "h": 7,
+   "x": 0.4,
+   "y": 2
+  },
+  {
+   "id": "F",
+   "h": 9,
+   "x": 1.6,
+   "y": 2
+  },
+  {
+   "id": "G",
+   "h": 5,
+   "x": 2.8,
+   "y": 2
+  },
+  {
+   "id": "H",
+   "h": 4,
+   "x": 3.7,
+   "y": 2
+  },
+  {
+   "id": "I",
+   "h": 5,
+   "x": 4.6,
+   "y": 2
+  },
+  {
+   "id": "J",
+   "h": 3,
+   "x": 5.6,
+   "y": 2
+  },
+  {
+   "id": "K",
+   "h": 0,
+   "solved": true,
+   "x": 0.4,
+   "y": 3
+  },
+  {
+   "id": "L",
+   "h": 0,
+   "solved": true,
+   "x": 5.6,
+   "y": 3
+  }
+ ],
+ "connectors": [
+  {
+   "from": "A",
+   "to": [
+    "B"
+   ]
+  },
+  {
+   "from": "A",
+   "to": [
+    "C",
+    "D"
+   ]
+  },
+  {
+   "from": "B",
+   "to": [
+    "E"
+   ]
+  },
+  {
+   "from": "B",
+   "to": [
+    "F"
+   ]
+  },
+  {
+   "from": "C",
+   "to": [
+    "G"
+   ]
+  },
+  {
+   "from": "C",
+   "to": [
+    "H",
+    "I"
+   ]
+  },
+  {
+   "from": "D",
+   "to": [
+    "J"
+   ]
+  },
+  {
+   "from": "E",
+   "to": [
+    "K"
+   ]
+  },
+  {
+   "from": "J",
+   "to": [
+    "L"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Variable neighbourhood descent — step by step · Search Studio</title>
+<meta name="description" content="If hill climbing gets stuck, one fix is to look further: use a bigger neighbourhood. Variable Neighbourhood Descent does this in order, from cheap and sparse to expensive and dense, so most of the improvement comes cheaply.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/tsp-vnd.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Variable neighbourhood descent — step by step · Search Studio"><meta property="og:description" content="If hill climbing gets stuck, one fix is to look further: use a bigger neighbourhood. Variable Neighbourhood Descent does this in order, from cheap and sparse to expensive and dense, so most of the improvement comes cheaply."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/tsp-vnd.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Variable neighbourhood descent","description":"If hill climbing gets stuck, one fix is to look further: use a bigger neighbourhood. Variable Neighbourhood Descent does this in order, from cheap and sparse to expensive and dense, so most of the improvement comes cheaply.","url":"https://1mystic.github.io/search-studio/learn/tsp-vnd.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Variable neighbourhood descent","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/tsp/vnd.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · TSP · local search</p><h1>Variable neighbourhood descent</h1></div><a class="btn primary" href="../#try-tsp-vnd">Run it step by step</a></div>
+<p class="intro">If hill climbing gets stuck, one fix is to look further: use a bigger neighbourhood. Variable Neighbourhood Descent does this in order, from cheap and sparse to expensive and dense, so most of the improvement comes cheaply.</p>
+<h2><small>01</small>Definition</h2><p>Given MoveGen functions ordered by density, hill climb with MoveGen(1) to a local optimum, then continue from there with MoveGen(2), and so on.</p>
+<h2><small>02</small>Pseudocode</h2><pre>node ← start
+for i ← 1 to n
+    moveGen ← MoveGen(i)            # sparse → dense
+    node ← HillClimbing(node, moveGen)
+return node</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>node ← start</td><td></td></tr><tr><td>for i ← 1 to n</td><td>MoveGens are sorted sparse → dense.</td></tr><tr><td>node ← HillClimbing(node, MoveGen(i))</td><td>Each phase starts where the previous phase stopped.</td></tr><tr><td>return node</td><td>A local optimum for the last (densest) neighbourhood.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">LocalOpt(N₁) ⊉ LocalOpt(N₂)</div><p class="read">being stuck in one neighbourhood does not mean being stuck in another</p><p class="why">Different moves reach different tours; a denser neighbourhood contains moves the sparse one lacks.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Sparse neighbourhoods are cheap and do most of the work; dense ones are used only near the end, where they escape the sparse operator's traps.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>sum of the phases' hill climbs</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The course version runs each MoveGen once, in order; some variants restart from MoveGen(1) after any improvement.</li><li>A phase can make no progress at all: that is fine.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-three-edge-exchange.html"><span>← Previous</span><b>3-edge exchange</b></a><a class="pg next" href="tsp-beam.html"><span>Next →</span><b>Beam search</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

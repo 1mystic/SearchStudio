@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Savings heuristic — step by step · Search Studio</title>
+<meta name="description" content="Imagine a delivery van that returns to the depot after every single delivery. The Savings heuristic starts there and asks: which two trips can I combine to save the most driving? It keeps combining trips until there is just one round trip.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/tsp-savings.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Savings heuristic — step by step · Search Studio"><meta property="og:description" content="Imagine a delivery van that returns to the depot after every single delivery. The Savings heuristic starts there and asks: which two trips can I combine to save the most driving? It keeps combining trips until there is just one round trip."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/tsp-savings.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Savings heuristic","description":"Imagine a delivery van that returns to the depot after every single delivery. The Savings heuristic starts there and asks: which two trips can I combine to save the most driving? It keeps combining trips until there is just one round trip.","url":"https://1mystic.github.io/search-studio/learn/tsp-savings.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Savings heuristic","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/tsp/savings.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · TSP · constructive</p><h1>Savings heuristic</h1></div><a class="btn primary" href="../#try-tsp-savings">Run it step by step</a></div>
+<p class="intro">Imagine a delivery van that returns to the depot after every single delivery. The Savings heuristic starts there and asks: which two trips can I combine to save the most driving? It keeps combining trips until there is just one round trip.</p>
+<h2><small>01</small>Definition</h2><p>Choose a base (fulcrum) city b. For each pair of other cities compute the saving S(i,j) of visiting i and j on one trip instead of two. Process pairs from the largest saving down, linking i and j whenever both are still ends of different sub-tours.</p>
+<h2><small>02</small>Pseudocode</h2><pre>for every pair i, j ≠ base:  S(i,j) ← C(base,i) + C(base,j) − C(i,j)
+sort pairs by S, largest first (ties: alphabetical)
+start with n−1 sub-tours base–x–base
+for each pair (i,j) in that order
+    if i and j are ends of different sub-tours: link i–j (merge)
+    else: skip (same sub-tour, or an interior city)
+return the single tour</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>S(i,j) ← C(b,i) + C(b,j) − C(i,j)</td><td>For n cities there are (n−1)(n−2)/2 pairs.</td></tr><tr><td>sort pairs, largest saving first</td><td>Ties change the result; the course breaks them alphabetically.</td></tr><tr><td>start with b–x–b for every x</td><td>Initial cost = 2 × Σ C(b,x).</td></tr><tr><td>link i–j if both are ends of different sub-tours</td><td>An end city is one still adjacent to the base. Linking removes edges b–i and b–j and adds i–j.</td></tr><tr><td>otherwise skip</td><td>Same sub-tour: would close a cycle. Interior city: already has two non-base neighbours.</td></tr><tr><td>return the single tour</td><td>Final cost = initial cost − Σ accepted savings.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">S(i,j) = C(b,i) + C(b,j) − C(i,j)</div><p class="read">trip b→i→b plus b→j→b, minus going i→j directly</p><p class="why">Merging two out-and-back trips replaces the two edges i–b and b–j with one edge i–j; the difference is the distance saved.</p></div><div class="formula"><div class="f">cost = 2·Σₓ C(b,x) − Σ accepted S(i,j)</div><p class="read">start with all out-and-back trips, subtract each saving you used</p><p class="why">Every merge removes exactly its saving from the total, which is a quick way to check your final tour cost.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Savings rewards pairs that are far from the base but close to each other, which avoids stranding remote cities. It is usually the best of the three constructive heuristics, but the result depends on the base city and on tie-breaking.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>always returns a tour</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>O(n² log n)</div><div class="prop"><span>space</span>O(n²)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The savings formula has a minus on C(i,j), not on the base distances.</li><li>A pair is refused if either city is interior, even if they are in different sub-tours.</li><li>Know which pairs merged and which did not: exams ask for the first three of each.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-greedy.html"><span>← Previous</span><b>Greedy heuristic</b></a><a class="pg next" href="tsp-two-city-exchange.html"><span>Next →</span><b>2-city exchange</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

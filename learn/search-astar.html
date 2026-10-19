@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A* — step by step · Search Studio</title>
+<meta name="description" content="A* combines the cost already paid with an estimate of the cost remaining. With an estimate that never overestimates, it finds the cheapest path and usually expands far fewer nodes than Uniform Cost Search.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/search-astar.html">
+<meta property="og:type" content="article"><meta property="og:title" content="A* — step by step · Search Studio"><meta property="og:description" content="A* combines the cost already paid with an estimate of the cost remaining. With an estimate that never overestimates, it finds the cheapest path and usually expands far fewer nodes than Uniform Cost Search."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/search-astar.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"A*","description":"A* combines the cost already paid with an estimate of the cost remaining. With an estimate that never overestimates, it finds the cheapest path and usually expands far fewer nodes than Uniform Cost Search.","url":"https://1mystic.github.io/search-studio/learn/search-astar.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"A*","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/a-star.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 5 · Graph search · optimal</p><h1>A*</h1></div><a class="btn primary" href="../#try-search-astar">Run it step by step</a></div>
+<p class="intro">A* combines the cost already paid with an estimate of the cost remaining. With an estimate that never overestimates, it finds the cheapest path and usually expands far fewer nodes than Uniform Cost Search.</p>
+<h2><small>01</small>Definition</h2><p>A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. OPEN is ordered by f(N) = g(N) + w·h(N). With w = 1 and an admissible h this is A*; with w &gt; 1 it is weighted A*.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, g=0)] ordered by f = g + w·h
+while OPEN not empty
+    N ← node with least f;  remove it
+    if GoalTest(N): return the path
+    move N to CLOSED
+    for each child C with g' = g(N) + k(N,C)
+        new: add to OPEN
+        cheaper than its pair on OPEN/CLOSED: update parent and g (reopen if CLOSED)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>f(N) = g(N) + h(N)</td><td>Estimated cost of the cheapest solution through N.</td></tr><tr><td>N ← least-f node</td><td></td></tr><tr><td>if GoalTest(N): return</td><td>With admissible h the first goal picked is optimal.</td></tr><tr><td>update cheaper paths</td><td>Change parent and g; reopen CLOSED nodes if needed.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">f(N) = g(N) + h(N)</div><p class="read">paid so far plus estimated remainder</p><p class="why">Balances progress (g) against promise (h).</p></div><div class="formula"><div class="f">admissible: h(N) ≤ h*(N) for all N</div><p class="read">never overestimate the true remaining cost</p><p class="why">Then f never overestimates the true cost of a path through N, so the optimal path is never skipped.</p></div><div class="formula"><div class="f">consistent: h(N) ≤ k(N,M) + h(M)</div><p class="read">the triangle inequality for h</p><p class="why">Then f never decreases along a path and closed nodes never need reopening.</p></div><div class="formula"><div class="f">weighted A*: f = g + w·h, w &gt; 1</div><p class="read">trust the heuristic more</p><p class="why">Faster, but the path can be up to w times the optimum.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>A* is optimal with an admissible h and is as efficient as any algorithm using the same h. Overestimating h (inadmissible) can make it return a worse path: try the 'inadmissible' example.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes with admissible h</div><div class="prop"><span>time</span>exponential in general</div><div class="prop"><span>space</span>same</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Admissible ≠ consistent: consistency implies admissibility, not the reverse.</li><li>h = 0 makes A* behave like UCS.</li><li>With an inadmissible h the first goal found may not be optimal.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-ucs.html"><span>← Previous</span><b>Uniform Cost Search</b></a><a class="pg next" href="align-dp.html"><span>Next →</span><b>Sequence alignment (dynamic programming)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

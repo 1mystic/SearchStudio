@@ -1,0 +1,24 @@
+{
+ "id": "plan-sussman",
+ "type": "planning",
+ "name": "Sussman anomaly",
+ "note": "C is on A; goal: A on B on C. Achieving the goals one at a time undoes earlier work.",
+ "blocks": [
+  "A",
+  "B",
+  "C"
+ ],
+ "init": [
+  [
+   "A",
+   "C"
+  ],
+  [
+   "B"
+  ]
+ ],
+ "goal": [
+  "on(A,B)",
+  "on(B,C)"
+ ]
+}

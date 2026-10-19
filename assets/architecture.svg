@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" width="1000" height="400" role="img" aria-label="How Search Studio is built: folders are scanned by the build into the site, a single file, static learn pages and crawler files">
+  <style>
+    .box{fill:#181818;stroke:#46443f;stroke-width:1.5}
+    .hot{stroke:#f0a23b;stroke-width:2.2}
+    .ok{stroke:#7fcb6a;stroke-width:2.2}
+    .h{font-family:Georgia,"Times New Roman",serif;font-size:19px;fill:#edebe6}
+    .s{font-family:"JetBrains Mono",Consolas,monospace;font-size:12.5px;fill:#a8a49b}
+    .k{font-family:"JetBrains Mono",Consolas,monospace;font-size:11.5px;fill:#f2cd4b;letter-spacing:1.5px}
+    .flow{fill:none;stroke:#f0a23b;stroke-width:2.2;stroke-dasharray:7 7;animation:flow 1.2s linear infinite}
+    .flow.g{stroke:#7fcb6a}
+    @keyframes flow{to{stroke-dashoffset:-14}}
+    @media (prefers-reduced-motion:reduce){.flow{animation:none}}
+  </style>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#f0a23b"/></marker><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#7fcb6a"/></marker></defs>
+  <rect width="1000" height="400" fill="#121212"/>
+  <text class="k" x="30" y="34">YOU ADD A FILE</text><text class="k" x="415" y="34">NODE BUILD</text><text class="k" x="700" y="34">EVERYONE GETS</text>
+  <g><rect class="box" x="30" y="52" width="290" height="70" rx="8"/><text class="h" x="46" y="82">algorithms/&lt;folder&gt;/*.js</text><text class="s" x="46" y="106">Studio.register({ run(P) → steps })</text></g>
+  <g><rect class="box" x="30" y="142" width="290" height="70" rx="8"/><text class="h" x="46" y="172">examples/*.json</text><text class="s" x="46" y="196">a matrix, graph, tree, plan, CSP …</text></g>
+  <g><rect class="box" x="30" y="232" width="290" height="70" rx="8"/><text class="h" x="46" y="262">problem-types/*.js</text><text class="s" x="46" y="286">Studio.registerType({ layout, text })</text></g>
+  <g><rect class="box hot" x="400" y="132" width="210" height="110" rx="10"/><text class="h" x="420" y="168">tools/build.mjs</text><text class="s" x="420" y="194">scan · validate · test</text><text class="s" x="420" y="214">→ library + manifest</text></g>
+  <path class="flow" d="M320,87 C360,87 360,170 398,170" marker-end="url(#a)"/>
+  <path class="flow" d="M320,177 L398,187" marker-end="url(#a)"/>
+  <path class="flow" d="M320,267 C360,267 360,205 398,205" marker-end="url(#a)"/>
+  <g><rect class="box ok" x="700" y="52" width="270" height="56" rx="8"/><text class="h" x="716" y="78">index.html</text><text class="s" x="716" y="98">the studio (GitHub Pages)</text></g>
+  <g><rect class="box" x="700" y="122" width="270" height="56" rx="8"/><text class="h" x="716" y="148">dist/search-studio.html</text><text class="s" x="716" y="168">one offline file</text></g>
+  <g><rect class="box" x="700" y="192" width="270" height="56" rx="8"/><text class="h" x="716" y="218">learn/&lt;id&gt;.html</text><text class="s" x="716" y="238">static pages for search engines</text></g>
+  <g><rect class="box" x="700" y="262" width="270" height="56" rx="8"/><text class="h" x="716" y="288">sitemap · robots · llms.txt</text><text class="s" x="716" y="308">Google and AI answer engines</text></g>
+  <path class="flow g" d="M610,160 C650,160 650,80 698,80" marker-end="url(#ag)"/>
+  <path class="flow g" d="M610,178 L698,150" marker-end="url(#ag)"/>
+  <path class="flow g" d="M610,198 L698,220" marker-end="url(#ag)"/>
+  <path class="flow g" d="M610,220 C650,220 650,290 698,290" marker-end="url(#ag)"/>
+  <text class="s" x="30" y="352">No framework, no bundler: plain scripts and one registry.</text><text class="s" x="30" y="374">Run <tspan fill="#f2cd4b">npm run build</tspan> and a new algorithm appears in the library, the course map and the studio.</text>
+</svg>

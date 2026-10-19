@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rete algorithm — step by step · Search Studio</title>
+<meta name="description" content="Most cycles of a rule system change only a few facts, yet naive matching re-checks every rule against everything. The Rete algorithm compiles the rules into a network that remembers partial matches, so each new fact is matched only where it matters.">
+<link rel="canonical" href="https://1mystic.github.io/search-studio/learn/rules-rete.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Rete algorithm — step by step · Search Studio"><meta property="og:description" content="Most cycles of a rule system change only a few facts, yet naive matching re-checks every rule against everything. The Rete algorithm compiles the rules into a network that remembers partial matches, so each new fact is matched only where it matters."><meta property="og:url" content="https://1mystic.github.io/search-studio/learn/rules-rete.html"><meta property="og:image" content="https://1mystic.github.io/search-studio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Rete algorithm","description":"Most cycles of a rule system change only a few facts, yet naive matching re-checks every rule against everything. The Rete algorithm compiles the rules into a network that remembers partial matches, so each new fact is matched only where it matters.","url":"https://1mystic.github.io/search-studio/learn/rules-rete.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/search-studio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Rete algorithm","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/rules/rete.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 10 · Rule-based systems</p><h1>Rete algorithm</h1></div><a class="btn primary" href="../#try-rules-rete">Run it step by step</a></div>
+<p class="intro">Most cycles of a rule system change only a few facts, yet naive matching re-checks every rule against everything. The Rete algorithm compiles the rules into a network that remembers partial matches, so each new fact is matched only where it matters.</p>
+<h2><small>01</small>Definition</h2><p>Alpha nodes test single patterns and store matching facts. Beta (join) nodes combine a stored partial match (token) from the left with a fact from the right when their variable bindings agree, and pass the result on. Terminal nodes add complete matches to the conflict set. Rules that share leading patterns share nodes.</p>
+<h2><small>02</small>Pseudocode</h2><pre>compile: one alpha memory per distinct pattern;
+         for each rule a chain of join nodes (shared when rules start with the same patterns) ending in a terminal
+add fact w:
+    for each alpha memory whose pattern matches w: store w, then
+        right-activate its join nodes: combine w with each token in the left memory whose bindings agree
+        each new token goes to the next join node, or to the terminal → add the instantiation to the conflict set
+fire instantiations (rule order); each new fact is added the same way</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>compile the rules</td><td>One alpha memory per distinct pattern; a chain of joins per rule, shared where prefixes coincide.</td></tr><tr><td>add a fact</td><td>It enters the alpha memories it matches.</td></tr><tr><td>join</td><td>Combine with stored tokens that agree on shared variables.</td></tr><tr><td>terminal</td><td>A complete token is a rule instantiation.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">work per new fact ∝ affected tokens, not |rules| × |WM|</div><p class="read">incremental matching</p><p class="why">Stored partial matches mean old facts are never matched again.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Trades memory (all partial matches) for speed, which made large production systems practical.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>same matches as naive matching</div><div class="prop"><span>optimal</span>n/a</div><div class="prop"><span>time</span>proportional to change</div><div class="prop"><span>space</span>all partial matches</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Joins compare bindings of shared variables only.</li><li>Node sharing comes from identical condition prefixes.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="rules-forward-chaining.html"><span>← Previous</span><b>Forward chaining</b></a><a class="pg next" href="csp-backtracking.html"><span>Next →</span><b>Backtracking</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>
