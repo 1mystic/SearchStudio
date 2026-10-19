@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 3 · TSP · local search</p><h1>Variable neighbourhood descent</h1></div><a class="btn primary" href="../#try-tsp-vnd">Run it step by step</a></div>
 <p class="intro">If hill climbing gets stuck, one fix is to look further: use a bigger neighbourhood. Variable Neighbourhood Descent does this in order, from cheap and sparse to expensive and dense, so most of the improvement comes cheaply.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>Given MoveGen functions ordered by density, hill climb with MoveGen(1) to a local optimum, then continue from there with MoveGen(2), and so on.</p>
 <h2><small>02</small>Pseudocode</h2><pre>node ← start
 for i ← 1 to n

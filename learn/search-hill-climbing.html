@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 3 · Graph search · informed</p><h1>Hill Climbing</h1></div><a class="btn primary" href="../#try-search-hill-climbing">Run it step by step</a></div>
 <p class="intro">Hill climbing is the simplest way to use a heuristic: always step to the neighbour that looks closest to the goal, and stop when no neighbour looks better than where you are. It needs almost no memory, but it can stop on a hilltop that is not the summit.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>From the current node move to the child with the smallest h, provided it is strictly smaller than h(current). Otherwise stop and return the current node.</p>
 <h2><small>02</small>Pseudocode</h2><pre>node ← start
 newNode ← head(sort_h(MoveGen(node)))

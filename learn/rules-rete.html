@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 10 · Rule-based systems</p><h1>Rete algorithm</h1></div><a class="btn primary" href="../#try-rules-rete">Run it step by step</a></div>
 <p class="intro">Most cycles of a rule system change only a few facts, yet naive matching re-checks every rule against everything. The Rete algorithm compiles the rules into a network that remembers partial matches, so each new fact is matched only where it matters.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>Alpha nodes test single patterns and store matching facts. Beta (join) nodes combine a stored partial match (token) from the left with a fact from the right when their variable bindings agree, and pass the result on. Terminal nodes add complete matches to the conflict set. Rules that share leading patterns share nodes.</p>
 <h2><small>02</small>Pseudocode</h2><pre>compile: one alpha memory per distinct pattern;
          for each rule a chain of join nodes (shared when rules start with the same patterns) ending in a terminal

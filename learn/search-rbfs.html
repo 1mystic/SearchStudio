@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 6 · Graph search · space saving</p><h1>Recursive Best-First Search</h1></div><a class="btn primary" href="../#try-search-rbfs">Run it step by step</a></div>
 <p class="intro">Recursive Best-First Search behaves like A* but stores only the current path. When the path it is exploring becomes worse than the best alternative elsewhere, it remembers how good that path turned out to be and switches.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>At each node, expand the child with the lowest backed-up value F while it stays below a limit (the best alternative higher up). When it exceeds the limit, return and replace the child's F by the best value found below it.</p>
 <h2><small>02</small>Pseudocode</h2><pre>RBFS(N, F(N), limit):
     if GoalTest(N): return SUCCESS

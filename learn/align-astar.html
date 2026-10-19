@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 6 · Sequence alignment</p><h1>Sequence alignment (A*)</h1></div><a class="btn primary" href="../#try-align-astar">Run it step by step</a></div>
 <p class="intro">Dynamic programming fills the whole table. A* treats alignment as a shortest-path search on the same lattice and, with a good heuristic, explores only the part of the table near the best alignment.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>States are lattice points (i,j); moves are diagonal, down and right with their costs. h(i,j) = gap × |(m−i) − (n−j)| because the remaining length difference must be covered by gaps.</p>
 <h2><small>02</small>Pseudocode</h2><pre>start (0,0), goal (m,n)
 moves: diagonal cost(aᵢ,bⱼ), down gap, right gap

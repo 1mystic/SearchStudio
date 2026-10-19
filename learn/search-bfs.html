@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 2 · Graph search · uninformed</p><h1>Breadth First Search</h1></div><a class="btn primary" href="../#try-search-bfs">Run it step by step</a></div>
 <p class="intro">Breadth First Search explores in rings: first everything one step from the start, then two steps, and so on. It finds the path with the fewest edges.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>A state-space search problem has a start node S, a goal test, and a MoveGen function that lists the neighbours of a node. The search keeps two lists: OPEN (nodes generated but not yet expanded) and CLOSED (nodes already expanded). Each entry is a node pair (node, parent, value) so the path can be read back through parents. BFS treats OPEN as a queue: new children go to the back.</p>
 <h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, 0)];  CLOSED ← [ ]
 while OPEN not empty

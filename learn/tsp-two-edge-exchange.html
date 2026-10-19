@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 3 · TSP · perturbation</p><h1>2-edge exchange (2-opt)</h1></div><a class="btn primary" href="../#try-tsp-two-edge-exchange">Run it step by step</a></div>
 <p class="intro">Perturbative methods start from a complete tour and improve it by small changes. 2-edge exchange is one such change: remove two non-adjacent edges and reconnect. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>MoveGen(2-edge exchange) lists every tour reachable by one 2-edge exchange move (n(n−3)/2 neighbours). Steepest-descent hill climbing moves to the best neighbour while it is strictly better than the current tour.</p>
 <h2><small>02</small>Pseudocode</h2><pre>node ← start tour
 loop

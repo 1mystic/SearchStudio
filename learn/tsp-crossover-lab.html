@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 4 · TSP · genetic</p><h1>Crossover lab</h1></div><a class="btn primary" href="../#try-tsp-crossover-lab">Run it step by step</a></div>
 <p class="intro">Genetic algorithms combine two good tours into a child. For the TSP that is tricky: cutting two city lists and gluing the halves usually repeats some cities and loses others. TSP crossovers are designed to always produce valid tours.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>A crossover takes parent tours P1, P2 and builds a child that inherits structure from both: positions (cycle crossover), a segment plus positions (PMX), a segment plus relative order (order crossover), edges (alternating edges, heuristic crossover), or a prefix in ordinal code (ordinal crossover).</p>
 <h2><small>02</small>Pseudocode</h2><pre>CX:  follow P1[i] → city P2[i] → its position in P1 …; odd cycles from P1, even from P2
 PMX: copy P1[a..b]; elsewhere take P2's city, following the a..b mapping while it is taken

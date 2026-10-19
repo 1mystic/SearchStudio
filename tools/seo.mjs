@@ -75,6 +75,7 @@ export function build(Studio, owner, SITE, PKG) {
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week ${a.week} · ${esc(a.family)}</p><h1>${esc(a.name)}</h1></div><a class="btn primary" href="../#try-${a.id}">Run it step by step</a></div>
 <p class="intro">${esc(L.intro || a.summary || "")}</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 ${L.definition ? `<h2><small>01</small>Definition</h2><p>${esc(L.definition)}</p>` : ""}
 <h2><small>02</small>Pseudocode</h2><pre>${esc(a.pseudocode || "")}</pre>
 ${L.steps && L.steps.length ? `<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody>${L.steps.map(([l, w]) => `<tr><td>${esc(l)}</td><td>${esc(w)}</td></tr>`).join("")}</tbody></table></div>` : ""}

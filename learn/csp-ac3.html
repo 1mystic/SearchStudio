@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 11 · Constraint processing</p><h1>Arc consistency (AC-1, AC-3)</h1></div><a class="btn primary" href="../#try-csp-ac3">Run it step by step</a></div>
 <p class="intro">A constraint satisfaction problem has variables, each with a domain of values, and constraints saying which combinations are allowed. A solution assigns every variable a value from its domain so that every constraint holds. Arc consistency removes values that cannot possibly be part of any solution, before or during search.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>An arc (X, Y) is consistent if every value of X has some supporting value in Y. Revise(X, Y) deletes unsupported values. AC-1 revises every arc until a whole pass changes nothing; AC-3 keeps a queue and re-examines only arcs pointing into a variable whose domain just shrank.</p>
 <h2><small>02</small>Pseudocode</h2><pre>Revise(X, Y):
     for each a in D(X): if no b in D(Y) satisfies the constraint: delete a from D(X)

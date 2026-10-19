@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 11 · Constraint processing</p><h1>Model-based diagnosis</h1></div><a class="btn primary" href="../#try-csp-diagnosis">Run it step by step</a></div>
 <p class="intro">When a device misbehaves, model-based diagnosis asks: which components, if broken, would explain what we observe? It uses models of how each component should behave and looks for contradictions.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>Assume a set of components works and propagate values through their models. A contradiction with an observation means that set cannot all be working: it is a conflict set. A diagnosis is a minimal set of components that intersects every minimal conflict.</p>
 <h2><small>02</small>Pseudocode</h2><pre>for each set S of components assumed OK
     propagate values using only the models of S (forward and backward through + and ×)

@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 9 · Problem decomposition</p><h1>AO*</h1></div><a class="btn primary" href="../#try-andor-ao-star">Run it step by step</a></div>
 <p class="intro">Some problems split into subproblems that must all be solved (AND), while others offer alternative ways to proceed (OR). AO* searches such AND–OR graphs for the cheapest solution graph, revising its choices as costs become known.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>Each node has connectors: a single-child connector is an OR option, a multi-child connector is an AND arc. Cost of a connector = its arc costs + sum of its children's costs. A node's cost is its cheapest connector, which is marked. AO* expands an unexpanded node on the marked partial solution, then revises costs and markings upwards.</p>
 <h2><small>02</small>Pseudocode</h2><pre>repeat until start is SOLVED (or its cost exceeds FUTILITY)
     trace marked connectors from start; pick an unexpanded node n on that partial solution

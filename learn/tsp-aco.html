@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 4 · TSP · swarm</p><h1>Ant colony optimisation</h1></div><a class="btn primary" href="../#try-tsp-aco">Run it step by step</a></div>
 <p class="intro">Real ants find short paths by leaving pheromone: short routes are travelled more often, collect more pheromone, and attract more ants. Ant colony optimisation copies this with artificial ants building tours on a pheromone map.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>Each ant builds a tour, choosing the next city j from i with probability proportional to τᵢⱼ^α · (1/dᵢⱼ)^β. After all ants finish, pheromone evaporates by a factor (1−ρ) and each ant adds Q/L on the edges of its tour.</p>
 <h2><small>02</small>Pseudocode</h2><pre>τ ← τ0 on every edge;  bestTour ← nil
 repeat for t iterations

@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 11 · Constraint processing</p><h1>Forward checking</h1></div><a class="btn primary" href="../#try-csp-forward-checking">Run it step by step</a></div>
 <p class="intro">A constraint satisfaction problem has variables, each with a domain of values, and constraints saying which combinations are allowed. A solution assigns every variable a value from its domain so that every constraint holds. Forward checking combines search with a little reasoning: it looks ahead after each assignment.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>After assigning X = a, remove from the domains of X's unassigned neighbours every value that conflicts with a. If a domain becomes empty, reject a immediately.</p>
 <h2><small>02</small>Pseudocode</h2><pre>FC(assignment, domains, i):
     if i &gt; n: return assignment

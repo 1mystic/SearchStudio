@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 10 · Rule-based systems</p><h1>Forward chaining</h1></div><a class="btn primary" href="../#try-rules-forward-chaining">Run it step by step</a></div>
 <p class="intro">A rule-based system holds facts in working memory and knowledge as if–then rules. Forward chaining starts from the facts and keeps firing rules whose conditions match until nothing new can be derived.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>The recognise–act cycle: match all rules against working memory to form the conflict set of rule instantiations; resolve the conflict by choosing one (rule order, recency, specificity); execute its actions; repeat. A fired instantiation is not fired again (refractoriness).</p>
 <h2><small>02</small>Pseudocode</h2><pre>repeat
     MATCH:   conflict set ← every (rule, bindings) whose conditions hold in WM and that has not fired

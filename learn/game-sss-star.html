@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 7 · Game playing</p><h1>SSS*</h1></div><a class="btn primary" href="../#try-game-sss-star">Run it step by step</a></div>
 <p class="intro">SSS* treats game-tree search as best-first search over strategies. It keeps an OPEN list of node triples and always refines the most promising one, so it never looks at a leaf that alpha-beta would skip, and sometimes skips leaves alpha-beta looks at.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>OPEN holds triples (node, status, merit) where status is LIVE (not yet examined) or SOLVED. Starting from (root, LIVE, +∞), repeatedly take the triple with the highest merit and apply one of the six cases until the root is SOLVED; its merit is the minimax value.</p>
 <h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(root, LIVE, +∞)]
 loop

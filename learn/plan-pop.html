@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 8 · Planning</p><h1>Partial Order Planning</h1></div><a class="btn primary" href="../#try-plan-pop">Run it step by step</a></div>
 <p class="intro">A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Partial Order Planning searches the space of plans instead of states, adding steps and orderings only when it must.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>A partial plan has steps, ordering constraints, causal links (A achieves p for B) and open preconditions. Repeatedly support an open precondition with an existing or new step, then resolve threats (a step that deletes p and could fall between A and B) by ordering it before A (demotion) or after B (promotion). Backtrack on failure.</p>
 <h2><small>02</small>Pseudocode</h2><pre>plan ← {Start, Finish}, Start &lt; Finish, agenda ← goal preconditions of Finish
 while agenda not empty

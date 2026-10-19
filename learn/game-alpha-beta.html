@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 7 · Game playing</p><h1>Alpha-Beta pruning</h1></div><a class="btn primary" href="../#try-game-alpha-beta">Run it step by step</a></div>
 <p class="intro">Alpha-beta gives the same answer as minimax while skipping parts of the tree that cannot change the decision. If you already know a move gives you 3, you can stop examining another move as soon as you see the opponent can hold you to 2 there.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>Pass a window (α, β) down the tree. α is the best value MAX is already guaranteed, β the best value MIN is guaranteed. At a MAX node raise α; at a MIN node lower β; as soon as α ≥ β, prune the remaining children.</p>
 <h2><small>02</small>Pseudocode</h2><pre>AlphaBeta(N, α, β):
     if N is a leaf: return e(N)

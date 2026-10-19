@@ -20,6 +20,7 @@
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week 6 · Sequence alignment</p><h1>Sequence alignment (dynamic programming)</h1></div><a class="btn primary" href="../#try-align-dp">Run it step by step</a></div>
 <p class="intro">Comparing two DNA strings means lining them up with as few mismatches and gaps as possible. Every alignment is a path through a grid, so the best alignment is a shortest path, and dynamic programming finds it by filling a table.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
 <h2><small>01</small>Definition</h2><p>D(i,j) is the cheapest alignment of the first i letters of a with the first j letters of b. Fill the table from D(0,0) = 0 using three moves: diagonal (pair two letters), down (a letter of a against a gap), right (a letter of b against a gap). Trace back from D(m,n).</p>
 <h2><small>02</small>Pseudocode</h2><pre>D(0,0) ← 0;  D(i,0) ← i·gap;  D(0,j) ← j·gap
 for i ← 1..m, for j ← 1..n
