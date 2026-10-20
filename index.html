@@ -414,7 +414,7 @@ B G 1</pre>
   <h2>Quick links</h2>
   <ul>
     <li><a href="https://github.com/1mystic/SearchStudio" rel="noopener" target="_blank">Source code on GitHub</a></li>
-    <li><a href="https://github.com/1mystic/SearchStudio/blob/main/docs/IMPORTING.md" rel="noopener" target="_blank">Importing problems: the JSON schema for every problem type</a>, with tested examples for TSP, graphs, game trees, AND–OR graphs, planning, rules, CSPs, line drawings, circuits and alignment.</li>
+    <li><a href="https://github.com/1mystic/SearchStudio/blob/main/IMPORTING.md" rel="noopener" target="_blank">Importing problems: the JSON schema for every problem type</a>, with tested examples for TSP, graphs, game trees, AND–OR graphs, planning, rules, CSPs, line drawings, circuits and alignment.</li>
     <li><a href="https://github.com/1mystic/SearchStudio/blob/main/CONTRIBUTING.md" rel="noopener" target="_blank">CONTRIBUTING.md</a>: the full contributor guide.</li>
     <li><a href="https://github.com/1mystic/SearchStudio/issues" rel="noopener" target="_blank">Report a bug or suggest an algorithm</a></li>
   </ul>
@@ -422,7 +422,7 @@ B G 1</pre>
   <h2>Use your own problem, no code needed</h2>
   <ol>
     <li>In the <a href="#studio">studio</a>, open the problem card and choose <b>Import</b>.</li>
-    <li>Paste JSON that follows the <a href="https://github.com/1mystic/SearchStudio/blob/main/docs/IMPORTING.md" rel="noopener" target="_blank">importing guide</a>, or choose a <code>.json</code> file.</li>
+    <li>Paste JSON that follows the <a href="https://github.com/1mystic/SearchStudio/blob/main/IMPORTING.md" rel="noopener" target="_blank">importing guide</a>, or choose a <code>.json</code> file.</li>
     <li>The problem is saved under <b>My problems</b> in this browser. You can share it with <b>Export &amp; print → Export problem</b>.</li>
   </ol>
   <p>The quickest way to make a new problem is to export a built-in example of the same kind, change the values, and import it again.</p>
@@ -441,7 +441,7 @@ B G 1</pre>
 │   ├── search/  tsp/  alignment/  games/  andor/  planning/  rules/  csp/
 ├── problem-types/       how each kind of problem is drawn, typed and generated
 ├── examples/            one JSON file per built-in problem
-├── docs/IMPORTING.md    JSON schemas for every problem type
+├── IMPORTING.md         JSON schemas for every problem type
 ├── src/
 │   ├── core/            registry, problem model, search engine, TSP helpers
 │   ├── ui/              stage renderer and the app
@@ -509,7 +509,7 @@ B G 1</pre>
 
   <h2>Add a built-in example</h2>
   <ol>
-    <li>Write the problem as JSON following the <a href="https://github.com/1mystic/SearchStudio/blob/main/docs/IMPORTING.md" rel="noopener" target="_blank">importing guide</a>.</li>
+    <li>Write the problem as JSON following the <a href="https://github.com/1mystic/SearchStudio/blob/main/IMPORTING.md" rel="noopener" target="_blank">importing guide</a>.</li>
     <li>Give it a unique <code>"id"</code> and a one-line <code>"note"</code>, then save it as <code>examples/&lt;type&gt;-&lt;name&gt;.json</code>.</li>
     <li>Run <code>npm run build</code>. The build validates it and runs every matching algorithm on it.</li>
   </ol>
