@@ -259,60 +259,206 @@ B G 1</pre>
   </ul>
 </article>
 </section>
-  <section class="page" data-page="about" hidden><article class="prose">
+  <section class="page" data-page="about" hidden>
+<article class="prose">
   <p class="eyebrow">About</p>
   <h1>About Search Studio</h1>
-  <p class="lede">A study companion for search methods: the algorithms of state-space search, informed search and stochastic optimisation, traced exactly the way they are traced by hand.</p>
+  <p class="lede">A free, public-domain study companion for <i>AI: Search Methods for Problem Solving</i> (Prof. Deepak Khemani, IIT Madras). Every algorithm in the course is traced step by step, exactly the way it is traced by hand.</p>
+
   <h2>Why it exists</h2>
-  <p>Search algorithms are easy to describe and surprisingly easy to trace wrongly: a missed tie-break, a child added twice, a forgotten closing edge, a savings pair merged that should have been refused. Seeing every step, with the working table and the OPEN and CLOSED lists side by side, makes those mistakes visible.</p>
-  <h2>What it covers</h2>
+  <p>Search algorithms are easy to describe and surprisingly easy to trace wrongly. A missed tie-break, a child added twice or a savings pair merged that should have been refused will all give a wrong answer. Seeing every step, with the working table and the OPEN and CLOSED lists side by side, makes those mistakes visible.</p>
+
+  <h2>Full syllabus</h2>
+  <p>Weeks 1–11 of the course, with the algorithms you can run for each week. Every week also has its own section on the <a href="#course">course map</a>.</p>
+
+  <h3>Week 1 · Introduction and philosophy</h3>
   <ul>
-    <li><b>State-space search</b>: Breadth First, Depth First, Depth First Iterative Deepening, Uniform Cost, Best First and A* (with weighted A*).</li>
-    <li><b>Travelling salesperson, constructive</b>: Nearest Neighbour, Greedy, Savings, and brute force as the exact reference.</li>
-    <li><b>Perturbation and local search</b>: 2-city exchange, 2-edge exchange, Or-opt, 3-edge exchange, Variable Neighbourhood Descent, Beam Search, Tabu Search, Iterated Hill Climbing, Random Walk, Simulated Annealing.</li>
-    <li><b>Population methods</b>: Genetic Algorithm with cycle, PMX, order, alternating-edges, heuristic and ordinal crossover, and Ant Colony Optimisation.</li>
+    <li>Introduction: what artificial intelligence is and where search fits in.</li>
+    <li>Philosophy: the Turing Test and the Winograd Schema Challenge.</li>
+    <li>No algorithms to run this week.</li>
   </ul>
+
+  <h3>Week 2 · State space search</h3>
+  <ul>
+    <li>Introduction to state space search: states, MoveGen, GoalTest, and the search space as a graph.</li>
+    <li>Examples of state spaces.</li>
+    <li>Depth First Search (DFS) and Breadth First Search (BFS), with OPEN and CLOSED as lists of node pairs.</li>
+    <li>Depth First Iterative Deepening (DFID).</li>
+    <li>Analysis: completeness, the path found, time and space.</li>
+    <li><b>In the studio:</b> <a href="#algo-search-bfs">BFS</a> · <a href="#algo-search-dfs">DFS</a> · <a href="#algo-search-dfid">DFID</a></li>
+  </ul>
+
+  <h3>Week 3 · Heuristic search and local search</h3>
+  <ul>
+    <li>Heuristic search: Best First Search, Hill Climbing and Beam Search on graphs.</li>
+    <li>Solution space search: the travelling salesperson problem (TSP).</li>
+    <li>Constructive TSP methods: Nearest Neighbour, Greedy and Savings, with brute force as the exact reference.</li>
+    <li>Perturbation methods: 2-city exchange, 2-edge exchange (2-opt), Or-opt, 3-edge exchange.</li>
+    <li>Escaping local optima: Variable Neighbourhood Descent, Beam Search, Tabu Search.</li>
+    <li>Stochastic local search: Iterated Hill Climbing, Random Walk, Simulated Annealing.</li>
+    <li><b>In the studio:</b> <a href="#algo-search-best-first">Best First</a> · <a href="#algo-search-hill-climbing">Hill Climbing</a> · <a href="#algo-search-beam">Beam Search</a> · <a href="#algo-tsp-nearest-neighbour">Nearest Neighbour</a> · <a href="#algo-tsp-greedy">Greedy</a> · <a href="#algo-tsp-savings">Savings</a> · <a href="#algo-tsp-brute-force">Brute force</a> · <a href="#algo-tsp-two-city-exchange">2-city exchange</a> · <a href="#algo-tsp-two-edge-exchange">2-opt</a> · <a href="#algo-tsp-or-opt">Or-opt</a> · <a href="#algo-tsp-three-edge-exchange">3-edge exchange</a> · <a href="#algo-tsp-vnd">VND</a> · <a href="#algo-tsp-beam">Beam (TSP)</a> · <a href="#algo-tsp-tabu">Tabu</a> · <a href="#algo-tsp-ihc">Iterated HC</a> · <a href="#algo-tsp-random-walk">Random walk</a> · <a href="#algo-tsp-sa">Simulated annealing</a></li>
+  </ul>
+
+  <h3>Week 4 · Population based methods</h3>
+  <ul>
+    <li>Genetic Algorithms: selection, crossover and mutation.</li>
+    <li>TSP crossovers: cycle (CX), partially mapped (PMX), order (OX), alternating edges (AEX), heuristic (HX) and ordinal.</li>
+    <li>Emergent systems.</li>
+    <li>Ant Colony Optimisation: pheromone, evaporation and the probabilistic tour rule.</li>
+    <li><b>In the studio:</b> <a href="#algo-tsp-ga">Genetic algorithm</a> · <a href="#algo-tsp-crossover-lab">Crossover lab</a> · <a href="#algo-tsp-aco">Ant colony</a></li>
+  </ul>
+
+  <h3>Week 5 · Finding optimal paths</h3>
+  <ul>
+    <li>Branch and bound and Uniform Cost Search (UCS).</li>
+    <li>Algorithm A*: f(n) = g(n) + h(n), and weighted A*.</li>
+    <li>Admissibility of A*: if h never overestimates, the first goal picked is optimal.</li>
+    <li><b>In the studio:</b> <a href="#algo-search-ucs">UCS</a> · <a href="#algo-search-astar">A*</a></li>
+  </ul>
+
+  <h3>Week 6 · Monotone condition and saving space</h3>
+  <ul>
+    <li>The monotone (consistency) condition: h(n) ≤ k(n, m) + h(m).</li>
+    <li>Space-saving versions of A*: IDA*, Recursive Best-First Search, Divide and Conquer Frontier Search.</li>
+    <li>Sequence alignment as shortest-path search, by dynamic programming and by A*.</li>
+    <li><b>In the studio:</b> <a href="#algo-search-monotone-check">Admissibility &amp; monotone check</a> · <a href="#algo-search-ida-star">IDA*</a> · <a href="#algo-search-rbfs">RBFS</a> · <a href="#algo-search-dcfs">DCFS</a> · <a href="#algo-align-dp">Alignment (DP)</a> · <a href="#algo-align-astar">Alignment (A*)</a></li>
+  </ul>
+
+  <h3>Week 7 · Game playing</h3>
+  <ul>
+    <li>Game theory and board games: game trees, MAX and MIN, evaluation functions.</li>
+    <li>Minimax.</li>
+    <li>Alpha-Beta pruning, and why node ordering matters.</li>
+    <li>SSS*: best-first search over strategies.</li>
+    <li><b>In the studio:</b> <a href="#algo-game-minimax">Minimax</a> · <a href="#algo-game-alpha-beta">Alpha-Beta</a> · <a href="#algo-game-sss-star">SSS*</a></li>
+  </ul>
+
+  <h3>Week 8 · Planning</h3>
+  <ul>
+    <li>Domain-independent planning in the blocks world: STRIPS operators, preconditions, add and delete lists.</li>
+    <li>Forward and backward state-space planning.</li>
+    <li>Goal Stack Planning, and the Sussman anomaly.</li>
+    <li>Plan Space Planning: Partial Order Planning.</li>
+    <li><b>In the studio:</b> <a href="#algo-plan-forward">Forward planning</a> · <a href="#algo-plan-backward">Backward planning</a> · <a href="#algo-plan-gsp">Goal Stack Planning</a> · <a href="#algo-plan-pop">Partial Order Planning</a></li>
+  </ul>
+
+  <h3>Week 9 · Problem decomposition</h3>
+  <ul>
+    <li>Problem decomposition with goal trees.</li>
+    <li>AND–OR graphs: hyper-arcs, solved nodes and futility.</li>
+    <li>Algorithm AO*: forward expansion, backward cost revision, the marked solution graph.</li>
+    <li><b>In the studio:</b> <a href="#algo-andor-ao-star">AO*</a></li>
+  </ul>
+
+  <h3>Week 10 · Rule-based expert systems</h3>
+  <ul>
+    <li>Rule-based expert systems and pattern-directed inference.</li>
+    <li>The inference engine: match, resolve, execute. Conflict resolution strategies.</li>
+    <li>The Rete algorithm: a network that remembers partial matches.</li>
+    <li><b>In the studio:</b> <a href="#algo-rules-forward-chaining">Forward chaining</a> · <a href="#algo-rules-rete">Rete</a></li>
+  </ul>
+
+  <h3>Week 11 · Constraint processing</h3>
+  <ul>
+    <li>Constraint satisfaction problems: variables, domains, binary constraints.</li>
+    <li>Backtracking and forward checking with variable-ordering heuristics.</li>
+    <li>Arc consistency (AC-1, AC-3).</li>
+    <li>Combining search and reasoning.</li>
+    <li>The Waltz algorithm: labelling line drawings of trihedral objects.</li>
+    <li>Model-based diagnosis: conflicts and minimal diagnoses.</li>
+    <li><b>In the studio:</b> <a href="#algo-csp-backtracking">Backtracking</a> · <a href="#algo-csp-forward-checking">Forward checking</a> · <a href="#algo-csp-ac3">Arc consistency</a> · <a href="#algo-csp-waltz">Waltz</a> · <a href="#algo-csp-diagnosis">Model-based diagnosis</a></li>
+  </ul>
+
   <h2>Notation</h2>
-  <p>The site follows the notation of <i>AI: Search Methods for Problem Solving</i> (Prof. Deepak Khemani, IIT Madras) and his book <i>A First Course in Artificial Intelligence</i>: MoveGen and GoalTest, OPEN and CLOSED as lists of node pairs, path representation for tours, the sigmoid acceptance rule for simulated annealing, and the course's crossover conventions. It is an independent study aid and is not affiliated with or endorsed by IIT Madras.</p>
+  <p>The site follows the notation of the course and of Prof. Khemani's book <i>A First Course in Artificial Intelligence</i>:</p>
+  <ul>
+    <li>MoveGen and GoalTest.</li>
+    <li>OPEN and CLOSED as lists of node pairs <code>(node, parent, depth or g)</code>.</li>
+    <li>Ties broken alphabetically.</li>
+    <li>The goal test applied when a node is picked from OPEN.</li>
+    <li>The path representation for tours.</li>
+    <li>The sigmoid acceptance rule for simulated annealing.</li>
+    <li>The course's crossover conventions.</li>
+  </ul>
+  <p>It is an independent study aid, not affiliated with or endorsed by IIT Madras or NPTEL.</p>
+
   <h2>How results are checked</h2>
-  <p>Every algorithm is run against every example and against random problems on each build. Tours must be permutations whose reported cost matches a recomputation; paths must run from start to goal with the reported cost. On the six-city instance the results are compared with an independent Python implementation (optimum 224, Nearest Neighbour 264, Greedy 238, Savings 224, and so on).</p>
+  <p>On each build, every algorithm runs against every example and against random problems.</p>
+  <ul>
+    <li>Tours must be permutations, and the reported cost must match a fresh recomputation. Paths must run from start to goal at the cost reported.</li>
+    <li>IDA*, RBFS and DCFS must find the same cost as UCS.</li>
+    <li>Minimax, Alpha-Beta and SSS* must give the same value.</li>
+    <li>Every plan must execute in the blocks world.</li>
+    <li>Rete must derive the same facts as forward chaining.</li>
+  </ul>
+  <p>The six-city TSP results also match an independent Python implementation: optimum 224, Nearest Neighbour 264, Greedy 238, Savings 224.</p>
+
   <h2>Further reading</h2>
   <ul>
     <li>Deepak Khemani, <i>A First Course in Artificial Intelligence</i>, McGraw Hill Education.</li>
-    <li>D. S. Johnson and L. A. McGeoch, “The Traveling Salesman Problem: A Case Study in Local Optimization”, in <i>Local Search in Combinatorial Optimization</i> (1997): how far above optimal the classic TSP heuristics land in practice.</li>
+    <li>D. S. Johnson and L. A. McGeoch, “The Traveling Salesman Problem: A Case Study in Local Optimization”, in <i>Local Search in Combinatorial Optimization</i> (1997).</li>
     <li>M. Dorigo and T. Stützle, <i>Ant Colony Optimization</i>, MIT Press (2004).</li>
+    <li>S. Russell and P. Norvig, <i>Artificial Intelligence: A Modern Approach</i>, chapters on search, games, planning and CSPs.</li>
   </ul>
+
+  <h2>Credits and license</h2>
+  <p>Made by <a href="https://github.com/1mystic" rel="author noopener" target="_blank">1mystic</a>. The source is on <a href="https://github.com/1mystic/search-studio" rel="noopener" target="_blank">GitHub</a> and released into the public domain under <a href="https://unlicense.org/" rel="noopener" target="_blank">the Unlicense</a>.</p>
 </article>
 </section>
-  <section class="page" data-page="contribute" hidden><article class="prose">
+<section class="page" data-page="contribute" hidden>
+<article class="prose">
   <p class="eyebrow">Contribute</p>
-  <h1>Add an algorithm or an example</h1>
-  <p class="lede">The library is the <code>algorithms/</code> folder. Add a file, run the build, and it appears on the site with its own learn page and studio entry.</p>
+  <h1>Add an algorithm, an example or a problem</h1>
+  <p class="lede">The library is made of plain folders. To add something, put a file in the right folder and run the build. It then appears in the library, on the course map and in the studio.</p>
+
+  <h2>Quick links</h2>
+  <ul>
+    <li><a href="https://github.com/1mystic/search-studio" rel="noopener" target="_blank">Source code on GitHub</a></li>
+    <li><a href="https://github.com/1mystic/search-studio/blob/main/docs/IMPORTING.md" rel="noopener" target="_blank">Importing problems: the JSON schema for every problem type</a>, with tested examples for TSP, graphs, game trees, AND–OR graphs, planning, rules, CSPs, line drawings, circuits and alignment.</li>
+    <li><a href="https://github.com/1mystic/search-studio/blob/main/CONTRIBUTING.md" rel="noopener" target="_blank">CONTRIBUTING.md</a>: the full contributor guide.</li>
+    <li><a href="https://github.com/1mystic/search-studio/issues" rel="noopener" target="_blank">Report a bug or suggest an algorithm</a></li>
+  </ul>
+
+  <h2>Use your own problem, no code needed</h2>
+  <ol>
+    <li>In the <a href="#studio">studio</a>, open the problem card and choose <b>Import</b>.</li>
+    <li>Paste JSON that follows the <a href="https://github.com/1mystic/search-studio/blob/main/docs/IMPORTING.md" rel="noopener" target="_blank">importing guide</a>, or choose a <code>.json</code> file.</li>
+    <li>The problem is saved under <b>My problems</b> in this browser. You can share it with <b>Export &amp; print → Export problem</b>.</li>
+  </ol>
+  <p>The quickest way to make a new problem is to export a built-in example of the same kind, change the values, and import it again.</p>
+  <p>A minimal TSP:</p>
+<pre>{
+  "type": "tsp",
+  "name": "My four cities",
+  "cities": [{ "id": "A" }, { "id": "B" }, { "id": "C" }, { "id": "D" }],
+  "matrix": [[0, 5, 9, 4], [5, 0, 3, 7], [9, 3, 0, 6], [4, 7, 6, 0]]
+}</pre>
 
   <h2>Project layout</h2>
-<pre>SearchStudio/
-├── algorithms/          one file per algorithm, grouped by family
+<pre>search-studio/
+├── algorithms/          one file per algorithm, grouped by folder
 │   ├── _template.js     copy this to start (files starting with _ are skipped)
-│   ├── search/          bfs.js, dfs.js, dfid.js, ucs.js, best-first.js, a-star.js
-│   └── tsp/             nearest-neighbour.js, greedy.js, savings.js, …
+│   ├── search/  tsp/  alignment/  games/  andor/  planning/  rules/  csp/
+├── problem-types/       how each kind of problem is drawn, typed and generated
 ├── examples/            one JSON file per built-in problem
+├── docs/IMPORTING.md    JSON schemas for every problem type
 ├── src/
 │   ├── core/            registry, problem model, search engine, TSP helpers
 │   ├── ui/              stage renderer and the app
 │   ├── pages/           home, guide, about, contribute (plain HTML)
 │   └── styles/          studio.css
 ├── tools/
-│   ├── build.mjs        scans the folders and builds the site
-│   └── test.mjs         runs every algorithm on every example
-├── index.html           generated: the site, loading files from the folders
-└── dist/SearchStudio.html   generated: the whole site in one file</pre>
+│   ├── build.mjs        scans the folders and builds the site, learn pages, sitemap, llms.txt
+│   └── test.mjs         runs every algorithm on every example, checks known answers
+├── index.html           generated: the site
+└── dist/search-studio.html   generated: the whole site in one file</pre>
 
   <h2>Add an algorithm in four steps</h2>
   <ol>
-    <li>Copy <code>algorithms/_template.js</code> to <code>algorithms/&lt;family&gt;/&lt;name&gt;.js</code>.</li>
-    <li>Fill in the metadata (<code>id</code>, <code>name</code>, <code>family</code>, <code>problem</code>), the <code>learn</code> block and <code>run</code>.</li>
-    <li>Run <code>node tools/build.mjs</code>. The build loads every file, checks that it registers, runs it on the examples, and regenerates <code>index.html</code>, the manifest and the single-file build. Use <code>node tools/build.mjs --watch</code> while you work.</li>
-    <li>Open <code>index.html</code> (or serve the folder with <code>npx serve</code>) and find your algorithm in the library.</li>
+    <li>Copy <code>algorithms/_template.js</code> to <code>algorithms/&lt;folder&gt;/&lt;name&gt;.js</code>.</li>
+    <li>Fill in the metadata (<code>id</code>, <code>name</code>, <code>family</code>, <code>week</code>, <code>problem</code>), the <code>learn</code> block, <code>params</code> and <code>run</code>.</li>
+    <li>Run <code>npm run build</code> (or <code>npm run watch</code> while you work). The build loads every file, checks that it registers, runs it on the examples and on random problems, and regenerates the site.</li>
+    <li>Open the site and find your algorithm in the library and on the course map.</li>
   </ol>
 
   <h2>The algorithm file</h2>
@@ -320,8 +466,8 @@ B G 1</pre>
   id: "tsp-my-method",            // unique, used in links: #algo-tsp-my-method
   name: "My method",
   family: "TSP · local search",   // the library groups by this
-  problem: "tsp",                 // tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment
   week: 3,                        // course week 1–11: places it on the course map
+  problem: "tsp",                 // tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment
   order: 200,                     // position inside the family
   summary: "One sentence for the library card.",
   pseudocode: `...`,
@@ -351,37 +497,35 @@ B G 1</pre>
     <thead><tr><th>field</th><th>shape</th><th>shown as</th></tr></thead>
     <tbody>
       <tr><td><code>caption</code></td><td>string</td><td>the yellow sentence under the stage (required)</td></tr>
-      <tr><td><code>nodes</code></td><td><code>{ A: { state, badge } }</code></td><td>node colours; states: plain, current, open, closed, visited, path, goal, start</td></tr>
-      <tr><td><code>edges</code></td><td><code>[{ u, v, state, label }]</code></td><td>edges; states: faint, tour, path, candidate, added, removed, rejected, alt, tree, pheromone</td></tr>
-      <tr><td><code>table</code></td><td><code>{ title, columns, rows, rowStates }</code></td><td>the working table; row states: ok, bad, warn, cur, dim</td></tr>
-      <tr><td><code>lists</code></td><td><code>[{ label, items: [{ text, state }] }]</code></td><td>OPEN / CLOSED style rows</td></tr>
-      <tr><td><code>stats</code></td><td><code>[{ label, value, state }]</code></td><td>small figures under the graph</td></tr>
-      <tr><td><code>chart</code></td><td><code>{ kind: "walk" | "drops" | "bars" | "pie", … }</code></td><td>a small chart beside the table</td></tr>
+      <tr><td><code>nodes</code></td><td><code>{ A: { state, badge, label, sub } }</code></td><td>node colours. States: plain, current, open, closed, visited, path, goal, start, rejected, pruned, dim</td></tr>
+      <tr><td><code>edges</code></td><td><code>[{ u, v, state, label, directed }]</code></td><td>edges. States: faint, tour, path, candidate, added, removed, rejected, alt, tree, pheromone, boundary</td></tr>
+      <tr><td><code>table</code></td><td><code>{ title, columns, rows, rowStates }</code></td><td>the working table. Row states: ok, bad, warn, cur, dim. A cell may be <code>{ t, s }</code></td></tr>
+      <tr><td><code>lists</code></td><td><code>[{ label, items: [{ text, state }] }]</code></td><td>OPEN and CLOSED rows, populations, agendas</td></tr>
+      <tr><td><code>stats</code></td><td><code>[{ label, value, state }]</code></td><td>the numbers under the drawing</td></tr>
+      <tr><td><code>chart</code></td><td><code>{ kind: walk | drops | bars | pie, … }</code></td><td>cost curves, roulette wheels, probability bars</td></tr>
+      <tr><td><code>scene</code> / <code>blocks</code></td><td>custom layout / blocks-world stacks</td><td>trees, lattices, line drawings, the blocks world</td></tr>
     </tbody>
   </table></div>
-  <p>Helpers in <code>src/core</code> do most of the work: <code>Studio.search.run</code> for OPEN/CLOSED searches, <code>Studio.tsp.moveGens</code> for 2-city, 2-edge, Or-opt and 3-edge neighbourhoods, <code>Studio.tspSteps.hillClimb</code> for traced hill climbing, <code>Studio.tsp.crossovers</code> for every crossover, and <code>Studio.rng(seed)</code> for repeatable randomness.</p>
 
-  <h2>Add an example problem</h2>
-  <p>Drop a JSON file into <code>examples/</code> and rebuild. In the studio, <b>Export problem</b> gives you a file in exactly this shape.</p>
-<pre>{ "id": "graph-my-maze", "type": "graph", "name": "My maze",
-  "note": "One line shown under the problem selector.",
-  "nodes": [{ "id": "S", "x": 0, "y": 0, "h": 4 }, …],
-  "edges": [["S", "A", 2], …], "start": "S", "goal": "G", "directed": false }
+  <h2>Add a built-in example</h2>
+  <ol>
+    <li>Write the problem as JSON following the <a href="https://github.com/1mystic/search-studio/blob/main/docs/IMPORTING.md" rel="noopener" target="_blank">importing guide</a>.</li>
+    <li>Give it a unique <code>"id"</code> and a one-line <code>"note"</code>, then save it as <code>examples/&lt;type&gt;-&lt;name&gt;.json</code>.</li>
+    <li>Run <code>npm run build</code>. The build validates it and runs every matching algorithm on it.</li>
+  </ol>
 
-{ "id": "tsp-my-cities", "type": "tsp", "name": "My cities",
-  "cities": [{ "id": "A", "x": 1, "y": 2 }, …],
-  "matrix": [[0, 12, …], …] }          // optional: without it, 10 × Euclidean distance</pre>
-
-  <h2>Checklist before you share</h2>
+  <h2>House rules</h2>
   <ul>
-    <li><code>node tools/test.mjs</code> passes: every step has a caption, edges and nodes exist, tours are permutations with correct costs.</li>
-    <li>Ties are broken the course's way (alphabetically) or a setting says otherwise.</li>
+    <li>Follow the course notation: node pairs <code>(N, parent, depth or g)</code>, and the goal test when a node is picked from OPEN.</li>
+    <li>Ties are broken the course's way (alphabetically), unless a setting says otherwise.</li>
+    <li>Every caption says <i>why</i> the step happened, not just what happened.</li>
     <li>The learn block explains every formula you use and at least one trap.</li>
     <li>Random choices go through <code>Studio.rng(seed)</code> so runs repeat exactly.</li>
+    <li>Add a known answer to <code>tools/test.mjs</code> when the course gives one.</li>
   </ul>
 
   <h2>Source and license</h2>
-  <p>The code is on <a href="https://github.com/1mystic/SearchStudio" rel="noopener" target="_blank">GitHub</a>, with a <code>CONTRIBUTING.md</code> that repeats this page. Everything is released into the public domain under <a href="https://unlicense.org/" rel="noopener" target="_blank">the Unlicense</a>: copy, change, teach with or sell it, no attribution needed. By contributing you release your work the same way.</p>
+  <p>The code is on <a href="https://github.com/1mystic/search-studio" rel="noopener" target="_blank">GitHub</a>. Everything is released into the public domain under <a href="https://unlicense.org/" rel="noopener" target="_blank">the Unlicense</a>: copy it, change it, teach with it or sell it, with no attribution needed. By contributing you release your work the same way.</p>
 </article>
 </section>
 </main>
