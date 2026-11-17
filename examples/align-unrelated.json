@@ -1,0 +1,11 @@
+{
+ "id": "align-unrelated",
+ "type": "alignment",
+ "name": "ACGTAC vs TGCATG: unrelated sequences",
+ "note": "Almost nothing matches (match 0, mismatch 1, gap 1): cost 5. Both sequences have length 6, so h = 0 at the start and A* has little to guide it: it expands 19 of 49 lattice points (39 %), against 11 of 121 (9 %) for the one-substitution example.",
+ "a": "ACGTAC",
+ "b": "TGCATG",
+ "match": 0,
+ "mismatch": 1,
+ "gap": 1
+}

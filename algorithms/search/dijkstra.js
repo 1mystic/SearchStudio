@@ -6,6 +6,7 @@ Studio.register({
   week: 5,
   problem: "graph",
   order: 41,
+  defaultExample: "graph-dijkstra",
   summary: "Every node is WHITE (not final) or BLACK (shortest distance known). Repeatedly blacken the WHITE node with the least d and relax its edges. Stops when the goal turns BLACK.",
   pseudocode: `d(S) ← 0;  d(v) ← ∞ for the rest;  all nodes WHITE
 repeat

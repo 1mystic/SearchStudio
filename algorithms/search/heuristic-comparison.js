@@ -6,6 +6,7 @@ Studio.register({
   week: 5,
   problem: "graph",
   order: 62,
+  defaultExample: "graph-weighted",
   summary: "Runs A* three times: with h = 0 (which is UCS), with the problem's h, and with the perfect h = h*. Compares nodes expanded and the effective branching factor b*: a better heuristic means fewer expansions.",
   pseudocode: `for each heuristic H in [ h = 0,  h (given),  h = h* ]:
     run A* with f = g + H
@@ -30,7 +31,7 @@ compare the three rows`,
     "why": "It makes the value of heuristic information concrete. On an inadmissible h the middle row can be cheaper to run but return a worse path: the path cost column then differs from the other two.",
     "traps": [
       "Admissible does not mean good: h = 0 is admissible and almost useless.",
-      "With an inadmissible h the middle row may have a higher cost than the others.",
+      "With an inadmissible h the middle row may have a higher cost than the others (example 'Same graph, inadmissible h(B) = 12': 13 against 12).",
       "Ties can make the counts differ by one or two; the ordering of the three rows is what matters.",
       "h* needs the true remaining costs, which in practice means already having solved the problem."
     ],

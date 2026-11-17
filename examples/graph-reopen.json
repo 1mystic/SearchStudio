@@ -1,0 +1,17 @@
+{
+ "id": "graph-reopen",
+ "type": "graph",
+ "name": "Admissible but not monotone h: A* reopens C",
+ "note": "h never overestimates (h(B) = 3 = h*(B)) but h(B) = 3 > k(B,C) + h(C) = 1 + 0, so h is not monotone. A* picks C early with g = 4 (f = 4) and closes it; later B offers C the cheaper g = 3, and C is REOPENED (watch the caption 'cheaper path via B ... reopened'). The result S-A-B-C-G = 5 is still optimal. Run the Admissibility & monotone check to see the edge B to C flagged.",
+ "nodes": [
+  { "id": "S", "x": 0.5, "y": 2.0, "h": 4 },
+  { "id": "A", "x": 2.0, "y": 0.8, "h": 4 },
+  { "id": "B", "x": 3.6, "y": 0.8, "h": 3 },
+  { "id": "C", "x": 4.0, "y": 2.8, "h": 0 },
+  { "id": "G", "x": 5.6, "y": 2.0, "h": 0 }
+ ],
+ "edges": [["S", "A", 1], ["A", "B", 1], ["B", "C", 1], ["S", "C", 4], ["C", "G", 2]],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}

@@ -100,6 +100,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 20,
+  defaultExample: "graph-dijkstra",
   summary: "A* that never puts a node with f > U on OPEN, where U is the cost of any known solution (here a quick greedy run, or a value you type). Those nodes cannot lie on a cheaper path when h is admissible, so OPEN stays smaller and the answer is unchanged.",
   pseudocode: `U ← cost of a quick solution (greedy by h) or a given bound
 OPEN ← [(S, nil, 0)]
@@ -125,7 +126,7 @@ return the quick solution if OPEN empties (it was optimal or h was inadmissible)
       { f: "discard C when g(C) + h(C) > U", read: "the best possible cost through C is already worse than a known solution", why: "With h ≤ h*, g(C) + h(C) never overestimates the cheapest solution through C, so such a C cannot improve on U." },
       { f: "C* ≤ U", read: "the optimum is at most the bound", why: "U is the cost of a real solution. A bound below C* would wrongly discard every solution; the run then reports failure." },
     ],
-    why: "A better bound prunes more. The saving is on OPEN only: CLOSED is as large as in A*. Combine with CLOSED-pruning methods (BFHS, SMGS) for real savings.",
+    why: "A better bound prunes more: on the 'Dijkstra demo' graph the greedy bound U = 9 keeps peak OPEN at 2 where A* needs 3. The saving is on OPEN only: CLOSED is as large as in A*. Combine with CLOSED-pruning methods (BFHS, SMGS) for real savings.",
     traps: ["With an inadmissible h, a node with f > U may still lead to a cheaper path, so pruning can lose the optimum (the search then falls back to the quick solution).", "A bound that is too small yields no solution at all.", "Nodes with f = U are kept: they may still give a solution of cost exactly U."],
     props: { complete: "yes if U ≥ C*", optimal: "yes with admissible h and U ≥ C*", time: "at most A*'s", space: "OPEN smaller than A*, CLOSED same" },
   },
