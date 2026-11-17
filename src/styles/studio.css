@@ -37,13 +37,15 @@ h1, h2, h3 { font-weight: 400; line-height: 1.2; text-wrap: balance; margin: 0; 
 p { margin: 0 0 .8em; }
 [hidden] { display: none !important; }
 
-/* ---------- minimal themed scrollbars: slim, invisible track, thumb brightens on hover */
-* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--dim) 55%, transparent) transparent; }
-::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--dim) 55%, transparent); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
-::-webkit-scrollbar-thumb:hover { background: var(--dim); background-clip: padding-box; }
-::-webkit-scrollbar-thumb:active { background: var(--muted); background-clip: padding-box; }
+/* ---------- minimal scrollbars: 6px, no arrows, faint thumb that brightens on hover.
+   Chrome ignores ::-webkit-scrollbar once scrollbar-width is set, so the standard properties are for Firefox only. */
+@supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--dim) 50%, transparent) transparent; } }
+::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-track-piece { background: transparent; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--dim) 45%, transparent); border-radius: 999px; min-height: 28px; min-width: 28px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--dim) 80%, transparent); }
+::-webkit-scrollbar-thumb:active { background: var(--muted); }
 ::-webkit-scrollbar-corner { background: transparent; }
 
 
@@ -777,4 +779,26 @@ button:disabled:hover, .icon-btn:disabled:hover { border-color: var(--rule-2); }
   .stage-inner.nodraw { grid-template-areas: "side" "cap" "lists"; }
   .stage-inner:not(.nodraw) .st-side { max-height: calc(100dvh / var(--zoom) * 0.42); overflow: auto; }
   .st-graph svg.g { max-height: calc(100dvh / var(--zoom) * 0.42); }
+}
+
+/* ---------- problem / algorithm action chips: a little air below, and a soft accent so they read as actions */
+.box .row.tight { margin-top: 10px; margin-bottom: 8px; gap: 6px; }
+.box .chip-link { background: color-mix(in srgb, var(--yellow) 9%, var(--panel)); border-color: color-mix(in srgb, var(--yellow) 32%, var(--rule-2)); color: var(--ink); }
+.box .chip-link:hover, .box .chip-link.on { background: color-mix(in srgb, var(--yellow) 18%, var(--panel)); border-color: var(--yellow); }
+
+/* ---------- wide screens: three panes separated by soft, thick dividers (which are also the resize handles);
+   the boxes inside the panes lose their own borders so the panes read as the only frames */
+@media (min-width: 1600px) {
+  .studio .controls { border-right: 0; padding-right: 18px; }
+  .studio .panel { border-left: 0; }
+  .studio .rz { width: 7px; background: color-mix(in srgb, var(--rule) 75%, var(--bg)); }
+  .studio .rz::after { display: none; }
+  .studio .rz:hover, .studio .rz.on { background: color-mix(in srgb, var(--yellow) 55%, var(--rule)); }
+  .studio .controls > .rz { right: 0; } .studio .panel > .rz { left: 0; }
+  .studio .panel .tabs, .studio .panel .tabpanel { padding-left: 19px; }
+  .studio .controls .box { border: 0; background: transparent; border-radius: 0; }
+  .studio .controls .box + .box { margin-top: 2px; }
+  .studio .controls .box > summary { padding-left: 2px; padding-right: 2px; }
+  .studio .stage, .studio .player { border-color: transparent; background: transparent; box-shadow: none; }
+  .studio .player { border-top: 1px solid var(--rule); border-radius: 0; }
 }
