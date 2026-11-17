@@ -80,10 +80,11 @@ return best member of P`,
     N = Math.max(2, N - (N % 2)); k = Math.max(0, Math.min(N, k));
     let pop = Array.from({ length: N }, () => [P.ids[0]].concat(rng.shuffle(P.ids.slice(1))));
     const bestOf = arr => arr.slice().sort((a, b) => P.cost(a) - P.cost(b))[0];
-    const series = [];
+    const series = [], diversity = [], meanSeries = [], bestSeries = [];
     const distinct = arr => new Set(arr.map(t => T.canon(t).join(","))).size;
     const meanCost = arr => Math.round(arr.reduce((s, t) => s + P.cost(t), 0) / arr.length * 10) / 10;
     const popTable = (rows, title) => ({ title, columns: ["#", "tour", "cost", "fitness", "p", "cumulative"], rows });
+    diversity.push(distinct(pop)); meanSeries.push(meanCost(pop)); bestSeries.push(P.cost(bestOf(pop)));
     for (let g = 1; g <= gens; g++) {
       const fit = pop.map(t => K / P.cost(t)), tot = fit.reduce((a, b) => a + b, 0);
       let cum = 0;
@@ -118,6 +119,7 @@ return best member of P`,
       const sortedKids = kids.slice().sort((x, y) => P.cost(x) - P.cost(y));
       const replaced = [];
       for (let r = 0; r < k; r++) { if (P.cost(sortedKids[r]) < P.cost(sortedPop[r][0])) { pop[sortedPop[r][1]] = sortedKids[r]; replaced.push(`P${sortedPop[r][1] + 1}: ${P.cost(sortedPop[r][0])} → ${P.cost(sortedKids[r])}`); } }
+      diversity.push(distinct(pop)); meanSeries.push(meanCost(pop)); bestSeries.push(P.cost(bestOf(pop)));
       steps.push({ caption: replaced.length ? `Replace weakest: ${replaced.join("; ")}` : `No offspring beat the ${k} weakest members: population unchanged`,
         nodes: Studio.tspSteps.nodes(P), edges: Studio.draw.tour(bestOf(pop), "tour", P),
         table: popTable(pop.map((t, i) => [`P${i + 1}`, t.join(","), P.cost(t), (K / P.cost(t)).toFixed(3), "", ""]), `after generation ${g}`),
@@ -126,9 +128,15 @@ return best member of P`,
     }
     const best = bestOf(pop);
     const dv = distinct(pop), opt = Studio.tspSteps.optimum(P);
+    const firstOne = diversity.indexOf(1);
+    steps.push({ caption: `Diversity over ${gens} generations: distinct tours went ${diversity[0]} → ${dv}${firstOne > 0 ? `, reaching 1 after generation ${firstOne}${pm === 0 ? ". With mutation probability 0 nothing can ever add a new tour, so it never recovers" : `. Mutation probability ${pm} only delayed it: selection kept draining the variety`}` : firstOne === 0 ? "" : `; it never fell to 1 (mutation probability ${pm} keeps injecting new tours)`}. When this line sits at 1 the mean cost equals the best cost: nothing is left to select from. Mean ${meanSeries[meanSeries.length - 1]} vs best ${bestSeries[bestSeries.length - 1]}.`,
+      nodes: Studio.tspSteps.nodes(P), edges: Studio.draw.tour(best, "tour", P),
+      chart: { kind: "walk", series: diversity.map((d, i) => ({ x: i, y: d })), yLabel: "distinct tours per generation (x = generation)" },
+      table: { title: "diversity per generation", columns: ["generation", "distinct tours", "best cost", "mean cost"], rows: diversity.map((d, i) => [i, d, bestSeries[i], meanSeries[i]]), rowStates: diversity.map(d => (d === 1 ? "bad" : "")) },
+      stats: [{ label: "distinct now", value: dv, state: dv === 1 ? "bad" : undefined }, { label: "mean cost", value: meanSeries[meanSeries.length - 1] }, { label: "best", value: bestSeries[bestSeries.length - 1], state: "ok" }] });
     steps.push({ caption: `Best member after ${gens} generations: ${best.join(",")} = ${P.cost(best)}${opt != null ? (P.cost(best) === opt ? ", the optimum" : `, ${P.cost(best) - opt} above the optimum ${opt}`) : ""}. ${dv === 1 ? (opt != null && P.cost(best) === opt ? `All ${N} members are now the same tour, and it is the optimum` : `All ${N} members are now the same tour${opt != null ? " but it is not the optimum" : ""}: premature convergence (mutation probability ${pm}); raise it or the population to keep exploring`) : `${dv} distinct tours remain in the population (mutation probability ${pm})`}`,
       nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.draw.tour(best, "path", P),
       stats: [{ label: "best", value: P.cost(best), state: "ok" }, { label: "distinct tours", value: dv, state: dv === 1 ? "bad" : undefined }] });
-    return { steps, result: { tour: best, cost: P.cost(best), distinct: dv, mean: meanCost(pop) } };
+    return { steps, result: { tour: best, cost: P.cost(best), distinct: dv, mean: meanCost(pop), diversity: diversity.slice() } };
   },
 });

@@ -51,12 +51,12 @@ When you import a problem whose type doesn't fit the current algorithm, the stud
 | `type` | Algorithms |
 |---|---|
 | `tsp` | Nearest Neighbour, Greedy, Savings, Brute force (≤ 9 cities), 2-city exchange, 2-edge exchange (2-opt), Or-opt, 3-edge exchange, VND, Beam search, Tabu search, Iterated hill climbing, Random walk, Simulated annealing, Genetic algorithm, Crossover lab, Ant colony |
-| `graph` | BFS, DFS, DFID, Best First, Hill Climbing, Beam Search, UCS, A*, Admissibility & monotone check, IDA*, RBFS, DCFS |
+| `graph` | BFS, DFS, DFID, Best First, Hill Climbing, Beam Search, UCS, A*, Admissibility & monotone check, IDA*, RBFS, DCFS, Divide and Conquer Beam Search |
 | `game` | Minimax, Alpha-Beta, SSS* |
 | `andor` | AO* |
 | `planning` | Forward and backward state-space planning, Goal Stack Planning, Partial Order Planning |
 | `rules` | Forward chaining, Rete |
-| `csp` | Backtracking, Forward checking, Arc consistency (AC-1, AC-3) |
+| `csp` | Backtracking, Forward checking, Arc consistency (AC-1, AC-3), Matching diagram, Strong k-consistency check |
 | `linedrawing` | Waltz algorithm |
 | `circuit` | Model-based diagnosis |
 | `alignment` | Sequence alignment (DP), Sequence alignment (A*) |
