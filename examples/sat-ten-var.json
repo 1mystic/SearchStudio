@@ -1,0 +1,18 @@
+{
+ "id": "sat-ten-var",
+ "type": "sat",
+ "name": "Random 3-SAT (10 variables, 48 clauses): annealing vs random walk",
+ "note": "Generated with seed 2; three solutions (0001001001, 0010001100, 0010101100) among 1024 strings. Hill climbing from 0000000000 (h 44) stops on a plateau at 1000000000 (h 45 of 48). Over 100 seeds with 30 steps, simulated annealing (defaults T0 = 2, α = 0.9) finds a solution 51 times and the random walk only 7 times. Try seed 2 with 30 steps: annealing solves it, the random walk ends at h 46. Annealing prefers uphill moves but still accepts some downhill ones; the walk ignores h. The brute-force truth table is limited to 6 variables, so use DPLL, VND or beam search as a check.",
+ "vars": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+ "start": "0000000000",
+ "clauses": [
+  ["-a", "e", "-j"], ["-c", "-f", "-g"], ["c", "-h", "-j"], ["-b", "d", "f"], ["-b", "c", "g"], ["-d", "e", "j"],
+  ["-a", "c", "-h"], ["a", "-d", "-e"], ["-c", "g", "i"], ["-d", "f", "-i"], ["a", "d", "h"], ["-d", "g", "h"],
+  ["a", "-b", "-e"], ["-a", "e", "h"], ["b", "-e", "-j"], ["-b", "-c", "i"], ["g", "h", "-i"], ["-c", "-i", "j"],
+  ["c", "e", "-f"], ["b", "-h", "-j"], ["-c", "-f", "h"], ["-b", "h", "-i"], ["d", "g", "-h"], ["-a", "-f", "-j"],
+  ["-b", "h", "-j"], ["e", "g", "-h"], ["-e", "h", "-i"], ["a", "e", "-f"], ["f", "-h", "-i"], ["-d", "-e", "-f"],
+  ["-a", "-c", "-g"], ["-a", "-i", "j"], ["c", "f", "j"], ["-d", "e", "-h"], ["b", "-c", "-j"], ["a", "e", "g"],
+  ["-b", "c", "f"], ["-b", "-c", "-e"], ["-e", "h", "j"], ["-c", "-d", "j"], ["b", "d", "h"], ["f", "h", "-i"],
+  ["c", "-h", "j"], ["-e", "g", "j"], ["-a", "g", "-j"], ["c", "d", "-f"], ["a", "-g", "-i"], ["a", "-e", "-i"]
+ ]
+}

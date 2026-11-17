@@ -6,6 +6,7 @@ Studio.register({
   week: 4,
   problem: "sat",
   order: 70,
+  defaultExample: "sat-four-var",
   summary: "Hill climbing gets stuck on plateaus and local maxima, so restart it from several different assignments and keep the best result. Starts can be typed in or drawn from a seeded random generator.",
   pseudocode: `best ← none
 for each start S (given, or r random bit strings)
@@ -29,7 +30,7 @@ return best`,
     why: "On the four-variable course example hill climbing from 0000 stops at 1000 (h 5). Among five starts only 0101 climbs on to 1101 (h 6). More starts means more chances, but each start is a fresh gamble: nothing learned in one run is used in the next.",
     traps: [
       "Restarts are independent: iterated hill climbing does not remember where earlier runs failed.",
-      "Two different starts can end in the same local maximum, so r starts do not give r different answers.",
+      "Two different starts can end in the same local maximum, so r starts do not give r different answers (on sat-four-var the starts 1110 and 0010 both climb to 1010).",
       "Failing on all r starts does not prove the formula unsatisfiable.",
     ],
     props: { complete: "no", optimal: "no", time: "r hill climbs", space: "O(n)" },

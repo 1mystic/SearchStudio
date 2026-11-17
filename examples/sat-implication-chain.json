@@ -1,0 +1,9 @@
+{
+ "id": "sat-implication-chain",
+ "type": "sat",
+ "name": "Implication chain with a conflict (DPLL)",
+ "note": "DPLL: clauses 1–3 form a unit chain, a = T forces b = T forces c = T with no decision. g occurs only positively, so it is a pure literal (g = T). With no unit or pure literal left, DPLL decides d = T; that forces e = T by clause 4 and empties clause 5, so it backtracks to d = F, which forces f = T (clause 6) and e = T (clause 7). Result 1110111 after 2 decisions and 1 backtrack. Set the value order to F first and the conflict never happens (1 decision, 0 backtracks); switch the pure literal rule off and g is forced later by unit propagation (clause 8) once f = T, at the cost of one more forced assignment. Hill climbing from 0000000 stops at 0001000 (h 7 of 8) on this formula.",
+ "vars": ["a", "b", "c", "d", "e", "f", "g"],
+ "clauses": [["a"], ["-a", "b"], ["-b", "c"], ["-c", "-d", "e"], ["-c", "-d", "-e"], ["d", "f"], ["d", "-f", "e"], ["g", "-f"]],
+ "start": "0000000"
+}

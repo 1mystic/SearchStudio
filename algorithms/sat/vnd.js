@@ -6,6 +6,7 @@ Studio.register({
   week: 3,
   problem: "sat",
   order: 40,
+  defaultExample: "sat-four-var",
   summary: "Hill climb in N1. When no one-flip neighbour is better, enlarge the neighbourhood to N1–2 (one or two flips), then N1–3, and so on up to N1–n; after every improvement go back to N1.",
   pseudocode: `N ← start;  k ← 1
 while k ≤ n and h(N) < m
@@ -29,10 +30,10 @@ return N`,
       { f: "|Nk| = C(n,k)", read: "choose which k of the n bits to flip", why: "This is why the neighbourhoods grow so fast: for n = 4 the sizes are 4, 6, 4, 1." },
       { f: "|N1–k| = C(n,1) + … + C(n,k)", read: "cumulative size", why: "|N1–n| = 2ⁿ − 1, so the last phase is brute force: VND ends exactly at a global maximum, at brute-force cost in the worst case." },
     ],
-    why: "On the course example, hill climbing stops at 1000 (h 5), but flipping the pair b, d reaches 1101 (h 6), a solution. VND finds it by widening to N1–2 at 1000. Most of the time the cheap neighbourhood does the work and the expensive ones are only paid for when needed.",
+    why: "On the course example, hill climbing stops at 1000 (h 5), but flipping the pair b, d reaches 1101 (h 6), a solution. VND finds it by widening to N1–2 at 1000. Most of the time the cheap neighbourhood does the work and the expensive ones are only paid for when needed. The same escape works at a strict local maximum: on 'Local-maximum trap' (sat-local-trap) N1 fails at 0100 (all four neighbours have h 6) and N1–2 flips c and d to reach the solution 0111. The first step lists the sizes C(n,k): 4, 6, 4, 1 for four variables, 6, 15, 20, 15, 6, 1 for the six-variable sat-random-3sat; set the largest neighbourhood to 1 to see plain hill climbing fail.",
     traps: [
       "After an improvement return to N1, not to the neighbourhood that found it.",
-      "N1–2 contains the one-flip neighbours as well as the pairs.",
+      "N1–2 contains the one-flip neighbours as well as the pairs: 4 + 6 = 10 strings for n = 4, not 6.",
       "If the whole sequence fails the result is a true global maximum of h, but a global maximum with h < m means the formula is unsatisfiable.",
     ],
     props: { complete: "yes if run up to N1–n (it then covers the space)", optimal: "yes with N1–n", time: "up to O(2ⁿ · m)", space: "O(n)" },

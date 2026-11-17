@@ -6,6 +6,7 @@ Studio.register({
   week: 3,
   problem: "sat",
   order: 50,
+  defaultExample: "sat-local-trap",
   summary: "Always move to the best one-flip neighbour, even if it is no better than the current string, for a fixed number of moves. With no memory it can walk in circles, which is the problem tabu search fixes.",
   pseudocode: `N ← start;  bestSeen ← N
 repeat for a fixed number of moves
@@ -26,7 +27,7 @@ return bestSeen`,
     formulas: [
       { f: "N′ = argmax over N1(N) of h", read: "the best neighbour, uphill or not", why: "Flipping a variable back and forth keeps being the best choice, so the walk can cycle: x → y → x → y …" },
     ],
-    why: "It shows why memory is needed. From the solution 1101 on the course example the best neighbour is 0101 (h 5) and from there the best neighbour is 1101 again: a cycle of length 2. Tabu search forbids the move back for a few iterations to break such cycles.",
+    why: "It shows why memory is needed. From the solution 1101 on the course example the best neighbour is 0101 (h 5) and from there the best neighbour is 1101 again: a cycle of length 2. Tabu search forbids the move back for a few iterations to break such cycles. The cycle also appears while still unsolved: on 'Local-maximum trap' (sat-local-trap) the walk goes 0000 → 0100 (h 7) → 1100 (h 6, downhill) → 0100 → 1100 … and never reaches the solutions 0011 or 0111, because 0100 is always the best neighbour of 1100.",
     traps: [
       "The last string is not the answer; the best string seen is.",
       "A revisited string means a cycle: from then on the walk repeats forever.",
