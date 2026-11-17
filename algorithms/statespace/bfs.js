@@ -34,10 +34,12 @@ return failure`,
     traps: [
       "Without CLOSED the same state is generated again and again (pour A→B then B→A). Graph search cuts these cycles.",
       "The goal test is on picking from OPEN, not on generating, so the last ring is generated before the search stops.",
+      "BFS needs memory for a whole ring: on example space-8-puzzle-12 (a 12-move board) it hits the 400-expansion cap long before the goal, while A* with Manhattan distance needs 16 expansions.",
       "Ties and the order of children follow MoveGen's order. A different order gives a different but equally short solution.",
     ],
     props: { complete: "yes (finite state space)", optimal: "yes, fewest moves (unit move cost)", time: "O(b^d)", space: "O(b^d)" },
   },
+  defaultExample: "space-water-jug",
   params: [
     { key: "maxExpand", label: "Expansion cap", type: "number", default: 400 },
   ],

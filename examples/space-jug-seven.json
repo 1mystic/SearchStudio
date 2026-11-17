@@ -1,0 +1,10 @@
+{
+ "id": "space-jug-seven",
+ "type": "statespace",
+ "domain": "water-jug",
+ "name": "Water jugs 8-5-3: get 7 litres into some jug",
+ "note": "Jug A starts full (8 L); the goal is any jug holding 7 L. BFS returns a shortest plan of 5 pourings. DFS dives into the first pouring (A→B) each time and reaches 7 L only after 9 pourings: same goal, a longer plan, because DFS takes the first goal it dives into. Compare the path length and the solution table of the two runs.",
+ "capacities": [8, 5, 3],
+ "start": [8, 0, 0],
+ "goal": { "contains": 7 }
+}

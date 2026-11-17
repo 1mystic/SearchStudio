@@ -30,7 +30,7 @@ while OPEN not empty
       { f: "h₁ ≤ h₂ ≤ h*", read: "tiles out of place ≤ Manhattan ≤ true moves left", why: "Each misplaced tile needs ≥ 1 move and each needs ≥ its Manhattan distance, so both are admissible and h₂ dominates h₁: A* with h₂ expands no more states than with h₁." },
       { f: "missionaries: h = 2·⌈(n − k)/(k − 1)⌉ + 1", read: "n people on the left bank, boat holds k (**supplementary**)", why: "Each round trip moves at most k − 1 people across net, and the last trip moves k; ignoring the safety rule only lowers the bound, so it is admissible." },
     ],
-    why: "A better (larger, still admissible) h prunes more of the search. Run the same board with each heuristic and compare the 'expanded' count: both return the same shortest length, Manhattan with fewer expansions.",
+    why: "A better (larger, still admissible) h prunes more of the search. Run example space-8-puzzle-12 with each heuristic and compare the 'expanded' count: both return the same 12-move solution, Manhattan after 16 expansions, tiles out of place after 79, and h = 0 does not finish within the 400-expansion cap. (On the easy five-move board space-8-puzzle the two tie at 6.)",
     traps: [
       "Admissible is not enough to compare: the larger of two admissible heuristics is better informed.",
       "The blank is never counted in either heuristic; counting it can overestimate.",
@@ -38,6 +38,7 @@ while OPEN not empty
     ],
     props: { complete: "yes", optimal: "yes with admissible h", time: "exponential in general", space: "exponential in general" },
   },
+  defaultExample: "space-8-puzzle-12",
   params: [
     { key: "h", label: "Heuristic (8-puzzle)", type: "select", default: "manhattan", options: [["manhattan", "Manhattan distance"], ["misplaced", "tiles out of place"], ["none", "none (h = 0)"]] },
     { key: "tie", label: "Ties", type: "select", default: "alpha", options: [["alpha", "alphabetical"], ["fifo", "first in, first out"], ["lifo", "last in, first out"]] },
