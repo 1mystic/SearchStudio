@@ -50,8 +50,10 @@ return failure`,
     ],
     "why": "Memory-light, but neither optimal nor guaranteed to finish on infinite or very deep spaces.",
     "traps": [
-      "The path found depends heavily on MoveGen order.",
-      "Do not confuse the order children are pushed with the order they are expanded."
+      "DFS returns the first goal it dives into, not the shortest path: on example graph-dfs-deep it returns a 5-edge path S–A–C–D–E–G while BFS finds the 3-edge S–B–F–G.",
+      "The path found depends heavily on MoveGen order: reverse the order of the neighbours and the other branch would be tried first.",
+      "Do not confuse the order children are pushed with the order they are expanded.",
+      "On an infinite or very deep graph DFS may never come back from one branch; the CLOSED list only protects it on finite graphs (**supplementary**: the course graphs here are all finite)."
     ],
     "props": {
       "complete": "finite graphs only",
@@ -60,6 +62,7 @@ return failure`,
       "space": "O(b·m)"
     }
   },
+  defaultExample: "graph-dfs-deep",
   params: [],
   run(P) { return Studio.search.run(P, "dfs"); },
 });

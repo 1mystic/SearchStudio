@@ -1,0 +1,18 @@
+{
+ "id": "graph-hill-trap",
+ "type": "graph",
+ "name": "Local optimum: L looks closest to G but is a dead end",
+ "note": "Unit costs, goal G (h is admissible). From S the neighbour L (h = 1) looks better than B (h = 2). Hill climbing moves to L and STOPS there: S (3) and X (4) are worse, and G is not reached. Beam search with w = 1 also dies (L, then X, then no new nodes), but with w = 2 the beam keeps B alive next to L and reaches G through S–B–C–G (cost 3). Best First is not trapped because OPEN remembers B (it wastes expansions on L first).",
+ "nodes": [
+  { "id": "S", "x": 0.5, "y": 2.0, "h": 3 },
+  { "id": "L", "x": 1.8, "y": 0.8, "h": 1 },
+  { "id": "X", "x": 3.2, "y": 0.8, "h": 4 },
+  { "id": "B", "x": 2.0, "y": 3.2, "h": 2 },
+  { "id": "C", "x": 3.5, "y": 3.2, "h": 1 },
+  { "id": "G", "x": 5.0, "y": 3.2, "h": 0 }
+ ],
+ "edges": [["S", "L", 1], ["S", "B", 1], ["L", "X", 1], ["B", "C", 1], ["C", "G", 1]],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}

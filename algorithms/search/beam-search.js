@@ -39,13 +39,14 @@ return the goal's path`,
       {
         "f": "memory ≤ w per level",
         "read": "the beam width bounds the frontier",
-        "why": "That is the whole point: predictable memory. w = 1 is hill climbing that may move uphill; w = ∞ is breadth-first search."
+        "why": "That is the whole point: predictable memory. w = 1 is hill climbing except that it keeps moving even when the best child is worse (and fails only when no unseen child is left); w = ∞ is breadth-first search."
       }
     ],
     "why": "Keeps several alternatives alive, so one bad estimate does not end the search, but anything outside the beam is lost forever.",
     "traps": [
-      "Beam search is incomplete: the only path to the goal can fall outside the beam.",
-      "Ties in h decide which nodes survive."
+      "Beam search is incomplete: the only path to the goal can fall outside the beam. On graph-hill-trap, w = 1 keeps only L and runs out of new nodes (fails); w = 2 keeps B too and reaches G. Change w and compare.",
+      "Ties in h decide which nodes survive.",
+      "A wider beam is not always cheaper or shorter: w only changes which nodes survive, it never optimises cost."
     ],
     "props": {
       "complete": "no",
@@ -54,6 +55,7 @@ return the goal's path`,
       "space": "O(w · d)"
     }
   },
+  defaultExample: "graph-hill-trap",
   params: [{ key: "w", label: "Beam width w", type: "int", default: 2, min: 1, max: 8 }],
   run(P, { w }) {
     const steps = [], parent = { [P.start]: null }, seen = new Set([P.start]);
@@ -72,7 +74,7 @@ return the goal's path`,
       const kids = [];
       OPEN.forEach(n => P.adj[n].forEach(([c]) => { if (!seen.has(c) && !kids.includes(c)) { kids.push(c); parent[c] = n; } }));
       kids.forEach(k => seen.add(k));
-      if (!kids.length) { snap(`Level ${level + 1}: no new children — beam search fails`, {}); return { steps, result: { found: false, expanded: seen.size } }; }
+      if (!kids.length) { snap(`Level ${level + 1}: no new children, so the beam is empty and beam search fails with w = ${w}: if the goal is reachable at all, the nodes leading to it were discarded earlier. A wider beam keeps more alternatives alive`, {}); return { steps, result: { found: false, expanded: seen.size } }; }
       kids.sort((a, b) => P.h[a] - P.h[b] || (a < b ? -1 : 1));
       const kept = kids.slice(0, w), dropped = kids.slice(w);
       level++;
@@ -81,7 +83,7 @@ return the goal's path`,
       snap(`Level ${level}: ${kids.length} new children, keep the ${kept.length} with smallest h${dropped.length ? `; ${dropped.join(", ")} discarded for good` : ""}`);
     }
     const path = pathTo(P.goal), cost = Studio.gs.pathCost(P, path);
-    snap(`Goal ${P.goal} is in the beam: path ${path.join(" – ")}, cost ${Studio.fmt(cost)}`, { nodes: Studio.gs.nodes(P, Object.fromEntries(path.map(p => [p, p === P.goal ? "goal" : "path"]))), edges: Studio.gs.edges(P, path) });
+    snap(`Goal ${P.goal} is in the beam (w = ${w}): path ${path.join(" – ")}, cost ${Studio.fmt(cost)}. A narrower beam might have discarded the route to the goal; a wider one gives more safety at more memory`, { nodes: Studio.gs.nodes(P, Object.fromEntries(path.map(p => [p, p === P.goal ? "goal" : "path"]))), edges: Studio.gs.edges(P, path) });
     return { steps, result: { found: true, path, cost, expanded: seen.size } };
   },
 });

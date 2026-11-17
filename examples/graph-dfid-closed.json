@@ -1,0 +1,18 @@
+{
+ "id": "graph-dfid-closed",
+ "type": "graph",
+ "name": "Y is reached twice: by a long route first, by a short route later",
+ "note": "Unit costs. Y can be reached as S–A–X–Y (depth 3) or S–B–Y (depth 2); the goal G hangs off Y, so the shortest path is S–B–Y–G (3 edges). Plain DFS dives S–A–X–Y–G and returns 4 edges; BFS returns S–B–Y–G. Depth-bounded DFS with bound 3 FAILS even though G is at depth 3: Y is closed at depth 3 (where it may not be expanded) and S–B–Y is then skipped because Y is already on CLOSED. DFID reopens Y when it is met again at depth 2, so its round with bound 3 finds S–B–Y–G.",
+ "nodes": [
+  { "id": "S", "x": 0.5, "y": 2.0, "h": 3 },
+  { "id": "A", "x": 1.6, "y": 0.8, "h": 3 },
+  { "id": "B", "x": 1.6, "y": 3.2, "h": 2 },
+  { "id": "X", "x": 2.8, "y": 0.8, "h": 2 },
+  { "id": "Y", "x": 3.8, "y": 2.0, "h": 1 },
+  { "id": "G", "x": 5.2, "y": 2.0, "h": 0 }
+ ],
+ "edges": [["S", "A", 1], ["S", "B", 1], ["A", "X", 1], ["X", "Y", 1], ["B", "Y", 1], ["Y", "G", 1]],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}

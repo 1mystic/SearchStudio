@@ -1,0 +1,20 @@
+{
+ "id": "graph-dfs-deep",
+ "type": "graph",
+ "name": "Deep dive: a long branch first, a short route second",
+ "note": "Unit costs, goal G. Alphabetical MoveGen puts the long branch S–A–C–D–E–G first. DFS dives down it and returns that 5-edge path (6 picks); BFS returns S–B–F–G with 3 edges. DFID needs bounds 0, 1, 2, 3 (1 + 3 + 5 + 7 = 16 expansions, S is expanded in every round) to find S–B–F–G. Depth-bounded DFS with bound 2 finds nothing, because the goal is at depth 3; with bound 3 it finds S–B–F–G only after the long branch has been cut off at D.",
+ "nodes": [
+  { "id": "S", "x": 0.5, "y": 2.0, "h": 3 },
+  { "id": "A", "x": 1.6, "y": 0.8, "h": 4 },
+  { "id": "B", "x": 1.6, "y": 3.2, "h": 2 },
+  { "id": "C", "x": 2.6, "y": 0.8, "h": 3 },
+  { "id": "D", "x": 3.6, "y": 0.8, "h": 2 },
+  { "id": "E", "x": 4.6, "y": 0.8, "h": 1 },
+  { "id": "F", "x": 3.4, "y": 3.2, "h": 1 },
+  { "id": "G", "x": 5.2, "y": 2.0, "h": 0 }
+ ],
+ "edges": [["S", "A", 1], ["S", "B", 1], ["A", "C", 1], ["C", "D", 1], ["D", "E", 1], ["E", "G", 1], ["B", "F", 1], ["F", "G", 1]],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}
