@@ -199,7 +199,7 @@ C G 3
 
 ## 3. Game tree — `"type": "game"`
 
-**Used by:** Minimax, Alpha-Beta, SSS* (Week 7).
+**Used by:** Minimax, Alpha-Beta, SSS*, Expectiminimax (Week 7).
 
 | Field | Required | Type | Meaning |
 |---|:--:|---|---|
@@ -242,6 +242,23 @@ Rules:
 root MAX
 ((3 12 8) (2 4 6) (14 5 2))
 ```
+
+**Chance nodes (optional, supplementary, for Expectiminimax; Russell & Norvig).** A subtree may be an object `{"chance": [[p1, subtree1], [p2, subtree2], ...]}`. Each `p` must be in [0, 1], and the probabilities must sum to 1.
+
+```json
+{
+  "type": "game",
+  "name": "MAX over two dice rolls",
+  "root": "MAX",
+  "tree": [ { "chance": [[0.5, [2, 8]], [0.5, [4, 6]]] },
+            { "chance": [[0.7, [5, 9]], [0.3, [0, 10]]] } ]
+}
+```
+
+- A chance node does not use up a ply. MAX/MIN alternation counts only the list nodes above a node.
+- The root must be a list (a MAX or MIN node), not a chance node.
+- Trees without chance nodes are unchanged. Minimax, Alpha-Beta and SSS* refuse a tree with chance nodes, because their answer would be wrong. Expectiminimax accepts ordinary trees too, and then equals Minimax.
+- Text format: `{ p1 child1 p2 child2 }`, for example `({0.5 (2 8) 0.5 (4 6)} {0.7 (5 9) 0.3 (0 10)})`.
 
 ---
 
@@ -328,12 +345,13 @@ Keep it to 3–5 blocks. Forward search grows very fast with more.
 
 ## 6. Rule base — `"type": "rules"`
 
-**Used by:** Forward chaining, Rete (Week 10).
+**Used by:** Forward chaining, Rete (Week 10), Backward chaining (Week 9).
 
 | Field | Required | Type | Meaning |
 |---|:--:|---|---|
 | `facts` | ✔ | array of strings | Working memory. Each fact is in brackets: `"(parent tom bob)"`. |
 | `rules` | ✔ | array of `{ "name", "if": [...], "then": [...] }` | Patterns use `?x`-style variables. |
+| `goal` | | string | Optional query for Backward chaining, for example `"(grandfather tom ?who)"`. It may contain `?variables`. Forward chaining and Rete ignore it. If it is absent, backward chaining uses its "Query goal" setting, or else the first `add` consequent of the last rule. Text format: a line `goal (grandfather tom ?who)`. |
 
 Inside a rule:
 - `if` patterns may start with `not ` to fire only when **no** matching fact exists: `"not (male ?x)"`.

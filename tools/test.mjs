@@ -134,8 +134,10 @@ eq(run("align-dp", ex("align-short")).cost, run("align-astar", ex("align-short")
   const fs = await import("node:fs"), path = await import("node:path"), url = await import("node:url");
   const dir = path.join(path.dirname(url.fileURLToPath(import.meta.url)), "tests");
   if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir).filter(f => f.endsWith(".mjs")).sort()) {
+    const before = pass, bf = fail;
     try { const m = await import(url.pathToFileURL(path.join(dir, f)).href); await m.default({ Studio, ok, eq, ex, run, checkRun }); }
     catch (e) { ok(false, `tests/${f}: threw ${e.stack || e.message}`); }
+    console.log(`  tests/${f}: ${pass - before} passed${fail - bf ? `, ${fail - bf} FAILED` : ""}`);
   }
 }
 
