@@ -1,6 +1,7 @@
 /* Week 12: conflict-directed backjumping (look-back). Same value/variable order as backtracking, but a dead end jumps to the deepest variable in its conflict set. */
 Studio.register({
   id: "csp-cbj",
+  defaultExample: "csp-cbj-jump",
   name: "Conflict-directed backjumping",
   family: "Constraint processing · lookback",
   week: 12,
@@ -23,7 +24,7 @@ Studio.register({
     "steps": [["try a value of Xᵢ", ""], ["clash with an earlier Xⱼ", "Record Xⱼ in conf(Xᵢ): it is a culprit."], ["no value left", "Dead end for Xᵢ."], ["jump to the deepest variable in conf(Xᵢ)", "Variables between h and Xᵢ are skipped: changing them cannot repair the failure."], ["merge the conflict sets", "h inherits the other culprits, so that if h fails too the jump is still correct."]],
     "formulas": [{ "f": "h = max { j : Xⱼ ∈ conf(Xᵢ) }", "read": "the jump target is the latest culprit", "why": "Every value of Xᵢ clashes with something in conf(Xᵢ); changing a variable outside it cannot help, and the latest culprit is the nearest place where a change might help." }, { "f": "conf(h) ← conf(h) ∪ conf(Xᵢ) − {h}", "read": "pass the blame on", "why": "If h fails after its other values are tried, the earlier culprits of Xᵢ are also culprits for h." }],
     "why": "Finds exactly the same first solution as chronological backtracking, with the same orders, in fewer or equal nodes: jumping over a variable never skips a solution.",
-    "traps": ["A jump over a level is only possible when the failing variable has no conflict with the intermediate variables.", "Conflict sets are only extended by the variables that clashed, not by every earlier variable.", "The culprit recorded for each value here is the first clashing variable in the ordering (the usual Prosser formulation); other books record all of them. Both are sound; the choice of culprit is **supplementary** to the lecture."],
+    "traps": ["Try example 'Backjumping' (D fails because of A alone): CBJ jumps from D over B and C to A, 10 values tried against 24 for chronological backtracking. On example 'Thrashing' it needs 16 against 45, but forward checking (6) still beats it: CBJ is look-back, it reacts only after the failure.", "A jump over a level is only possible when the failing variable has no conflict with the intermediate variables.", "Conflict sets are only extended by the variables that clashed, not by every earlier variable.", "The culprit recorded for each value here is the first clashing variable in the ordering (the usual Prosser formulation); other books record all of them. Both are sound; the choice of culprit is **supplementary** to the lecture."],
     "props": { "complete": "yes", "optimal": "n/a", "time": "O(dⁿ) worst case, ≤ backtracking", "space": "O(n²) for conflict sets" },
   },
   params: [],

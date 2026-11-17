@@ -2,7 +2,7 @@
  "id": "circuit-polybox",
  "type": "circuit",
  "name": "Polybox (three multipliers, two adders)",
- "note": "Inputs A=3, B=2, C=2, D=3, E=3. Expected F=12 and G=12, but F is observed as 10.",
+ "note": "Inputs A=3, B=2, C=2, D=3, E=3. Expected F=12 and G=12, but F is observed as 10 while G = 12 is correct. Conflicts {M1, M2, A1} and {M1, M3, A1, A2}; minimal diagnoses: two single faults {M1} and {A1} (they sit in both conflicts) and two double faults {M2, M3} and {M2, A2}. M2 alone is not enough: it is not in the second conflict.",
  "inputs": {
   "A": 3,
   "B": 2,

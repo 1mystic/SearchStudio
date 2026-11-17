@@ -1,0 +1,79 @@
+{
+ "id": "csp-ordering",
+ "type": "csp",
+ "name": "Variable ordering: the tight variables D and E come late",
+ "note": "Order A, B, C, D, E. D < E with E in {1,2} forces D = 1, E = 2, but D and E are listed last. Backtracking in the given order tries 58 values (it keeps re-trying the irrelevant B and C); with 'most constraints first' (order D, E, A, B, C) only 7. Forward checking needs 27 values in the given order and 6 with 'smallest domain first' (MRV), which picks C, then E, and then D is forced. Arc consistency (run Arc consistency) also fixes D = 1 and E = 2 and shrinks A to {2,3} and B to {1,3}, but leaves A, B, C ambiguous: search is still needed.",
+ "variables": [
+  {
+   "id": "A",
+   "domain": [
+    1,
+    2,
+    3
+   ],
+   "x": 0,
+   "y": 0
+  },
+  {
+   "id": "B",
+   "domain": [
+    1,
+    2,
+    3
+   ],
+   "x": 3,
+   "y": 0
+  },
+  {
+   "id": "C",
+   "domain": [
+    1,
+    2
+   ],
+   "x": 1.5,
+   "y": 1.6
+  },
+  {
+   "id": "D",
+   "domain": [
+    1,
+    2,
+    3
+   ],
+   "x": 1,
+   "y": 0.5
+  },
+  {
+   "id": "E",
+   "domain": [
+    1,
+    2
+   ],
+   "x": 2,
+   "y": 0.5
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "A",
+    "D"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "B",
+    "E"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "D",
+    "E"
+   ],
+   "rel": "lt"
+  }
+ ]
+}

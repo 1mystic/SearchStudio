@@ -2,7 +2,7 @@
  "id": "csp-australia",
  "type": "csp",
  "name": "Map colouring: Australia",
- "note": "Seven regions, three colours, neighbours must differ.",
+ "note": "Seven regions, three colours, neighbours must differ. Run Arc consistency: it deletes nothing (every colour has a partner for every neighbour), so all domains stay at three values and search is needed: arc consistency alone cannot solve this one (compare the Ordering chain, which it solves). Then run Backtracking and Forward checking; Tasmania is a free region that never causes a failure.",
  "variables": [
   {
    "id": "WA",

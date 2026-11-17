@@ -1,6 +1,7 @@
 /* Chronological backtracking for CSPs. */
 Studio.register({
   id: "csp-backtracking",
+  defaultExample: "csp-thrashing",
   name: "Backtracking",
   family: "Constraint processing",
   week: 11,
@@ -43,15 +44,17 @@ Studio.register({
         "why": "Each level multiplies the branches by the domain size."
       }
     ],
-    "why": "Complete and simple, but it discovers failures late. Look-ahead (forward checking) and consistency (arc consistency) detect them earlier.",
+    "why": "Complete and simple, but it discovers failures late (thrashing). Look-ahead (forward checking) and consistency (arc consistency) detect them earlier.",
     "traps": [
       "Count every value tried as a node.",
-      "Backtracking returns to the most recent variable, even if it is not the cause of the failure."
+      "Thrashing: backtracking returns to the most recent variable, even if it is not the cause of the failure, and so it rediscovers the same dead end under every combination of irrelevant earlier values. Try example 'Thrashing': 45 values tried where forward checking needs 6.",
+      "The variable order changes the tree a lot, and a bad order is only found out by running it. Try example 'Variable ordering': 58 values in the given order, 7 with 'most constraints first'. It is a heuristic, not a guarantee: on the Australia map the given order is better (11 vs 15 values).",
+      "Backtracking only checks a value against EARLIER variables, so a conflict with a later variable is found only when that variable is reached. Forward checking moves that test forward."
     ],
     "props": {
       "complete": "yes",
       "optimal": "n/a (any solution)",
-      "time": "O(dⁿ)",
+      "time": "O(dⁿ) worst case",
       "space": "O(n)"
     }
   },

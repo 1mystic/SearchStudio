@@ -1,0 +1,85 @@
+{
+ "id": "csp-thrashing",
+ "type": "csp",
+ "name": "Thrashing: E = r kills A = r, backtracking redoes B, C, D",
+ "note": "Order A, B, C, D, E. E has the single value r, so A = r can never work, but plain backtracking only finds out at the very end: it first assigns all six permutations of x, y, z to B, C, D (they must differ) and fails at E each time. Run Backtracking: 45 values tried ('most constraints first' needs only 10). Run Forward checking: A = r empties D(E) at once, 6 values tried. Run Conflict-directed backjumping: 16, because it jumps from E straight to A. Watch the nodes counter.",
+ "variables": [
+  {
+   "id": "A",
+   "domain": [
+    "r",
+    "g"
+   ],
+   "x": 0,
+   "y": 1
+  },
+  {
+   "id": "B",
+   "domain": [
+    "x",
+    "y",
+    "z"
+   ],
+   "x": 2.5,
+   "y": 0
+  },
+  {
+   "id": "C",
+   "domain": [
+    "x",
+    "y",
+    "z"
+   ],
+   "x": 3.5,
+   "y": 0
+  },
+  {
+   "id": "D",
+   "domain": [
+    "x",
+    "y",
+    "z"
+   ],
+   "x": 3,
+   "y": 1.3
+  },
+  {
+   "id": "E",
+   "domain": [
+    "r"
+   ],
+   "x": 1,
+   "y": 1
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "A",
+    "E"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "B",
+    "C"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "B",
+    "D"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "C",
+    "D"
+   ],
+   "rel": "neq"
+  }
+ ]
+}

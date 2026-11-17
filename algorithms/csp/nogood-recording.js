@@ -1,6 +1,7 @@
 /* Week 12: nogood recording (look-back learning). Backtracking that stores the reason of every dead end as a nogood and prunes with it later. */
 Studio.register({
   id: "csp-nogood",
+  defaultExample: "csp-nogood-learn",
   name: "Nogood recording",
   family: "Constraint processing · lookback",
   week: 12,
@@ -23,7 +24,7 @@ Studio.register({
     "steps": [["try a value of Xᵢ", ""], ["contains a stored nogood?", "Reject at once and note which nogood did it."], ["clash with an earlier Xⱼ?", "Record Xⱼ in the conflict set."], ["no value left", "Build the nogood from the conflict set and store it."], ["backtrack", "Chronologically here; combine with backjumping for both effects."]],
     "formulas": [{ "f": "nogood = { Xⱼ = vⱼ : Xⱼ ∈ conf(Xᵢ) }", "read": "the culprits and their current values", "why": "The values in conf(Xᵢ) alone already exclude every value of Xᵢ, so any assignment containing them is hopeless, whatever else it says." }],
     "why": "Small nogoods prune big parts of the tree. In the example 'Nogood recording' the single nogood {A=r} found at D rejects three later values (C=z, B=y, B=z) without any search.",
-    "traps": ["A nogood only prunes assignments that contain ALL of its variable-value pairs.", "Storing every nogood costs memory; real systems bound the size or the number of nogoods.", "Nogoods whose variables are already covered by a smaller stored nogood are not stored again. This subsumption test is **supplementary**."],
+    "traps": ["Try example 'Nogood recording': the dead end at D is stored as {A=r} and later rejects C=z, B=y and B=z without search (10 nodes against 24 for plain backtracking). Nogood recording is chronological, so it still goes back one level at a time; CBJ jumps but forgets, nogoods remember but do not jump.", "A nogood only prunes assignments that contain ALL of its variable-value pairs.", "Storing every nogood costs memory; real systems bound the size or the number of nogoods.", "Nogoods whose variables are already covered by a smaller stored nogood are not stored again. This subsumption test is **supplementary**."],
     "props": { "complete": "yes", "optimal": "n/a", "time": "O(dⁿ) worst case, ≤ backtracking", "space": "O(number of nogoods)" },
   },
   params: [],

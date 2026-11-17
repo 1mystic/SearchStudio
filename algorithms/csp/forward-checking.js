@@ -1,6 +1,7 @@
 /* Backtracking with forward checking (look-ahead). */
 Studio.register({
   id: "csp-forward-checking",
+  defaultExample: "csp-thrashing",
   name: "Forward checking",
   family: "Constraint processing",
   week: 11,
@@ -41,7 +42,9 @@ Studio.register({
     ],
     "why": "Usually far fewer nodes than plain backtracking; pairs well with choosing the variable with the smallest remaining domain (MRV).",
     "traps": [
-      "Forward checking does not check two future variables against each other; arc consistency does."
+      "Forward checking does not check two future variables against each other; arc consistency does. Try example 'G = W wipes out E': forward checking accepts G = W and only fails two assignments later.",
+      "It only pays off together with a good variable order. Smallest domain first (MRV) picks the variable most likely to fail next (the 'fail-first' principle); see example 'Variable ordering' (27 values in the given order, 6 with MRV).",
+      "Forward checking removes the thrashing of plain backtracking on example 'Thrashing': 6 values against 45, because A = r empties D(E) at once, but it spends extra work at every node pruning domains."
     ],
     "props": {
       "complete": "yes",
