@@ -1,0 +1,9 @@
+{
+ "id": "plan-hill-terrain",
+ "type": "planning",
+ "name": "Blocks-world hill climbing: h1 vs h2",
+ "note": "A is on the table, C is on B. Goal: the tower A, B, C (A at the bottom). h1 = +1 at the start and no move improves it; h2 climbs to the goal in 3 moves.",
+ "blocks": ["A", "B", "C"],
+ "init": [["A"], ["B", "C"]],
+ "goal": ["ontable(A)", "on(B,A)", "on(C,B)"]
+}
