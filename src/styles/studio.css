@@ -849,3 +849,8 @@ a:hover { color: var(--link-hover); text-decoration-color: currentColor; }
 .btn.wide-go { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px 40px; font-size: 14px; font-weight: 600; letter-spacing: .01em; }
 .btn.wide-go .ic { position: absolute; right: 14px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); transition: transform .15s ease; }
 .btn.wide-go:hover .ic { transform: translate(3px, -50%); }
+
+/* primary buttons: a clearly darker fill on hover, and darker again while pressed */
+.btn.primary:hover, .btn.wide-go:hover { filter: none; background: color-mix(in srgb, var(--yellow) 74%, #000); border-color: color-mix(in srgb, var(--yellow) 60%, #000); color: #151515; }
+.btn.primary:active { background: color-mix(in srgb, var(--yellow) 62%, #000); }
+:root[data-theme="light"] .btn.primary:hover, :root[data-theme="light"] .btn.wide-go:hover { background: color-mix(in srgb, var(--yellow) 78%, #000); color: #fff; }
