@@ -6,6 +6,7 @@ Studio.register({
   week: 4,
   problem: "tsp",
   order: 145,
+  defaultExample: "tsp-thirteen-cities",
   summary: "Convert a tour between path, ordinal and adjacency representations step by step; see that the reversed tour's adjacency is also valid, that one-point crossover on ordinal strings always decodes to a tour, and that the same cut on adjacency lists may not.",
   pseudocode: `Ordinal encode:  ref ← the cities of the tour in alphabetical order
     for each city c of the tour, in order:  gene ← position of c in ref (1-based);  delete c from ref

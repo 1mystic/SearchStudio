@@ -52,7 +52,8 @@ return bestEver`,
     "traps": [
       "w = 1 behaves exactly like hill climbing.",
       "Merge duplicate tours when generating neighbours of several beam members.",
-      "Stopping is on the level's best, not on any member improving."
+      "Stopping is on the level's best, not on any member improving.",
+      "The width matters: Six cities from the Greedy tour with 2-city exchange gives 229 for w = 1 (plain hill climbing) and w = 2, but 224 (the optimum) for w = 3."
     ],
     "props": {
       "complete": "no",

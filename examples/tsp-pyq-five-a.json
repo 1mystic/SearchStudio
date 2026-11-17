@@ -2,7 +2,7 @@
  "id": "tsp-pyq-five-a",
  "type": "tsp",
  "name": "Five cities, practice set A",
- "note": "Sorted edges DE 12, BC 20, CD 28, AD 34, BD 46, CE 53, AB 58, BE 70, AE 81, AC 92 (study-guide practice matrix).",
+ "note": "Sorted edges DE 12, BC 20, CD 28, AD 34, BD 46, CE 53, AB 58, BE 70, AE 81, AC 92 (study-guide practice matrix). Optimum 177. Nearest neighbour depends on the start city: 177 from A or D, 199 from B or E, 251 from C. Greedy gives 199.",
  "cities": [
   {
    "id": "A"

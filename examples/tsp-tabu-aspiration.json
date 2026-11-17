@@ -1,0 +1,108 @@
+{
+ "id": "tsp-tabu-aspiration",
+ "type": "tsp",
+ "name": "Seven cities (tabu aspiration)",
+ "note": "Made for tabu search (defaults: start = hill-climbing local optimum of the Greedy tour 254, tenure 3, 8 iterations, 2-city exchange). Optimum 241. Watch iteration 4: the swap D↔F was used in iteration 1, so it is still tabu, but it would give 241, better than bestSeen 249, so the aspiration criterion allows it and tabu search reaches the optimum. Set Aspiration to Off and the same move is refused, a worse move is taken instead and the best tour found is only 249.",
+ "cities": [
+  {
+   "id": "A",
+   "x": 5,
+   "y": 4.2
+  },
+  {
+   "id": "B",
+   "x": 6.9,
+   "y": 7.1
+  },
+  {
+   "id": "C",
+   "x": 5.5,
+   "y": 8
+  },
+  {
+   "id": "D",
+   "x": 1.2,
+   "y": 4.5
+  },
+  {
+   "id": "E",
+   "x": 3.6,
+   "y": 3.4
+  },
+  {
+   "id": "F",
+   "x": 2.1,
+   "y": 3.9
+  },
+  {
+   "id": "G",
+   "x": 9.6,
+   "y": 0.8
+  }
+ ],
+ "matrix": [
+  [
+   0,
+   35,
+   38,
+   38,
+   16,
+   29,
+   57
+  ],
+  [
+   35,
+   0,
+   17,
+   63,
+   50,
+   58,
+   69
+  ],
+  [
+   38,
+   17,
+   0,
+   55,
+   50,
+   53,
+   83
+  ],
+  [
+   38,
+   63,
+   55,
+   0,
+   26,
+   11,
+   92
+  ],
+  [
+   16,
+   50,
+   50,
+   26,
+   0,
+   16,
+   65
+  ],
+  [
+   29,
+   58,
+   53,
+   11,
+   16,
+   0,
+   81
+  ],
+  [
+   57,
+   69,
+   83,
+   92,
+   65,
+   81,
+   0
+  ]
+ ]
+}

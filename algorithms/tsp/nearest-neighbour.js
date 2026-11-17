@@ -50,9 +50,9 @@ return tour   (closing edge back to start is implied)`,
         "why": "Bad cases exist where greedy local moves strand far-away cities."
       }
     ],
-    "why": "Cheap and intuitive. Its weakness is the end game: the last cities are whatever is left over, often far apart, and the forced return edge can be the longest edge in the tour.",
+    "why": "Cheap and intuitive. Its weakness is the end game: the last cities are whatever is left over, often far apart, and the forced return edge can be the longest edge in the tour. It always returns a tour, but never promises an optimal one.",
     "traps": [
-      "The tour depends on the start city: run it from every city and keep the best.",
+      "The tour depends on the start city: run it from every city and keep the best. On Six cities (examples) the tour costs 264 from A (its forced return leg B→A = 92 is the longest edge) but 240 from C, and the optimum is 224 (try the start city setting).",
       "Do not forget the forced return edge in the cost.",
       "Write the answer in path representation starting from the asked city."
     ],

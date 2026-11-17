@@ -39,7 +39,8 @@ return bestSeen`,
     ],
     "why": "Pure exploration can in principle reach anything, but without guidance it rarely finds good tours in reasonable time.",
     "traps": [
-      "Simulated annealing at very high temperature behaves almost like this (a coin flip per move)."
+      "Simulated annealing at very high temperature behaves almost like this (a coin flip per move).",
+      "Do not expect it to settle: on Six cities started from the Greedy tour (238) the cost jumps up and down by tens of units from step to step with no downward trend (more steps give a range of roughly 220 to 380), and the last step reports that range. Only the remembered bestSeen is useful."
     ],
     "props": {
       "complete": "no",
@@ -65,8 +66,9 @@ return bestSeen`,
       series.push({ x: i, y: P.cost(cur), best: P.cost(best) });
       push(`Step ${i}: random ${r.move} → ${P.cost(cur)}`);
     }
-    steps.push({ caption: `bestSeen ${best.join(",")} = ${P.cost(best)}`, nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.tspSteps.edges(P, best, { state: "path" }),
+    const ys = series.map(q => q.y), lo = Math.min(...ys), hi = Math.max(...ys), tail = ys.slice(Math.ceil(ys.length / 2)), mean = Math.round(tail.reduce((a, b) => a + b, 0) / tail.length);
+    steps.push({ caption: `bestSeen ${best.join(",")} = ${P.cost(best)}. The walk visited costs from ${lo} to ${hi} and the second half averaged ${mean}: it never converges, because it ignores the cost, so only the remembered bestSeen is useful`, nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.tspSteps.edges(P, best, { state: "path" }),
       chart: { kind: "walk", series, yLabel: "tour cost" }, table: { columns: ["step", "move", "tour", "cost", "best"], rows: rows.slice(-14) }, stats: [{ label: "bestSeen", value: P.cost(best), state: "ok" }] });
-    return { steps, result: { tour: best, cost: P.cost(best) } };
+    return { steps, result: { tour: best, cost: P.cost(best), low: lo, high: hi, tailMean: mean } };
   },
 });

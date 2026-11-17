@@ -60,7 +60,8 @@ return the single tour`,
     "traps": [
       "The savings formula has a minus on C(i,j), not on the base distances.",
       "A pair is refused if either city is interior, even if they are in different sub-tours.",
-      "Know which pairs merged and which did not: exams ask for the first three of each."
+      "Know which pairs merged and which did not: exams ask for the first three of each (Six cities, base A: merged BF, BD, CF; refused DF, BC, CD).",
+      "The result depends on the base city: on Six cities base A gives 224 (the optimum) but base E gives 229, and there AD (S = 42) is refused because D is already interior, not because of a cycle."
     ],
     "props": {
       "complete": "always returns a tour",

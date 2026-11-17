@@ -6,6 +6,7 @@ Studio.register({
   week: 3,
   problem: "tsp",
   order: 90,
+  defaultExample: "tsp-tabu-aspiration",
   summary: "Always move to the best neighbour that is not tabu, even if it is worse. A move's key (the swapped pair / removed edges) stays tabu for tt iterations; aspiration allows a tabu move that beats bestSeen.",
   pseudocode: `N ← start;  bestSeen ← N
 repeat for k iterations
@@ -18,7 +19,7 @@ return bestSeen`,
   complexity: "k × |neighbourhood| evaluations; memory O(tt)",
   learn: {
     "intro": "Tabu search always moves, even downhill, to escape local optima. To avoid simply stepping back to where it came from, it keeps a short-term memory of recent moves that are forbidden (tabu) for a few iterations.",
-    "definition": "At each iteration, move to the best neighbour whose move is not tabu. Mark that move tabu for tt iterations (the tenure). A tabu move is allowed anyway if it gives a tour better than any seen (aspiration). Return the best tour seen.",
+    "definition": "At each iteration, move to the best neighbour whose move is not tabu. Mark that move tabu for tt iterations (the tenure). A tabu move is allowed anyway if it gives a tour better than any seen (aspiration; the studio can switch it off to show the difference). Return the best tour seen.",
     "steps": [
       [
         "N ← start;  bestSeen ← N",
@@ -43,7 +44,7 @@ return bestSeen`,
     ],
     "formulas": [
       {
-        "f": "tabu(m) ⇔ t < expiry(m),  expiry(m) = t(used) + tt",
+        "f": "tabu(m) ⇔ t_used < t ≤ t_used + tt",
         "read": "a move stays forbidden for tt iterations",
         "why": "Short tenure risks cycling; long tenure can block good moves."
       },
@@ -56,8 +57,9 @@ return bestSeen`,
     "why": "Memory turns a greedy walk into a systematic one. On small instances a short tenure leads to cycles; a frequency memory (prefer rarely-used moves) further diversifies the search.",
     "traps": [
       "Tabu takes the best non-tabu move even if it is worse than the current tour.",
-      "Apply aspiration before rejecting a tabu move.",
-      "Return bestSeen, not the final current tour."
+      "Apply aspiration before rejecting a tabu move. Seven cities (tabu aspiration) in the examples: in iteration 4 swap D↔F is still tabu from iteration 1, but it gives 241 < bestSeen 249, so it is taken and reaches the optimum; with aspiration off the best found is only 249.",
+      "Return bestSeen, not the final current tour.",
+      "The tenure matters: on Six cities in 8 iterations, tenure 2 lands on an already visited tour 5 times (short memory, cycling), tenure 3 only 3 times and it explores tours costing 237 and 233 on the way."
     ],
     "props": {
       "complete": "no",
@@ -68,11 +70,12 @@ return bestSeen`,
   },
   params: [
     { key: "start", label: "Start tour", type: "select", default: "trap", options: [["trap", "Hill-climbing local optimum of the Greedy tour"], ["greedy", "Greedy tour"], ["nn", "Nearest-neighbour tour"], ["alphabetical", "A, B, C, … in order"], ["random", "Random (uses seed)"]], allowText: true },
-    { key: "tenure", label: "Tabu tenure tt", type: "int", default: 2, min: 1, max: 20 },
+    { key: "tenure", label: "Tabu tenure tt", type: "int", default: 3, min: 1, max: 20 },
     { key: "iters", label: "Iterations", type: "int", default: 8, min: 1, max: 60 },
+    { key: "aspiration", label: "Aspiration criterion", type: "select", default: "yes", options: [["yes", "On: a tabu move that beats bestSeen is allowed"], ["no", "Off: tabu moves are always refused"]] },
     Studio.tsp.mgParam("2-city"), Studio.seedParam(1),
   ],
-  run(P, { start, tenure, iters, movegen, seed }) {
+  run(P, { start, tenure, iters, aspiration, movegen, seed }) {
     const T = Studio.tsp, steps = [];
     let cur = start === "trap" ? Studio.tsp.hillClimb(P, T.startTour(P, "greedy"), movegen).pop().tour : T.startTour(P, start, seed);
     let best = cur;
@@ -90,7 +93,7 @@ return bestSeen`,
       let chosen = null, asp = false; const skipped = [];
       for (const r of nb) {
         const isTabu = (tabu.get(r.key) || 0) >= it;
-        if (isTabu && r.cost < P.cost(best)) { chosen = r; asp = true; break; }
+        if (isTabu && aspiration !== "no" && r.cost < P.cost(best)) { chosen = r; asp = true; break; }
         if (isTabu) { skipped.push(`${r.move} (${r.cost})`); continue; }
         chosen = r; break;
       }

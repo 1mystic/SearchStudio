@@ -28,7 +28,7 @@ return bestSeen`,
     why: "It shows why local search needs more than a greedy best-neighbour rule: tabu search adds a memory (forbidden moves) and simulated annealing adds randomness precisely to break this cycle.",
     traps: [
       "Reporting the final tour instead of the best tour seen.",
-      "Thinking that moving uphill alone is enough to escape a local optimum: without memory or randomness it goes straight back.",
+      "Thinking that moving uphill alone is enough to escape a local optimum: without memory or randomness it goes straight back. On Six cities the walk bounces between 224 and 229 for ever (a cycle of length 2 from move 1), exactly the repetition that tabu search's memory forbids.",
     ],
     props: { complete: "no", optimal: "no", time: "k scans of the neighbourhood", space: "O(n)" },
   },
@@ -57,11 +57,11 @@ return bestSeen`,
       if (b.cost < P.cost(best)) best = cur;
       const k = key(cur), again = seen.get(k);
       if (again !== undefined && cycleStart === null) { cycleStart = again; cycleLength = i - again; }
-      if (again === undefined) seen.set(k, i);
+      seen.set(k, i);
       rows.push([i, b.move, Tz.canon(cur, P.ids[0]).join(","), b.cost, again !== undefined ? `yes, move ${again}` : "no"]);
       states.push(again !== undefined ? "warn" : worse ? "bad" : "ok");
       walk.push({ x: i, y: b.cost, best: P.cost(best) });
-      snap(`Move ${i}: best of ${nb.length} neighbours is ${b.move} = ${b.cost} (${worse ? `worse than ${was}, taken anyway` : b.cost < was ? `better than ${was}` : `equal to ${was}`})${again !== undefined ? `; this tour was already visited at move ${again}: a cycle of length ${i - again}, the same moves will repeat` : ""}`);
+      snap(`Move ${i}: best of ${nb.length} neighbours is ${b.move} = ${b.cost} (${worse ? `worse than ${was}, taken anyway` : b.cost < was ? `better than ${was}` : `equal to ${was}`})${again !== undefined ? `; this tour was last visited at move ${again}: the walk is going round a cycle of length ${i - again}, the same moves will repeat` : ""}`);
     }
     steps.push({ caption: cycleStart !== null ? `Finished ${moves} moves: cycle of length ${cycleLength} from move ${cycleStart}. bestSeen ${best.join(",")} = ${P.cost(best)}, the final tour costs ${P.cost(cur)}` : `Finished ${moves} moves without repeating a tour. bestSeen ${best.join(",")} = ${P.cost(best)}`,
       nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.tspSteps.edges(P, best, { state: "path" }),

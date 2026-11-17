@@ -55,7 +55,8 @@ read the tour from the chosen edges, starting at the given city`,
     "traps": [
       "Track degrees and fragments carefully; most exam errors are an illegal acceptance.",
       "The last accepted edge is forced and may be long.",
-      "'Greedy from city X' only changes where you start writing the tour."
+      "'Greedy from city X' only changes where you start writing the tour.",
+      "Watch both rejection reasons on Six cities (examples): CE = 31 is refused as a premature cycle (A–C–E would close a triangle), CF, BD, AD … are refused because a city would get a degree of 3. The result, 238, is not the optimum 224."
     ],
     "props": {
       "complete": "always returns a tour",

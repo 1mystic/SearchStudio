@@ -1,0 +1,154 @@
+{
+ "id": "tsp-ga-premature",
+ "type": "tsp",
+ "name": "Nine cities (GA premature convergence)",
+ "note": "Made for the genetic algorithm (optimum 255). Set Generations 30, Replace k = 3, keep Population 6, PMX and seed 15. With mutation probability 0 the whole population collapses into copies of one tour costing 329 (74 above the optimum): crossover can only reshuffle what is already there, so the search has converged prematurely. With mutation probability 0.9 the same run keeps finding new tours and reaches 255. Watch the distinct tours counter and the mean-cost line.",
+ "cities": [
+  {
+   "id": "A",
+   "x": 6.1,
+   "y": 9.3
+  },
+  {
+   "id": "B",
+   "x": 2.7,
+   "y": 5.9
+  },
+  {
+   "id": "C",
+   "x": 3.5,
+   "y": 3.1
+  },
+  {
+   "id": "D",
+   "x": 5.1,
+   "y": 7.1
+  },
+  {
+   "id": "E",
+   "x": 3.1,
+   "y": 1.6
+  },
+  {
+   "id": "F",
+   "x": 8.7,
+   "y": 6.3
+  },
+  {
+   "id": "G",
+   "x": 3.8,
+   "y": 10
+  },
+  {
+   "id": "H",
+   "x": 4.8,
+   "y": 1.8
+  },
+  {
+   "id": "I",
+   "x": 2.5,
+   "y": 9.2
+  }
+ ],
+ "matrix": [
+  [
+   0,
+   48,
+   67,
+   24,
+   83,
+   40,
+   24,
+   76,
+   36
+  ],
+  [
+   48,
+   0,
+   29,
+   27,
+   43,
+   60,
+   42,
+   46,
+   33
+  ],
+  [
+   67,
+   29,
+   0,
+   43,
+   16,
+   61,
+   69,
+   18,
+   62
+  ],
+  [
+   24,
+   27,
+   43,
+   0,
+   59,
+   37,
+   32,
+   53,
+   33
+  ],
+  [
+   83,
+   43,
+   16,
+   59,
+   0,
+   73,
+   84,
+   17,
+   76
+  ],
+  [
+   40,
+   60,
+   61,
+   37,
+   73,
+   0,
+   61,
+   60,
+   68
+  ],
+  [
+   24,
+   42,
+   69,
+   32,
+   84,
+   61,
+   0,
+   83,
+   15
+  ],
+  [
+   76,
+   46,
+   18,
+   53,
+   17,
+   60,
+   83,
+   0,
+   77
+  ],
+  [
+   36,
+   33,
+   62,
+   33,
+   76,
+   68,
+   15,
+   77,
+   0
+  ]
+ ]
+}

@@ -45,7 +45,8 @@ return best`,
     "why": "Simple and effective when local optima are many but hill climbing is cheap. It wastes effort if most random starts lead to the same poor basin.",
     "traps": [
       "Each restart is independent: nothing is learned between restarts.",
-      "Random starts are usually much worse than constructive tours."
+      "Random starts are usually much worse than constructive tours.",
+      "Different starts end in different local optima: on Six cities with 5 restarts the optima are 229, 224, 224, 229, 224, so one climb can be stuck at 229 while another finds 224."
     ],
     "props": {
       "complete": "no",

@@ -56,7 +56,7 @@ return best member of P`,
     "why": "Selection pushes toward good tours, crossover mixes their good parts, and mutation keeps exploring. Too much selection pressure makes the population identical too soon (premature convergence).",
     "traps": [
       "Fitness must be inverted for a minimisation problem.",
-      "If the population converges early: raise mutation, lower selection pressure, enlarge the population.",
+      "If the population converges early: raise mutation, lower selection pressure, enlarge the population. Nine cities (GA premature convergence) in the examples: with Generations 30, Replace k 3 and mutation 0 the whole population becomes one tour costing 329 (optimum 255); with mutation 0.9 the same run reaches 255. Watch the distinct tours counter.",
       "Cumulative probabilities decide roulette picks; recompute them carefully."
     ],
     "props": {
@@ -81,6 +81,8 @@ return best member of P`,
     let pop = Array.from({ length: N }, () => [P.ids[0]].concat(rng.shuffle(P.ids.slice(1))));
     const bestOf = arr => arr.slice().sort((a, b) => P.cost(a) - P.cost(b))[0];
     const series = [];
+    const distinct = arr => new Set(arr.map(t => T.canon(t).join(","))).size;
+    const meanCost = arr => Math.round(arr.reduce((s, t) => s + P.cost(t), 0) / arr.length * 10) / 10;
     const popTable = (rows, title) => ({ title, columns: ["#", "tour", "cost", "fitness", "p", "cumulative"], rows });
     for (let g = 1; g <= gens; g++) {
       const fit = pop.map(t => K / P.cost(t)), tot = fit.reduce((a, b) => a + b, 0);
@@ -89,9 +91,10 @@ return best member of P`,
       const cums = []; cum = 0; fit.forEach(f => { cum += f / tot; cums.push(cum); });
       const best = bestOf(pop);
       series.push({ x: g - 1, y: P.cost(best), avg: pop.reduce((s, t) => s + P.cost(t), 0) / N });
-      steps.push({ caption: `Generation ${g}: population costs ${pop.map(t => P.cost(t)).join(", ")}; best ${P.cost(best)}`,
+      steps.push({ caption: `Generation ${g}: population costs ${pop.map(t => P.cost(t)).join(", ")}; best ${P.cost(best)}; ${distinct(pop)} distinct tour${distinct(pop) === 1 ? "" : "s"} among ${N}${distinct(pop) === 1 ? ": the population has converged, crossover can only recombine copies of one tour and only mutation can add anything new" : ""}`,
         nodes: Studio.tspSteps.nodes(P), edges: Studio.draw.tour(best, "tour", P), table: popTable(rows, `generation ${g}: roulette wheel`),
-        chart: { kind: "pie", slices: fit.map(f => f / tot), labels: pop.map((_, i) => "P" + (i + 1)) }, stats: [{ label: "best", value: P.cost(best), state: "ok" }] });
+        chart: { kind: "pie", slices: fit.map(f => f / tot), labels: pop.map((_, i) => "P" + (i + 1)) },
+        stats: [{ label: "best", value: P.cost(best), state: "ok" }, { label: "mean cost", value: meanCost(pop) }, { label: "distinct tours", value: distinct(pop), state: distinct(pop) === 1 ? "bad" : undefined }] });
       const picks = [];
       for (let s = 0; s < N; s++) { const u = rng.r3(); const i = cums.findIndex(c => u <= c); picks.push({ u, i: i < 0 ? N - 1 : i }); }
       steps.push({ caption: `Roulette spins: ${picks.map(p => `u=${p.u}→P${p.i + 1}`).join(", ")}`, nodes: Studio.tspSteps.nodes(P), edges: Studio.draw.tour(best, "tour", P),
@@ -118,10 +121,14 @@ return best member of P`,
       steps.push({ caption: replaced.length ? `Replace weakest: ${replaced.join("; ")}` : `No offspring beat the ${k} weakest members: population unchanged`,
         nodes: Studio.tspSteps.nodes(P), edges: Studio.draw.tour(bestOf(pop), "tour", P),
         table: popTable(pop.map((t, i) => [`P${i + 1}`, t.join(","), P.cost(t), (K / P.cost(t)).toFixed(3), "", ""]), `after generation ${g}`),
-        chart: { kind: "walk", series: series.concat([{ x: g, y: P.cost(bestOf(pop)), avg: pop.reduce((s, t) => s + P.cost(t), 0) / N }]), yLabel: "best (line) and mean cost" } });
+        chart: { kind: "walk", series: series.concat([{ x: g, y: P.cost(bestOf(pop)), avg: pop.reduce((s, t) => s + P.cost(t), 0) / N }]), yLabel: "best (line) and mean cost" },
+        stats: [{ label: "best", value: P.cost(bestOf(pop)), state: "ok" }, { label: "mean cost", value: meanCost(pop) }, { label: "distinct tours", value: distinct(pop), state: distinct(pop) === 1 ? "bad" : undefined }] });
     }
     const best = bestOf(pop);
-    steps.push({ caption: `Best member after ${gens} generations: ${best.join(",")} = ${P.cost(best)}`, nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.draw.tour(best, "path", P), stats: [{ label: "best", value: P.cost(best), state: "ok" }] });
-    return { steps, result: { tour: best, cost: P.cost(best) } };
+    const dv = distinct(pop), opt = Studio.tspSteps.optimum(P);
+    steps.push({ caption: `Best member after ${gens} generations: ${best.join(",")} = ${P.cost(best)}${opt != null ? (P.cost(best) === opt ? ", the optimum" : `, ${P.cost(best) - opt} above the optimum ${opt}`) : ""}. ${dv === 1 ? (opt != null && P.cost(best) === opt ? `All ${N} members are now the same tour, and it is the optimum` : `All ${N} members are now the same tour${opt != null ? " but it is not the optimum" : ""}: premature convergence (mutation probability ${pm}); raise it or the population to keep exploring`) : `${dv} distinct tours remain in the population (mutation probability ${pm})`}`,
+      nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.draw.tour(best, "path", P),
+      stats: [{ label: "best", value: P.cost(best), state: "ok" }, { label: "distinct tours", value: dv, state: dv === 1 ? "bad" : undefined }] });
+    return { steps, result: { tour: best, cost: P.cost(best), distinct: dv, mean: meanCost(pop) } };
   },
 });

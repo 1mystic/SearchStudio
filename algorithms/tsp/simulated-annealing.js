@@ -63,11 +63,12 @@ return bestSeen`,
     "traps": [
       "ΔE sign: define it so that positive means better for the problem at hand.",
       "With the sigmoid rule, P(better move) < 1 at finite T.",
-      "Return bestSeen: the current tour can wander off the best one."
+      "Return bestSeen: the current tour can wander off the best one.",
+      "Temperature is the whole story: on Six cities with the default settings worse moves are accepted at k = 1 (T = 30) and k = 7 (T = 11); at k = 12 (T = 5) only an improving move is taken, and the run escapes the 229 trap to reach 224. Try T0 = 1: the sigmoid is so steep that it behaves like hill climbing and stays at 229."
     ],
     "props": {
       "complete": "no",
-      "optimal": "only with impractically slow cooling",
+      "optimal": "no guarantee in practice (only in the limit of extremely slow cooling)",
       "time": "k samples",
       "space": "O(n)"
     }
@@ -83,6 +84,7 @@ return bestSeen`,
     const Tz = Studio.tsp, rng = Studio.rng(seed), steps = [];
     let cur = start === "trap" ? Tz.hillClimb(P, Tz.startTour(P, "greedy"), movegen).pop().tour : Tz.startTour(P, start, seed);
     let best = cur, T = T0;
+    const worseAt = [];
     const rows = [], states = [], series = [{ x: 0, y: P.cost(cur), best: P.cost(best), T }];
     const push = (cap, extra = {}) => steps.push(Object.assign({ caption: cap, nodes: Studio.tspSteps.nodes(P), edges: Studio.tspSteps.edges(P, cur),
       table: { columns: ["k", "T", "cur", "move", "next", "ΔE", "P", "u", ""], rows: rows.slice(-14), rowStates: states.slice(-14) },
@@ -100,12 +102,13 @@ return bestSeen`,
       const verdict = acc ? (dE < 0 ? "accept (worse)" : "accept") : (dE > 0 ? "reject (better!)" : "reject");
       rows.push([i, Math.round(T * 100) / 100, P.cost(cur), r.move, r.cost, dE, pr, u, verdict]);
       states.push(acc ? (dE < 0 ? "warn" : "ok") : (dE > 0 ? "warn" : "bad"));
-      if (acc) { cur = r.tour; if (P.cost(cur) < P.cost(best)) best = cur; }
+      if (acc) { cur = r.tour; if (acc && dE < 0) worseAt.push(i); if (P.cost(cur) < P.cost(best)) best = cur; }
       series.push({ x: i, y: P.cost(cur), best: P.cost(best), T, proposal: r.cost, accepted: acc });
       push(`k = ${i}, T = ${Math.round(T * 100) / 100}: ${r.move}, ΔE = ${dE}, P = ${pr}, u = ${u} → ${verdict}`);
       T *= alpha;
     }
-    push(`bestSeen ${best.join(",")} = ${P.cost(best)}`, { nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.tspSteps.edges(P, best, { state: "path" }) });
-    return { steps, result: { tour: best, cost: P.cost(best) } };
+    const half = Math.ceil(k / 2), early = worseAt.filter(i => i <= half).length, late = worseAt.length - early, opt = Studio.tspSteps.optimum(P);
+    push(`bestSeen ${best.join(",")} = ${P.cost(best)}${opt != null ? (P.cost(best) === opt ? ", the optimum" : `, ${P.cost(best) - opt} above the optimum ${opt}`) : ""}. Worse moves accepted: ${early} in the hot first half (T from ${Math.round(T0 * 100) / 100}), ${late} in the cool second half (T down to ${Math.round(T * 100) / 100}). As T falls the sigmoid steepens and the walk settles`, { nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.tspSteps.edges(P, best, { state: "path" }) });
+    return { steps, result: { tour: best, cost: P.cost(best), worseEarly: early, worseLate: late, finalT: T } };
   },
 });

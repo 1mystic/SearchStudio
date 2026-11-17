@@ -43,12 +43,13 @@ loop
       {
         "f": "|N₃e| = O(n³)",
         "read": "choose three edges, then a reconnection",
-        "why": "Denser than 2-edge exchange: fewer local optima, more work per step."
+        "why": "Many more neighbours than 2-edge exchange, so more work per step; the extra moves reach tours that a 2-edge descent cannot."
       }
     ],
-    "why": "Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A denser neighbourhood has fewer such traps but costs more per step.",
+    "why": "Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A 3-edge move changes all three edges it touches (the studio lists only these pure moves, not the 2-opt ones), so its local optima differ from 2-opt's: it is most useful after a 2-edge descent, which is what variable neighbourhood descent does.",
     "traps": [
       "Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).",
+      "Do not assume a 3-edge local optimum is also a 2-edge local optimum: on Six cities from the Nearest-neighbour tour pure 3-edge exchange stops at 229 while 2-edge exchange from the same tour reaches 224. From the 2-opt optimum 229 (Greedy start) a 3-edge move does reach 224: see variable neighbourhood descent.",
       "Count neighbours with the right formula for the operator.",
       "In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change."
     ],

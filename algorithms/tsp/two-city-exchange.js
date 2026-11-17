@@ -49,6 +49,7 @@ loop
     "why": "Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A denser neighbourhood has fewer such traps but costs more per step.",
     "traps": [
       "Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).",
+      "A local optimum is not the global one: on Six cities, started from the Greedy tour (238), 2-city exchange stops at 229, the optimum is 224. Variable neighbourhood descent continues from such a tour with a different move.",
       "Count neighbours with the right formula for the operator.",
       "In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change."
     ],

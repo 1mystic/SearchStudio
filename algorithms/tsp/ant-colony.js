@@ -58,7 +58,8 @@ return bestTour`,
     "traps": [
       "Normalise only over unvisited cities.",
       "Evaporate before depositing (course order).",
-      "β = 0 ignores distance; α = 0 ignores pheromone and gives a randomised nearest neighbour."
+      "β = 0 ignores distance; α = 0 ignores pheromone and gives a randomised nearest neighbour.",
+      "Reinforcement is visible in the update steps: on Six cities the pheromone on the six strongest edges rises from about 60% to about 70% of the total within a few iterations (40% if spread evenly), while unused edges evaporate. A larger ρ forgets faster."
     ],
     "props": {
       "complete": "no",
@@ -69,7 +70,7 @@ return bestTour`,
   },
   params: [
     { key: "m", label: "Ants m", type: "int", default: 3, min: 1, max: 30 },
-    { key: "iters", label: "Iterations", type: "int", default: 3, min: 1, max: 50 },
+    { key: "iters", label: "Iterations", type: "int", default: 6, min: 1, max: 50 },
     { key: "alpha", label: "α (pheromone weight)", type: "number", default: 1 },
     { key: "beta", label: "β (visibility weight)", type: "number", default: 2 },
     { key: "rho", label: "ρ (evaporation)", type: "number", default: 0.5 },
@@ -82,6 +83,9 @@ return bestTour`,
     const tau = {}; ids.forEach((a, i) => ids.slice(i + 1).forEach(b => (tau[key(a, b)] = tau0)));
     const pherEdges = (scale) => { const mx = Math.max(...Object.values(tau)); return Object.entries(tau).map(([e, v]) => ({ u: e[0], v: e[1], state: "pheromone", weight: v / mx, label: undefined })); };
     let best = null;
+    const bestShare = () => { const v = Object.values(tau).sort((a, b) => b - a), tot = v.reduce((a, b) => a + b, 0); return v.slice(0, ids.length).reduce((a, b) => a + b, 0) / tot; };
+    const pct = x => Math.round(x * 1000) / 10;
+    const uniform = 2 / (ids.length - 1), shares = [];
     const starts = Array.from({ length: m }, (_, k) => ids[Math.floor((k * ids.length) / m) % ids.length]);
     for (let it = 1; it <= iters; it++) {
       const ants = [];
@@ -116,12 +120,14 @@ return bestTour`,
       for (const e in tau) tau[e] *= 1 - rho;
       ants.forEach(a => Studio.tsp.tourEdges(a.t).forEach(([u, v]) => (tau[key(u, v)] += Q / a.L)));
       const top = Object.entries(tau).sort((a, b) => b[1] - a[1]).slice(0, 8);
-      steps.push({ caption: `Pheromone update: evaporate ×${(1 - rho).toFixed(2)}, deposit Q/L. Strongest: ${top.slice(0, 3).map(([e, v]) => e + " " + v.toFixed(2)).join(", ")}`,
+      shares.push(bestShare());
+      steps.push({ caption: `Pheromone update: evaporate ×${(1 - rho).toFixed(2)}, deposit Q/L. Strongest: ${top.slice(0, 3).map(([e, v]) => e + " " + v.toFixed(2)).join(", ")}. The ${ids.length} strongest edges hold ${pct(shares[shares.length - 1])}% of all pheromone (${pct(uniform)}% if it were spread evenly): edges used by many and by short tours are reinforced, unused ones evaporate`,
         nodes: Studio.tspSteps.nodes(P), edges: pherEdges(),
         table: { title: `τ after iteration ${it} (top 8)`, columns: ["edge", "before", "(1−ρ)·before", "deposit", "after"], rows: top.map(([e, v]) => [e, before[e].toFixed(3), (before[e] * (1 - rho)).toFixed(3), (v - before[e] * (1 - rho)).toFixed(3), v.toFixed(3)]) },
-        stats: [{ label: "best so far", value: best.cost, state: "ok" }] });
+        stats: [{ label: "best so far", value: best.cost, state: "ok" }, { label: "pheromone on strongest edges", value: pct(shares[shares.length - 1]) + "%" }] });
     }
-    steps.push({ caption: `Best tour ${best.tour.join(",")} = ${best.cost}`, nodes: Studio.tspSteps.nodes(P, "path"), edges: pherEdges().concat(Studio.draw.tour(best.tour, "path", P)), stats: [{ label: "best", value: best.cost, state: "ok" }] });
-    return { steps, result: best };
+    const opt = Studio.tspSteps.optimum(P);
+    steps.push({ caption: `Best tour ${best.tour.join(",")} = ${best.cost}${opt != null ? (best.cost === opt ? ", the optimum" : `, ${best.cost - opt} above the optimum ${opt}`) : ""}. The share of all pheromone on the ${ids.length} strongest edges went ${shares.map(pct).join("% → ")}% (${pct(uniform)}% = evenly spread): the trail concentrates on edges that short tours share`, nodes: Studio.tspSteps.nodes(P, "path"), edges: pherEdges().concat(Studio.draw.tour(best.tour, "path", P)), stats: [{ label: "best", value: best.cost, state: "ok" }] });
+    return { steps, result: { tour: best.tour, cost: best.cost, shares } };
   },
 });
