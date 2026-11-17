@@ -1,0 +1,9 @@
+{
+ "id": "sat-four-var",
+ "type": "sat",
+ "name": "Four-variable SAT (course example)",
+ "note": "Start 0000 (h 4): hill climbing stops at 1000 (h 5); VND and tabu reach the unique solution 1101 (h 6).",
+ "vars": ["a", "b", "c", "d"],
+ "clauses": [["-b", "-c"], ["-b", "d"], ["b", "-c"], ["a", "d"], ["b", "c"], ["a", "-d"]],
+ "start": "0000"
+}

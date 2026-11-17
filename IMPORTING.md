@@ -7,7 +7,7 @@ This guide covers how to bring your own problem into the studio, and the exact J
 1. [Three ways to bring a problem in](#three-ways-to-bring-a-problem-in)
 2. [Fields every problem shares](#fields-every-problem-shares)
 3. [Which problem type each algorithm uses](#which-problem-type-each-algorithm-uses)
-4. Schemas: [TSP](#1-tsp--type-tsp) · [Graph](#2-state-space-graph--type-graph) · [Game tree](#3-game-tree--type-game) · [AND–OR graph](#4-andor-graph--type-andor) · [Planning](#5-blocks-world-planning--type-planning) · [Rule base](#6-rule-base--type-rules) · [CSP](#7-constraint-problem--type-csp) · [Line drawing](#8-line-drawing--type-linedrawing) · [Circuit](#9-circuit-diagnosis--type-circuit) · [Alignment](#10-sequence-alignment--type-alignment)
+4. Schemas: [TSP](#1-tsp--type-tsp) · [Graph](#2-state-space-graph--type-graph) · [Game tree](#3-game-tree--type-game) · [AND–OR graph](#4-andor-graph--type-andor) · [Planning](#5-blocks-world-planning--type-planning) · [Rule base](#6-rule-base--type-rules) · [CSP](#7-constraint-problem--type-csp) · [Line drawing](#8-line-drawing--type-linedrawing) · [Circuit](#9-circuit-diagnosis--type-circuit) · [Alignment](#10-sequence-alignment--type-alignment) · [SAT](#11-propositional-satisfiability--type-sat)
 5. [Adding a problem to the built-in examples](#adding-a-problem-to-the-built-in-examples)
 6. [Common errors](#common-errors)
 
@@ -33,7 +33,7 @@ When you import a problem whose type doesn't fit the current algorithm, the stud
 
 ```jsonc
 {
-  "type": "tsp",            // REQUIRED. One of: tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment
+  "type": "tsp",            // REQUIRED. One of: tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment, sat
   "name": "My problem",     // optional: shown in the picker (default "Imported problem")
   "note": "One line.",      // optional: shown under the name
   "id": "my-problem"        // ignored on import (a new id is given); REQUIRED only for files in examples/
@@ -60,6 +60,7 @@ When you import a problem whose type doesn't fit the current algorithm, the stud
 | `linedrawing` | Waltz algorithm |
 | `circuit` | Model-based diagnosis |
 | `alignment` | Sequence alignment (DP), Sequence alignment (A*) |
+| `sat` | Brute force (truth table, ≤ 6 variables), Hill climbing (N1), Beam search, Variable Neighbourhood Descent, Best neighbour (fixed moves), Tabu search |
 
 Settings such as the start city, tie-break rule, temperature or seed are **not** part of the problem. You set them in the studio's Settings card after importing.
 
@@ -578,6 +579,45 @@ gap 1
 
 ---
 
+## 11. Propositional satisfiability — `"type": "sat"`
+
+**Used by:** Brute force, Hill climbing, Beam search, Variable Neighbourhood Descent, Best neighbour and Tabu search on SAT (Week 3).
+
+| Field | Required | Type | Meaning |
+|---|:--:|---|---|
+| `vars` | ✔ | array of names, 1–20 | The propositional variables, e.g. `["a", "b", "c", "d"]`. Names start with a letter and use letters, digits or `_`. Their order fixes the bit order. |
+| `clauses` | ✔ | array of arrays of literals | Conjunctive normal form: every inner array is one clause, an OR of literals. `"b"` is the variable, `"-b"` is NOT b. |
+| `start` | | string of 0s and 1s, one per variable | Where the local-search methods begin (default all zeros). A bit is 1 when its variable is true. |
+
+A candidate assignment is a bit string in `vars` order, so `1101` means a = true, b = true, c = false, d = true. The score **h** is the number of clauses it satisfies and it is **maximised**; h equal to the number of clauses is a solution. Neighbours of a string differ in one bit (N1), two bits (N2) and so on; ties are broken by the lowest bit (the first variable).
+
+```json
+{
+  "type": "sat",
+  "name": "Four-variable SAT (course example)",
+  "vars": ["a", "b", "c", "d"],
+  "clauses": [["-b", "-c"], ["-b", "d"], ["b", "-c"], ["a", "d"], ["b", "c"], ["a", "-d"]],
+  "start": "0000"
+}
+```
+
+**Text format (Edit box):** the variables on the first line, then one clause per line, `-` for NOT, and an optional `start:` line. Lines starting with `#` are ignored; `∨`, commas and brackets are accepted between literals.
+
+```
+a b c d
+-b -c
+-b d
+b -c
+a d
+b c
+a -d
+start: 0000
+```
+
+**Random 3-SAT:** the Random panel builds instances with a chosen number of variables, number of clauses and a seed. Each clause has three different variables, each negated with probability one half; the same seed gives the same instance. About 4.3 clauses per variable is the hard region.
+
+---
+
 ## Adding a problem to the built-in examples
 
 To ship a problem with the site for everyone, not just your browser:
@@ -593,7 +633,7 @@ To ship a problem with the site for everyone, not just your browser:
 | Message | Fix |
 |---|---|
 | `That is not a valid problem: Unexpected token …` | The JSON is malformed: look for a trailing comma, a `//` comment or a missing quote. |
-| `Unknown problem type "…"` | `type` must be one of the ten names above, in lowercase. |
+| `Unknown problem type "…"` | `type` must be one of the eleven names above, in lowercase. |
 | `Matrix must be n × n` | One row per city, one number per city in every row, in the same order as `cities`. |
 | `Edge X–Y uses an unknown node` | Every edge end must be listed in `nodes`, with the same case. |
 | `Start node is not in the graph` | `start` (and `goal`) must be node ids. |
@@ -602,6 +642,8 @@ To ship a problem with the site for everyone, not just your browser:
 | `Unknown goal predicate` | Write `on(A,B)` with no spaces, or `ontable(A)`, `clear(A)`, `holding(A)`, `AE`. |
 | `"…" must be written in brackets` | Facts and patterns look like `(parent tom bob)`. |
 | `Constraint … must name two variables` | Each CSP constraint has exactly two variables in `scope`, both declared. |
+| `Literal "…" uses an unknown variable` | Every literal in `clauses` must be a name from `vars`, with `-` in front for NOT. |
+| `start must be a string of N bits` | `start` needs one 0 or 1 per variable. |
 | `Point X has N lines` | Waltz handles junctions of 2 or 3 lines only. |
 | `Keep sequences to 10 letters or fewer` | Shorten `a` and `b` so every lattice node can be drawn. |
 | The drawing is squashed into one spot | Give `x`/`y` on all nodes, or none, never only some. For circuits, add `layout`. |
