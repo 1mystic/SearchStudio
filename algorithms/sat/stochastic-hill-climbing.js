@@ -6,6 +6,7 @@ Studio.register({
   week: 4,
   problem: "sat",
   order: 90,
+  defaultExample: "sat-four-var",
   summary: "Pick a random one-flip neighbour and move to it with probability P = 1/(1 + e^(−ΔE/T)), ΔE = h(new) − h(current), at a constant temperature T. Better moves are likely, worse moves are possible.",
   pseudocode: `N ← start;  bestSeen ← N
 repeat k times
@@ -33,7 +34,7 @@ return bestSeen`,
     traps: [
       "With the sigmoid rule even an improving move can be rejected (P < 1 at finite T).",
       "ΔE is h(new) − h(current) here: do not copy the TSP sign.",
-      "Fixed T is a compromise: too hot is a random walk, too cold is hill climbing. Annealing varies it.",
+      "Fixed T is a compromise: too hot is a random walk (try T = 100), too cold is hill climbing (try T = 0.05). Annealing varies it.",
     ],
     props: { complete: "no", optimal: "no", time: "k samples", space: "O(n)" },
   },

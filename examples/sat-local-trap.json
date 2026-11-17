@@ -1,0 +1,9 @@
+{
+ "id": "sat-local-trap",
+ "type": "sat",
+ "name": "Local-maximum trap (four variables)",
+ "note": "Start 0000 (h 6 of 8). The formula forces c = d = T and a = F, so the solutions are 0011 and 0111. Hill climbing goes 0000 → 0100 (h 7) and stops: all four neighbours of 0100 have h 6, a strict local maximum (the course example sat-four-var stops on a plateau instead). Beam search: w = 1 is hill climbing and fails, w = 2 keeps 0001 (h 7) as well and reaches 0011 at level 2. VND: N1 fails at 0100, N1–2 flips c, d and reaches 0111. Best neighbour (8 moves): 0100 ↔ 1100 repeat from move 3, a cycle that never finds a solution. Tabu: tenure 1 cycles 0000 → 0100 → 1100 → 1000 → 0000, tenure 2 solves in 5 flips (b, a, c, d, a); tenure 4 with aspiration off stops at 1111 because every flip is tabu, and with aspiration on the last flip (a, tabu) is allowed because 0111 beats the best h seen.",
+ "vars": ["a", "b", "c", "d"],
+ "clauses": [["c", "d"], ["-a", "-b"], ["c", "-d"], ["a", "b", "d"], ["-b", "c", "-d"], ["-a", "b"], ["-b", "-c", "d"], ["-c", "d"]],
+ "start": "0000"
+}

@@ -6,6 +6,7 @@ Studio.register({
   week: 4,
   problem: "sat",
   order: 110,
+  defaultExample: "sat-four-var",
   summary: "A population of bit strings. Fitness = h (clauses satisfied); roulette-wheel selection picks parents with probability h / Σh, one-point crossover builds two children per pair, and mutation flips a random bit with probability pm.",
   pseudocode: `Pop ← N bit strings (given, or random)
 repeat for g generations
@@ -33,6 +34,7 @@ return the best string ever seen`,
     ],
     why: "Crossover recombines good partial assignments, mutation keeps diversity. On the course example a single generation can produce the solution 1101 when mutation flips the right bit of a child that is one flip away from it. The method is incomplete: with few generations or a tiny population it may never find a solution.",
     traps: [
+      "Crossover only recombines bit values already present in the population; only mutation creates new ones. Default population 1000,0110,0011,1100, 1 generation: with pm = 0.5 and seed 9 the solution 1101 is made by mutation (child 1100 mutated at d); with pm = 0 and seed 1 it is made by crossover alone (1100 × 0011 cut after c gives 1101). With the population 1000,0110,1100,0100, where every string has d = 0, pm = 0 can never produce 1101 however many generations you run, while pm = 0.5 usually finds it.",
       "Fitness-proportional selection is weak when all h values are close: the probabilities are then almost equal.",
       "If every h is 0 the wheel would divide by zero; the trace falls back to uniform probabilities.",
       "A solution found in a child must be recorded when it appears: the next generation may lose it.",

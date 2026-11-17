@@ -6,6 +6,7 @@ Studio.register({
   week: 3,
   problem: "sat",
   order: 20,
+  defaultExample: "sat-four-var",
   summary: "From a start assignment move to the best one-flip neighbour, but only if it satisfies strictly more clauses. It stops at a local maximum or a plateau, which may be below the solution.",
   pseudocode: `N ← start
 loop
@@ -34,13 +35,14 @@ loop
       "Stopping with h < m does not mean the formula is unsatisfiable, only that this start is stuck.",
       "Equal h is not an improvement: a plateau stops strict hill climbing.",
       "Ties between equally good neighbours go to the lowest bit; a different rule can give a different path.",
+      "Two different traps: on a plateau some neighbour has equal h, at a strict local maximum every neighbour is worse. The captions say which one. Course example sat-four-var stops on a plateau (1000: three neighbours with h 5); the example 'Local-maximum trap' (sat-local-trap) stops at 0100, where all four neighbours have h 6.",
     ],
     props: { complete: "no", optimal: "no", time: "O(n · m) per move", space: "O(n)" },
   },
   params: [Studio.satLib.startParam],
   run(P, { start }) {
     const L = Studio.satLib, steps = [];
-    let cur = L.startBits(P, start); const path = [cur], rows = [];
+    let cur = L.startBits(P, start), kind = ""; const path = [cur], rows = [];
     steps.push(Object.assign({ caption: `Start at ${cur}: ${P.h(cur)} of ${P.m} clauses are satisfied.${P.solved(cur) ? " That is already a solution." : ` False clauses: ${L.unsatText(P, cur)}.`}`,
       table: L.clauseTable(P, cur), stats: L.stats(P, cur) }, L.drawBits(P, cur)));
     for (let it = 1; it <= 200 && !P.solved(cur); it++) {
@@ -50,15 +52,15 @@ loop
           table: L.nbrTable(P, nb, cur, b.bits), stats: L.stats(P, cur, [{ label: "iteration", value: it }]) }, L.drawNeighbourhood(P, cur, nb, { chosen: b.bits })));
         rows.push([it, cur, b.move, b.bits, b.h]); cur = b.bits; path.push(cur);
       } else {
-        const plateau = nb.some(x => x.h === h0);
+        const plateau = nb.some(x => x.h === h0); kind = plateau ? "plateau" : "local maximum";
         steps.push(Object.assign({ caption: `Iteration ${it}: the ${nb.length} neighbours of ${cur} have h = ${hs}. The best (${b.bits}, h ${b.h}) is not better than ${h0}, so hill climbing stops: ${plateau ? "a plateau (equal neighbours exist but a sideways move is not an improvement)" : "a local maximum (every neighbour is worse)"}.`,
           table: L.nbrTable(P, nb, cur, null), stats: L.stats(P, cur, [{ label: "iteration", value: it }]) }, L.drawNeighbourhood(P, cur, nb, {})));
         break;
       }
     }
     const solved = P.solved(cur);
-    steps.push(Object.assign({ caption: solved ? `${cur} satisfies all ${P.m} clauses: solved after ${path.length - 1} move${path.length === 2 ? "" : "s"} (${path.join(" → ")}).` : `Stopped at ${cur} with h = ${P.h(cur)} < ${P.m} after ${path.length - 1} move${path.length === 2 ? "" : "s"} (${path.join(" → ")}). Unsatisfied: ${L.unsatText(P, cur)}.`,
+    steps.push(Object.assign({ caption: solved ? `${cur} satisfies all ${P.m} clauses: solved after ${path.length - 1} move${path.length === 2 ? "" : "s"} (${path.join(" → ")}).` : `Stopped at ${cur} with h = ${P.h(cur)} < ${P.m} after ${path.length - 1} move${path.length === 2 ? "" : "s"} (${path.join(" → ")}), on ${kind === "plateau" ? "a plateau" : "a local maximum"}. Unsatisfied: ${L.unsatText(P, cur)}. This is a failure of the method, not a proof that the formula is unsatisfiable.`,
       table: L.clauseTable(P, cur), stats: L.stats(P, cur, [{ label: "result", value: solved ? "solved" : "stuck", state: solved ? "ok" : "bad" }]) }, L.drawBits(P, cur, { state: solved ? "goal" : "path" })));
-    return { steps, result: { bits: cur, h: P.h(cur), solved, path, moves: path.length - 1 } };
+    return { steps, result: { bits: cur, h: P.h(cur), solved, path, moves: path.length - 1, stuckOn: solved ? null : kind } };
   },
 });

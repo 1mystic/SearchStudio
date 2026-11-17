@@ -6,6 +6,7 @@ Studio.register({
   week: 11,
   problem: "sat",
   order: 120,
+  defaultExample: "sat-implication-chain",
   summary: "Treat each variable as a CSP variable with domain {T, F} and each clause as a constraint. Backtracking assigns variables one at a time; unit propagation (a clause with one open literal forces it) and pure literals prune the tree, and an empty clause forces a backtrack. It is complete: it can also prove a formula unsatisfiable.",
   pseudocode: `DPLL(assignment):
     repeat
@@ -39,6 +40,7 @@ Studio.register({
     ],
     why: "Where hill climbing from 0000 stops at 1000 (h 5), backtracking cannot be fooled by a local maximum: it either reaches an assignment satisfying every clause or has tried all possibilities. Related CSP pages: Backtracking (csp-backtracking) is the plain version of this search, Forward checking (csp-forward-checking) is what unit propagation does after each assignment, and Arc consistency (csp-ac3) generalises it by propagating until nothing more can be removed.",
     traps: [
+      "See the pieces separately on the example sat-implication-chain: clauses 1–3 give a chain of unit propagations (a, b, c) with no decision, g is a pure literal, the decision d = T runs into an empty clause (backtrack) and d = F succeeds. Value order F first removes the backtrack; pure literal 'No' makes g a unit propagation instead. sat-unsat shows the UNSAT proof: every branch ends in an empty clause.",
       "A conflict means undo to the last decision; forced assignments are not retried with the other value.",
       "Unassigned variables at the end are free, not False: the printed bit string fills them with 0 only for display.",
       "Pure literals and unit propagation never lose solutions, but without them the same formula needs more backtracks.",

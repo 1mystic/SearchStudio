@@ -6,6 +6,7 @@ Studio.register({
   week: 3,
   problem: "sat",
   order: 30,
+  defaultExample: "sat-local-trap",
   summary: "Keep w assignments instead of one. Each level generates the N1 neighbours of every assignment in the beam and keeps the w with the largest h; stop when the head of the beam no longer improves. w = 1 is hill climbing.",
   pseudocode: `OPEN ← [start]                       # the beam, best first
 loop
@@ -29,11 +30,12 @@ return the best assignment seen`,
       { f: "|cand| ≤ w · n", read: "at most w·n candidates per level", why: "The work per level is linear in the beam width." },
       { f: "w = 1 ⇒ hill climbing; w ≥ 2ⁿ ⇒ breadth-first over the whole space", read: "the width interpolates between the two", why: "The same dial as in graph and TSP beam search." },
     ],
-    why: "The beam lets a path that is momentarily no better than its rivals survive, so it can step across a plateau that traps hill climbing. It is still incomplete: if all w members fall into the same basin, it stalls like hill climbing does.",
+    why: "The beam lets a runner-up survive. Hill climbing keeps only the single best neighbour, but the second-best string may have a neighbour that beats everything reachable from the best one. On the example 'Local-maximum trap' (sat-local-trap) from 0000: w = 1 is hill climbing and stops at 0100 (h 7); w = 2 also keeps 0001 (h 7), and its neighbour 0011 has h 8, a solution, at level 2. The beam is still incomplete: it stops as soon as the head does not improve, so it cannot cross a plateau, and if all w members fall into the same basin it stalls like hill climbing. On the course example sat-four-var even w = 4 stops at 1000 (h 5), because the head of the beam does not improve at level 2.",
     traps: [
       "The beam holds the w best of all neighbours together, not w neighbours per member.",
       "Remove duplicate neighbours, or the beam fills up with copies of the same string.",
-      "Stopping rule: the head not improving. A level whose beam is merely as good as the last one ends the search.",
+      "Stopping rule: the head not improving. A level whose beam is merely as good as the last one ends the search, so a wider beam does not help on a plateau (try sat-four-var with w = 1 to 4).",
+      "A wider beam is not always better; it costs w times more evaluations and only helps when a runner-up leads somewhere the best member does not.",
     ],
     props: { complete: "no", optimal: "no", time: "O(levels · w · n · m)", space: "O(w · n)" },
   },
@@ -61,7 +63,7 @@ return the best assignment seen`,
       }, L.drawBits(P, head, { state: solved ? "goal" : undefined })));
       if (!improved && !solved) break;
     }
-    steps.push(Object.assign({ caption: P.solved(best) ? `Beam search (w = ${w}) found the solution ${best}.` : `Beam search (w = ${w}) returns ${best} with h = ${P.h(best)} of ${P.m}; unsatisfied: ${L.unsatText(P, best)}.`,
+    steps.push(Object.assign({ caption: P.solved(best) ? `Beam search (w = ${w}) found the solution ${best} at level ${levels.length - 1}; compare with w = 1, which is plain hill climbing.` : `Beam search (w = ${w}) returns ${best} with h = ${P.h(best)} of ${P.m}; unsatisfied: ${L.unsatText(P, best)}. The head stopped improving, so all ${w} member${w === 1 ? "" : "s"} of the beam are stuck${w === 1 ? " (w = 1 is hill climbing)" : "; a different width may do better"}.`,
       table: Object.assign(tbl(), { rowStates: levels.map(() => "") }), stats: L.stats(P, best, [{ label: "result", value: P.solved(best) ? "solved" : "stuck", state: P.solved(best) ? "ok" : "bad" }]) }, L.drawBits(P, best, { state: P.solved(best) ? "goal" : "path" })));
     return { steps, result: { bits: best, h: P.h(best), solved: P.solved(best), levels: levels.length - 1, w } };
   },

@@ -6,6 +6,7 @@ Studio.register({
   week: 3,
   problem: "sat",
   order: 10,
+  defaultExample: "sat-four-var",
   summary: "Try all 2ⁿ assignments in binary order and count the satisfied clauses of each. The rows with h = m are the solutions, so brute force is exact but doubles with every variable (limited to 6 variables here).",
   pseudocode: `for each bit string X of length n, in counting order 00…0, 00…1, …
     h(X) ← number of clauses satisfied by X
@@ -31,6 +32,7 @@ return the solutions (or, if none, the rows with the largest h)`,
       "A solution is h = m (all clauses), not just a high h.",
       "There can be several solutions, or none; do not stop at the first unless asked.",
       "The truth table grows as 2ⁿ: adding one variable doubles it.",
+      "No row with h = m proves the formula unsatisfiable: on sat-unsat the best rows have h = 4 of 5 clauses, and brute force can say 'none' for certain. Local search failing says nothing of the kind.",
     ],
     props: { complete: "yes", optimal: "yes (finds every solution)", time: "O(2ⁿ · m)", space: "O(n)" },
   },
