@@ -1,0 +1,61 @@
+{
+ "id": "csp-cbj-jump",
+ "type": "csp",
+ "name": "Backjumping: D fails because of A alone",
+ "note": "Order A, B, C, D. D has the single value r, which clashes with A = r only; B and C (B ≠ C) are irrelevant. When D fails, conf(D) = {A}, so conflict-directed backjumping jumps from D straight to A, skipping B and C (two levels). Chronological backtracking wastes its time re-trying B and C.",
+ "variables": [
+  {
+   "id": "A",
+   "domain": [
+    "r",
+    "g"
+   ],
+   "x": 0,
+   "y": 0.6
+  },
+  {
+   "id": "B",
+   "domain": [
+    "x",
+    "y",
+    "z"
+   ],
+   "x": 1,
+   "y": 0
+  },
+  {
+   "id": "C",
+   "domain": [
+    "x",
+    "y",
+    "z"
+   ],
+   "x": 2,
+   "y": 0
+  },
+  {
+   "id": "D",
+   "domain": [
+    "r"
+   ],
+   "x": 3,
+   "y": 0.6
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "A",
+    "D"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "B",
+    "C"
+   ],
+   "rel": "neq"
+  }
+ ]
+}

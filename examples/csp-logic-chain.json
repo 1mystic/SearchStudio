@@ -1,0 +1,108 @@
+{
+ "id": "csp-logic-chain",
+ "type": "csp",
+ "name": "Logic as propagation: P → Q → R → S",
+ "note": "Boolean variables 1 = true, 0 = false. Each implication is a table constraint listing the allowed pairs (0,0), (0,1), (1,1). The fact P is given by D(P) = {1}. Arc consistency propagates it: Q = 0 has no support, so Q = 1; then R = 1; then S = 1. This is modus ponens done by constraint propagation.",
+ "variables": [
+  {
+   "id": "P",
+   "domain": [
+    1
+   ],
+   "x": 0,
+   "y": 0
+  },
+  {
+   "id": "Q",
+   "domain": [
+    0,
+    1
+   ],
+   "x": 1,
+   "y": 0
+  },
+  {
+   "id": "R",
+   "domain": [
+    0,
+    1
+   ],
+   "x": 2,
+   "y": 0
+  },
+  {
+   "id": "S",
+   "domain": [
+    0,
+    1
+   ],
+   "x": 3,
+   "y": 0
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "P",
+    "Q"
+   ],
+   "rel": "table",
+   "allowed": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  },
+  {
+   "scope": [
+    "Q",
+    "R"
+   ],
+   "rel": "table",
+   "allowed": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  },
+  {
+   "scope": [
+    "R",
+    "S"
+   ],
+   "rel": "table",
+   "allowed": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  }
+ ]
+}

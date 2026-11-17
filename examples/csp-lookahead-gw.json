@@ -1,0 +1,75 @@
+{
+ "id": "csp-lookahead-gw",
+ "type": "csp",
+ "name": "Map colouring: G = W wipes out E (look-ahead vs forward checking)",
+ "note": "Constructed to match the lecture's observation (the course notes are not reproduced here). Regions G, N, S, E; colours W (white), R (red), Y (yellow). G touches N and S; E touches N and S; G and E do not touch. D(G) = {W,R,Y}, D(N) = {W,R}, D(S) = {W,Y}, D(E) = {R,Y}. After G = W, forward checking leaves N = {R}, S = {Y} and does NOT touch E (E is not a neighbour of G), so D(E) = {R,Y} still looks fine. Full look-ahead or arc consistency revises E against N and S: R and Y both lose their support, D(E) is empty, so G = W is rejected at once. Forward checking only finds out two assignments later.",
+ "variables": [
+  {
+   "id": "G",
+   "domain": [
+    "W",
+    "R",
+    "Y"
+   ],
+   "x": 0,
+   "y": 1
+  },
+  {
+   "id": "N",
+   "domain": [
+    "W",
+    "R"
+   ],
+   "x": 1.5,
+   "y": 0
+  },
+  {
+   "id": "S",
+   "domain": [
+    "W",
+    "Y"
+   ],
+   "x": 1.5,
+   "y": 2
+  },
+  {
+   "id": "E",
+   "domain": [
+    "R",
+    "Y"
+   ],
+   "x": 3,
+   "y": 1
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "G",
+    "N"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "G",
+    "S"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "N",
+    "E"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "S",
+    "E"
+   ],
+   "rel": "neq"
+  }
+ ]
+}
