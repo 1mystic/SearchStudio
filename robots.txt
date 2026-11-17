@@ -19,4 +19,4 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://1mystic.github.io/search-studio/sitemap.xml
+Sitemap: https://1mystic.github.io/SearchStudio/sitemap.xml

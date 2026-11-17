@@ -1,11 +1,11 @@
 <p align="center">
-  <a href="https://1mystic.github.io/search-studio/"><img src="assets/banner.svg" alt="Search Studio: watch search algorithms think, one step at a time" width="100%"></a>
+  <a href="https://1mystic.github.io/SearchStudio/"><img src="assets/banner.svg" alt="Search Studio: watch search algorithms think, one step at a time" width="100%"></a>
 </p>
 
 <p align="center">
-  <a href="https://1mystic.github.io/search-studio/"><b>Open the studio</b></a> ·
-  <a href="https://1mystic.github.io/search-studio/#library">Learn</a> ·
-  <a href="https://1mystic.github.io/search-studio/#course">Course map</a> ·
+  <a href="https://1mystic.github.io/SearchStudio/"><b>Open the studio</b></a> ·
+  <a href="https://1mystic.github.io/SearchStudio/#library">Learn</a> ·
+  <a href="https://1mystic.github.io/SearchStudio/#course">Course map</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
   <br>
   <img alt="46 algorithms" src="https://img.shields.io/badge/algorithms-46-f2cd4b?style=flat-square&labelColor=151515">
@@ -51,7 +51,7 @@ Conventions used everywhere: OPEN and CLOSED hold node pairs `(node, parent, dep
 ## Quick start
 
 ```bash
-git clone https://github.com/1mystic/search-studio && cd search-studio
+git clone https://github.com/1mystic/SearchStudio && cd search-studio
 npm run build     # validate + test + build (Node 18+, no npm install needed)
 npm run serve     # then open the printed localhost address
 # or just open dist/search-studio.html: the whole site in one file

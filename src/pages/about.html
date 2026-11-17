@@ -1,24 +1,144 @@
 <article class="prose">
   <p class="eyebrow">About</p>
   <h1>About Search Studio</h1>
-  <p class="lede">A study companion for search methods: the algorithms of state-space search, informed search and stochastic optimisation, traced exactly the way they are traced by hand.</p>
+  <p class="lede">A free, public-domain study companion for <i>AI: Search Methods for Problem Solving</i> (Prof. Deepak Khemani, IIT Madras). Every algorithm in the course is traced step by step, exactly the way it is traced by hand.</p>
+
   <h2>Why it exists</h2>
-  <p>Search algorithms are easy to describe and surprisingly easy to trace wrongly: a missed tie-break, a child added twice, a forgotten closing edge, a savings pair merged that should have been refused. Seeing every step, with the working table and the OPEN and CLOSED lists side by side, makes those mistakes visible.</p>
-  <h2>What it covers</h2>
+  <p>Search algorithms are easy to describe and surprisingly easy to trace wrongly. A missed tie-break, a child added twice or a savings pair merged that should have been refused will all give a wrong answer. Seeing every step, with the working table and the OPEN and CLOSED lists side by side, makes those mistakes visible.</p>
+
+  <h2>Full syllabus</h2>
+  <p>Weeks 1–11 of the course, with the algorithms you can run for each week. Every week also has its own section on the <a href="#course">course map</a>.</p>
+
+  <h3>Week 1 · Introduction and philosophy</h3>
   <ul>
-    <li><b>State-space search</b>: Breadth First, Depth First, Depth First Iterative Deepening, Uniform Cost, Best First and A* (with weighted A*).</li>
-    <li><b>Travelling salesperson, constructive</b>: Nearest Neighbour, Greedy, Savings, and brute force as the exact reference.</li>
-    <li><b>Perturbation and local search</b>: 2-city exchange, 2-edge exchange, Or-opt, 3-edge exchange, Variable Neighbourhood Descent, Beam Search, Tabu Search, Iterated Hill Climbing, Random Walk, Simulated Annealing.</li>
-    <li><b>Population methods</b>: Genetic Algorithm with cycle, PMX, order, alternating-edges, heuristic and ordinal crossover, and Ant Colony Optimisation.</li>
+    <li>Introduction: what artificial intelligence is and where search fits in.</li>
+    <li>Philosophy: the Turing Test and the Winograd Schema Challenge.</li>
+    <li>No algorithms to run this week.</li>
   </ul>
+
+  <h3>Week 2 · State space search</h3>
+  <ul>
+    <li>Introduction to state space search: states, MoveGen, GoalTest, and the search space as a graph.</li>
+    <li>Examples of state spaces.</li>
+    <li>Depth First Search (DFS) and Breadth First Search (BFS), with OPEN and CLOSED as lists of node pairs.</li>
+    <li>Depth First Iterative Deepening (DFID).</li>
+    <li>Analysis: completeness, the path found, time and space.</li>
+    <li><b>In the studio:</b> <a href="#algo-search-bfs">BFS</a> · <a href="#algo-search-dfs">DFS</a> · <a href="#algo-search-dfid">DFID</a></li>
+  </ul>
+
+  <h3>Week 3 · Heuristic search and local search</h3>
+  <ul>
+    <li>Heuristic search: Best First Search, Hill Climbing and Beam Search on graphs.</li>
+    <li>Solution space search: the travelling salesperson problem (TSP).</li>
+    <li>Constructive TSP methods: Nearest Neighbour, Greedy and Savings, with brute force as the exact reference.</li>
+    <li>Perturbation methods: 2-city exchange, 2-edge exchange (2-opt), Or-opt, 3-edge exchange.</li>
+    <li>Escaping local optima: Variable Neighbourhood Descent, Beam Search, Tabu Search.</li>
+    <li>Stochastic local search: Iterated Hill Climbing, Random Walk, Simulated Annealing.</li>
+    <li><b>In the studio:</b> <a href="#algo-search-best-first">Best First</a> · <a href="#algo-search-hill-climbing">Hill Climbing</a> · <a href="#algo-search-beam">Beam Search</a> · <a href="#algo-tsp-nearest-neighbour">Nearest Neighbour</a> · <a href="#algo-tsp-greedy">Greedy</a> · <a href="#algo-tsp-savings">Savings</a> · <a href="#algo-tsp-brute-force">Brute force</a> · <a href="#algo-tsp-two-city-exchange">2-city exchange</a> · <a href="#algo-tsp-two-edge-exchange">2-opt</a> · <a href="#algo-tsp-or-opt">Or-opt</a> · <a href="#algo-tsp-three-edge-exchange">3-edge exchange</a> · <a href="#algo-tsp-vnd">VND</a> · <a href="#algo-tsp-beam">Beam (TSP)</a> · <a href="#algo-tsp-tabu">Tabu</a> · <a href="#algo-tsp-ihc">Iterated HC</a> · <a href="#algo-tsp-random-walk">Random walk</a> · <a href="#algo-tsp-sa">Simulated annealing</a></li>
+  </ul>
+
+  <h3>Week 4 · Population based methods</h3>
+  <ul>
+    <li>Genetic Algorithms: selection, crossover and mutation.</li>
+    <li>TSP crossovers: cycle (CX), partially mapped (PMX), order (OX), alternating edges (AEX), heuristic (HX) and ordinal.</li>
+    <li>Emergent systems.</li>
+    <li>Ant Colony Optimisation: pheromone, evaporation and the probabilistic tour rule.</li>
+    <li><b>In the studio:</b> <a href="#algo-tsp-ga">Genetic algorithm</a> · <a href="#algo-tsp-crossover-lab">Crossover lab</a> · <a href="#algo-tsp-aco">Ant colony</a></li>
+  </ul>
+
+  <h3>Week 5 · Finding optimal paths</h3>
+  <ul>
+    <li>Branch and bound and Uniform Cost Search (UCS).</li>
+    <li>Algorithm A*: f(n) = g(n) + h(n), and weighted A*.</li>
+    <li>Admissibility of A*: if h never overestimates, the first goal picked is optimal.</li>
+    <li><b>In the studio:</b> <a href="#algo-search-ucs">UCS</a> · <a href="#algo-search-astar">A*</a></li>
+  </ul>
+
+  <h3>Week 6 · Monotone condition and saving space</h3>
+  <ul>
+    <li>The monotone (consistency) condition: h(n) ≤ k(n, m) + h(m).</li>
+    <li>Space-saving versions of A*: IDA*, Recursive Best-First Search, Divide and Conquer Frontier Search.</li>
+    <li>Sequence alignment as shortest-path search, by dynamic programming and by A*.</li>
+    <li><b>In the studio:</b> <a href="#algo-search-monotone-check">Admissibility &amp; monotone check</a> · <a href="#algo-search-ida-star">IDA*</a> · <a href="#algo-search-rbfs">RBFS</a> · <a href="#algo-search-dcfs">DCFS</a> · <a href="#algo-align-dp">Alignment (DP)</a> · <a href="#algo-align-astar">Alignment (A*)</a></li>
+  </ul>
+
+  <h3>Week 7 · Game playing</h3>
+  <ul>
+    <li>Game theory and board games: game trees, MAX and MIN, evaluation functions.</li>
+    <li>Minimax.</li>
+    <li>Alpha-Beta pruning, and why node ordering matters.</li>
+    <li>SSS*: best-first search over strategies.</li>
+    <li><b>In the studio:</b> <a href="#algo-game-minimax">Minimax</a> · <a href="#algo-game-alpha-beta">Alpha-Beta</a> · <a href="#algo-game-sss-star">SSS*</a></li>
+  </ul>
+
+  <h3>Week 8 · Planning</h3>
+  <ul>
+    <li>Domain-independent planning in the blocks world: STRIPS operators, preconditions, add and delete lists.</li>
+    <li>Forward and backward state-space planning.</li>
+    <li>Goal Stack Planning, and the Sussman anomaly.</li>
+    <li>Plan Space Planning: Partial Order Planning.</li>
+    <li><b>In the studio:</b> <a href="#algo-plan-forward">Forward planning</a> · <a href="#algo-plan-backward">Backward planning</a> · <a href="#algo-plan-gsp">Goal Stack Planning</a> · <a href="#algo-plan-pop">Partial Order Planning</a></li>
+  </ul>
+
+  <h3>Week 9 · Problem decomposition</h3>
+  <ul>
+    <li>Problem decomposition with goal trees.</li>
+    <li>AND–OR graphs: hyper-arcs, solved nodes and futility.</li>
+    <li>Algorithm AO*: forward expansion, backward cost revision, the marked solution graph.</li>
+    <li><b>In the studio:</b> <a href="#algo-andor-ao-star">AO*</a></li>
+  </ul>
+
+  <h3>Week 10 · Rule-based expert systems</h3>
+  <ul>
+    <li>Rule-based expert systems and pattern-directed inference.</li>
+    <li>The inference engine: match, resolve, execute. Conflict resolution strategies.</li>
+    <li>The Rete algorithm: a network that remembers partial matches.</li>
+    <li><b>In the studio:</b> <a href="#algo-rules-forward-chaining">Forward chaining</a> · <a href="#algo-rules-rete">Rete</a></li>
+  </ul>
+
+  <h3>Week 11 · Constraint processing</h3>
+  <ul>
+    <li>Constraint satisfaction problems: variables, domains, binary constraints.</li>
+    <li>Backtracking and forward checking with variable-ordering heuristics.</li>
+    <li>Arc consistency (AC-1, AC-3).</li>
+    <li>Combining search and reasoning.</li>
+    <li>The Waltz algorithm: labelling line drawings of trihedral objects.</li>
+    <li>Model-based diagnosis: conflicts and minimal diagnoses.</li>
+    <li><b>In the studio:</b> <a href="#algo-csp-backtracking">Backtracking</a> · <a href="#algo-csp-forward-checking">Forward checking</a> · <a href="#algo-csp-ac3">Arc consistency</a> · <a href="#algo-csp-waltz">Waltz</a> · <a href="#algo-csp-diagnosis">Model-based diagnosis</a></li>
+  </ul>
+
   <h2>Notation</h2>
-  <p>The site follows the notation of <i>AI: Search Methods for Problem Solving</i> (Prof. Deepak Khemani, IIT Madras) and his book <i>A First Course in Artificial Intelligence</i>: MoveGen and GoalTest, OPEN and CLOSED as lists of node pairs, path representation for tours, the sigmoid acceptance rule for simulated annealing, and the course's crossover conventions. It is an independent study aid and is not affiliated with or endorsed by IIT Madras.</p>
+  <p>The site follows the notation of the course and of Prof. Khemani's book <i>A First Course in Artificial Intelligence</i>:</p>
+  <ul>
+    <li>MoveGen and GoalTest.</li>
+    <li>OPEN and CLOSED as lists of node pairs <code>(node, parent, depth or g)</code>.</li>
+    <li>Ties broken alphabetically.</li>
+    <li>The goal test applied when a node is picked from OPEN.</li>
+    <li>The path representation for tours.</li>
+    <li>The sigmoid acceptance rule for simulated annealing.</li>
+    <li>The course's crossover conventions.</li>
+  </ul>
+  <p>It is an independent study aid, not affiliated with or endorsed by IIT Madras or NPTEL.</p>
+
   <h2>How results are checked</h2>
-  <p>Every algorithm is run against every example and against random problems on each build. Tours must be permutations whose reported cost matches a recomputation; paths must run from start to goal with the reported cost. On the six-city instance the results are compared with an independent Python implementation (optimum 224, Nearest Neighbour 264, Greedy 238, Savings 224, and so on).</p>
+  <p>On each build, every algorithm runs against every example and against random problems.</p>
+  <ul>
+    <li>Tours must be permutations, and the reported cost must match a fresh recomputation. Paths must run from start to goal at the cost reported.</li>
+    <li>IDA*, RBFS and DCFS must find the same cost as UCS.</li>
+    <li>Minimax, Alpha-Beta and SSS* must give the same value.</li>
+    <li>Every plan must execute in the blocks world.</li>
+    <li>Rete must derive the same facts as forward chaining.</li>
+  </ul>
+  <p>The six-city TSP results also match an independent Python implementation: optimum 224, Nearest Neighbour 264, Greedy 238, Savings 224.</p>
+
   <h2>Further reading</h2>
   <ul>
     <li>Deepak Khemani, <i>A First Course in Artificial Intelligence</i>, McGraw Hill Education.</li>
-    <li>D. S. Johnson and L. A. McGeoch, “The Traveling Salesman Problem: A Case Study in Local Optimization”, in <i>Local Search in Combinatorial Optimization</i> (1997): how far above optimal the classic TSP heuristics land in practice.</li>
+    <li>D. S. Johnson and L. A. McGeoch, “The Traveling Salesman Problem: A Case Study in Local Optimization”, in <i>Local Search in Combinatorial Optimization</i> (1997).</li>
     <li>M. Dorigo and T. Stützle, <i>Ant Colony Optimization</i>, MIT Press (2004).</li>
+    <li>S. Russell and P. Norvig, <i>Artificial Intelligence: A Modern Approach</i>, chapters on search, games, planning and CSPs.</li>
   </ul>
+
+  <h2>Credits and license</h2>
+  <p>Made by <a href="https://github.com/1mystic" rel="author noopener" target="_blank">1mystic</a>. The source is on <a href="https://github.com/1mystic/SearchStudio" rel="noopener" target="_blank">GitHub</a> and released into the public domain under <a href="https://unlicense.org/" rel="noopener" target="_blank">the Unlicense</a>.</p>
 </article>

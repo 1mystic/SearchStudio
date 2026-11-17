@@ -2,7 +2,7 @@
 
 ## Breadth First Search (week 2, Graph search · uninformed)
 
-URL: https://1mystic.github.io/search-studio/learn/search-bfs.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-bfs.html
 
 Breadth First Search explores in rings: first everything one step from the start, then two steps, and so on. It finds the path with the fewest edges.
 
@@ -32,7 +32,7 @@ Complete: yes. Optimal: yes for unit costs. Time: O(b^d). Space: O(b^d).
 
 ## Depth First Search (week 2, Graph search · uninformed)
 
-URL: https://1mystic.github.io/search-studio/learn/search-dfs.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-dfs.html
 
 Depth First Search goes as deep as possible along one path before backing up. It needs little memory but can wander far from a nearby goal.
 
@@ -62,7 +62,7 @@ Complete: finite graphs only. Optimal: no. Time: O(b^m). Space: O(b·m).
 
 ## Depth First Iterative Deepening (week 2, Graph search · uninformed)
 
-URL: https://1mystic.github.io/search-studio/learn/search-dfid.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-dfid.html
 
 Depth First Iterative Deepening runs DFS with a depth limit of 0, then 1, then 2, … It finds the same shallow path as BFS while using only DFS's memory.
 
@@ -88,7 +88,7 @@ Complete: yes. Optimal: yes for unit costs. Time: O(b^d). Space: O(b·d).
 
 ## Brute force (exact) (week 3, TSP · exact)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-brute-force.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-brute-force.html
 
 The travelling salesperson problem (TSP) asks for the shortest round trip that visits every city exactly once. Brute force simply tries every possible round trip and keeps the shortest. It is the only method here that is guaranteed to find the best tour, and it is how every other method's answer is checked.
 
@@ -116,7 +116,7 @@ Complete: yes. Optimal: yes. Time: O(n!). Space: O(n).
 
 ## Nearest Neighbour (week 3, TSP · constructive)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-nearest-neighbour.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-nearest-neighbour.html
 
 Nearest Neighbour is what most people do by hand: from where you are, go to the closest place you have not visited yet. It builds a tour quickly but can paint itself into a corner and pay for a long trip home at the end.
 
@@ -145,7 +145,7 @@ Complete: always returns a tour. Optimal: no. Time: O(n²). Space: O(n).
 
 ## Greedy heuristic (week 3, TSP · constructive)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-greedy.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-greedy.html
 
 The Greedy heuristic builds the tour out of the shortest edges available anywhere on the map, like snapping together the closest pairs of cities first. Two rules keep the pieces from becoming something other than one big loop.
 
@@ -175,7 +175,7 @@ Complete: always returns a tour. Optimal: no. Time: O(n² log n). Space: O(n²).
 
 ## Savings heuristic (week 3, TSP · constructive)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-savings.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-savings.html
 
 Imagine a delivery van that returns to the depot after every single delivery. The Savings heuristic starts there and asks: which two trips can I combine to save the most driving? It keeps combining trips until there is just one round trip.
 
@@ -206,7 +206,7 @@ Complete: always returns a tour. Optimal: no. Time: O(n² log n). Space: O(n²).
 
 ## 2-city exchange (week 3, TSP · perturbation)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-two-city-exchange.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-two-city-exchange.html
 
 Perturbative methods start from a complete tour and improve it by small changes. 2-city exchange is one such change: swap the positions of two cities. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.
 
@@ -235,7 +235,7 @@ Complete: no. Optimal: no (local optimum). Time: n(n−1)/2 evaluations per step
 
 ## Best First Search (week 3, Graph search · informed)
 
-URL: https://1mystic.github.io/search-studio/learn/search-best-first.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-best-first.html
 
 Best First Search uses a heuristic h(N), a guess of the distance from N to the goal, and always expands the node that looks closest to the goal.
 
@@ -263,7 +263,7 @@ Complete: finite graphs. Optimal: no. Time: O(b^m) worst case. Space: O(b^m).
 
 ## 2-edge exchange (2-opt) (week 3, TSP · perturbation)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-two-edge-exchange.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-two-edge-exchange.html
 
 Perturbative methods start from a complete tour and improve it by small changes. 2-edge exchange is one such change: remove two non-adjacent edges and reconnect. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.
 
@@ -293,7 +293,7 @@ Complete: no. Optimal: no (local optimum). Time: n(n−3)/2 evaluations per step
 
 ## Hill Climbing (week 3, Graph search · informed)
 
-URL: https://1mystic.github.io/search-studio/learn/search-hill-climbing.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-hill-climbing.html
 
 Hill climbing is the simplest way to use a heuristic: always step to the neighbour that looks closest to the goal, and stop when no neighbour looks better than where you are. It needs almost no memory, but it can stop on a hilltop that is not the summit.
 
@@ -322,7 +322,7 @@ Complete: no. Optimal: no. Time: O(b) per step. Space: O(1).
 
 ## Or-opt (move a city) (week 3, TSP · perturbation)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-or-opt.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-or-opt.html
 
 Perturbative methods start from a complete tour and improve it by small changes. Or-opt is one such change: move one city to another place in the tour. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.
 
@@ -351,7 +351,7 @@ Complete: no. Optimal: no (local optimum). Time: about n² evaluations per step.
 
 ## Beam Search (week 3, Graph search · informed)
 
-URL: https://1mystic.github.io/search-studio/learn/search-beam.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-beam.html
 
 Beam search is breadth-first search on a diet: at every level it keeps only the w most promising nodes by h and forgets the rest. A wider beam is safer, a narrower one is cheaper.
 
@@ -379,7 +379,7 @@ Complete: no. Optimal: no. Time: O(w · b · d). Space: O(w · d).
 
 ## 3-edge exchange (week 3, TSP · perturbation)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-three-edge-exchange.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-three-edge-exchange.html
 
 Perturbative methods start from a complete tour and improve it by small changes. 3-edge exchange is one such change: remove three edges and reconnect the segments. Repeating the best improving change until none helps is hill climbing, and where it stops is a local optimum.
 
@@ -408,7 +408,7 @@ Complete: no. Optimal: no (local optimum). Time: O(n³) evaluations per step. Sp
 
 ## Variable neighbourhood descent (week 3, TSP · local search)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-vnd.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-vnd.html
 
 If hill climbing gets stuck, one fix is to look further: use a bigger neighbourhood. Variable Neighbourhood Descent does this in order, from cheap and sparse to expensive and dense, so most of the improvement comes cheaply.
 
@@ -435,7 +435,7 @@ Complete: no. Optimal: no. Time: sum of the phases' hill climbs. Space: O(n).
 
 ## Beam search (week 3, TSP · local search)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-beam.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-beam.html
 
 Hill climbing follows one path. Beam search keeps a few of the best candidates at each level, a beam of width w, so a slightly worse option that leads somewhere better is not thrown away immediately.
 
@@ -466,7 +466,7 @@ Complete: no. Optimal: no. Time: w · |N| per level. Space: O(w).
 
 ## Tabu search (week 3, TSP · local search)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-tabu.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-tabu.html
 
 Tabu search always moves, even downhill, to escape local optima. To avoid simply stepping back to where it came from, it keeps a short-term memory of recent moves that are forbidden (tabu) for a few iterations.
 
@@ -498,7 +498,7 @@ Complete: no. Optimal: no. Time: iterations × |N|. Space: O(tt).
 
 ## Iterated hill climbing (week 3, TSP · local search)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-ihc.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-ihc.html
 
 If one hill climb gets stuck, start again from somewhere else. Iterated hill climbing repeats hill climbing from random starting tours and keeps the best local optimum found.
 
@@ -526,7 +526,7 @@ Complete: no. Optimal: no. Time: r × hill climb. Space: O(n).
 
 ## Random walk (week 3, TSP · local search)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-random-walk.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-random-walk.html
 
 A random walk is the opposite extreme of hill climbing: it ignores costs entirely and steps to a random neighbour each time. It is a baseline that shows how much the evaluation function helps.
 
@@ -552,7 +552,7 @@ Complete: no. Optimal: no. Time: k samples. Space: O(n).
 
 ## Simulated annealing (week 3, TSP · local search)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-sa.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-sa.html
 
 Simulated annealing borrows from metalworking: hot metal moves freely, then settles into a strong structure as it cools. The search accepts worse moves often while the 'temperature' is high, and becomes stricter as it cools.
 
@@ -586,7 +586,7 @@ Complete: no. Optimal: only with impractically slow cooling. Time: k samples. Sp
 
 ## Genetic algorithm (week 4, TSP · genetic)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-ga.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-ga.html
 
 A genetic algorithm evolves a population of tours. Better tours are more likely to be chosen as parents, parents are combined by crossover, children are occasionally mutated, and the population slowly improves.
 
@@ -618,7 +618,7 @@ Complete: no. Optimal: no. Time: O(g · N · n). Space: O(N · n).
 
 ## Crossover lab (week 4, TSP · genetic)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-crossover-lab.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-crossover-lab.html
 
 Genetic algorithms combine two good tours into a child. For the TSP that is tricky: cutting two city lists and gluing the halves usually repeats some cities and loses others. TSP crossovers are designed to always produce valid tours.
 
@@ -648,7 +648,7 @@ Complete: n/a. Optimal: n/a. Time: O(n) to O(n²) per child. Space: O(n).
 
 ## Ant colony optimisation (week 4, TSP · swarm)
 
-URL: https://1mystic.github.io/search-studio/learn/tsp-aco.html
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-aco.html
 
 Real ants find short paths by leaving pheromone: short routes are travelled more often, collect more pheromone, and attract more ants. Ant colony optimisation copies this with artificial ants building tours on a pheromone map.
 
@@ -681,7 +681,7 @@ Complete: no. Optimal: no. Time: O(m · n²) per iteration. Space: O(n²).
 
 ## Uniform Cost Search (week 5, Graph search · optimal)
 
-URL: https://1mystic.github.io/search-studio/learn/search-ucs.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-ucs.html
 
 Uniform Cost Search always expands the cheapest path found so far. With different edge costs it finds the cheapest route, not just the one with the fewest steps.
 
@@ -712,7 +712,7 @@ Complete: yes. Optimal: yes. Time: O(b^(1+C*/ε)). Space: same.
 
 ## A* (week 5, Graph search · optimal)
 
-URL: https://1mystic.github.io/search-studio/learn/search-astar.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-astar.html
 
 A* combines the cost already paid with an estimate of the cost remaining. With an estimate that never overestimates, it finds the cheapest path and usually expands far fewer nodes than Uniform Cost Search.
 
@@ -746,7 +746,7 @@ Complete: yes. Optimal: yes with admissible h. Time: exponential in general. Spa
 
 ## Sequence alignment (dynamic programming) (week 6, Sequence alignment)
 
-URL: https://1mystic.github.io/search-studio/learn/align-dp.html
+URL: https://1mystic.github.io/SearchStudio/learn/align-dp.html
 
 Comparing two DNA strings means lining them up with as few mismatches and gaps as possible. Every alignment is a path through a grid, so the best alignment is a shortest path, and dynamic programming finds it by filling a table.
 
@@ -774,7 +774,7 @@ Complete: yes. Optimal: yes. Time: O(m·n). Space: O(m·n).
 
 ## Sequence alignment (A*) (week 6, Sequence alignment)
 
-URL: https://1mystic.github.io/search-studio/learn/align-astar.html
+URL: https://1mystic.github.io/SearchStudio/learn/align-astar.html
 
 Dynamic programming fills the whole table. A* treats alignment as a shortest-path search on the same lattice and, with a good heuristic, explores only the part of the table near the best alignment.
 
@@ -799,7 +799,7 @@ Complete: yes. Optimal: yes. Time: ≤ O(m·n log). Space: ≤ O(m·n).
 
 ## Admissibility & monotone check (week 6, Graph search · optimal)
 
-URL: https://1mystic.github.io/search-studio/learn/search-monotone-check.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-monotone-check.html
 
 A* is only as good as its heuristic. Two properties matter: admissibility (never overestimate the remaining cost) and the monotone or consistency condition (the estimate never drops by more than the cost of an edge). This tool checks both on any graph.
 
@@ -827,7 +827,7 @@ Complete: n/a. Optimal: n/a. Time: O(E log V). Space: O(V).
 
 ## IDA* (week 6, Graph search · space saving)
 
-URL: https://1mystic.github.io/search-studio/learn/search-ida-star.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-ida-star.html
 
 A* is optimal but can run out of memory because OPEN grows exponentially. IDA* gets the same answer using memory proportional to the path length, by running depth-first searches with a growing cost limit.
 
@@ -863,7 +863,7 @@ Complete: yes. Optimal: yes with admissible h. Time: A* × number of bounds (wor
 
 ## Recursive Best-First Search (week 6, Graph search · space saving)
 
-URL: https://1mystic.github.io/search-studio/learn/search-rbfs.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-rbfs.html
 
 Recursive Best-First Search behaves like A* but stores only the current path. When the path it is exploring becomes worse than the best alternative elsewhere, it remembers how good that path turned out to be and switches.
 
@@ -895,7 +895,7 @@ Complete: yes. Optimal: yes with admissible h. Time: can exceed A*. Space: O(b·
 
 ## Divide & Conquer Frontier Search (week 6, Graph search · space saving)
 
-URL: https://1mystic.github.io/search-studio/learn/search-dcfs.html
+URL: https://1mystic.github.io/SearchStudio/learn/search-dcfs.html
 
 Most of A*'s memory is the CLOSED list, kept only to avoid regenerating expanded nodes and to rebuild the path. Frontier search drops CLOSED altogether; Divide and Conquer Frontier Search then rebuilds the path from a node remembered halfway along it.
 
@@ -923,7 +923,7 @@ Complete: yes. Optimal: yes with admissible h. Time: a small multiple of one sea
 
 ## Minimax (week 7, Game playing)
 
-URL: https://1mystic.github.io/search-studio/learn/game-minimax.html
+URL: https://1mystic.github.io/SearchStudio/learn/game-minimax.html
 
 In a two-player game one player (MAX) wants a high score and the other (MIN) a low one. Minimax looks ahead to the end of the tree and assumes both play perfectly: MAX picks the child with the largest value, MIN the smallest.
 
@@ -949,7 +949,7 @@ Complete: yes (finite tree). Optimal: yes against an optimal opponent. Time: O(b
 
 ## Alpha-Beta pruning (week 7, Game playing)
 
-URL: https://1mystic.github.io/search-studio/learn/game-alpha-beta.html
+URL: https://1mystic.github.io/SearchStudio/learn/game-alpha-beta.html
 
 Alpha-beta gives the same answer as minimax while skipping parts of the tree that cannot change the decision. If you already know a move gives you 3, you can stop examining another move as soon as you see the opponent can hold you to 2 there.
 
@@ -981,7 +981,7 @@ Complete: yes. Optimal: same value as minimax. Time: O(b^(d/2)) best, O(b^d) wor
 
 ## SSS* (week 7, Game playing)
 
-URL: https://1mystic.github.io/search-studio/learn/game-sss-star.html
+URL: https://1mystic.github.io/SearchStudio/learn/game-sss-star.html
 
 SSS* treats game-tree search as best-first search over strategies. It keeps an OPEN list of node triples and always refines the most promising one, so it never looks at a leaf that alpha-beta would skip, and sometimes skips leaves alpha-beta looks at.
 
@@ -1015,7 +1015,7 @@ Complete: yes. Optimal: minimax value. Time: ≤ alpha-beta leaves. Space: O(b^(
 
 ## Forward state-space planning (week 8, Planning)
 
-URL: https://1mystic.github.io/search-studio/learn/plan-forward.html
+URL: https://1mystic.github.io/SearchStudio/learn/plan-forward.html
 
 A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Forward planning simply searches the state space from the initial state.
 
@@ -1044,7 +1044,7 @@ Complete: yes. Optimal: shortest plan (BFS). Time: O(b^d). Space: O(b^d).
 
 ## Backward state-space planning (week 8, Planning)
 
-URL: https://1mystic.github.io/search-studio/learn/plan-backward.html
+URL: https://1mystic.github.io/SearchStudio/learn/plan-backward.html
 
 A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Backward planning starts from the goal and asks which action could have achieved it last.
 
@@ -1073,7 +1073,7 @@ Complete: yes. Optimal: shortest plan (BFS). Time: O(b^d) with smaller b. Space:
 
 ## Goal Stack Planning (week 8, Planning)
 
-URL: https://1mystic.github.io/search-studio/learn/plan-gsp.html
+URL: https://1mystic.github.io/SearchStudio/learn/plan-gsp.html
 
 A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Goal Stack Planning, the strategy of STRIPS, works through the goals one at a time using a stack.
 
@@ -1102,7 +1102,7 @@ Complete: no. Optimal: no. Time: linear in plan length (when it works). Space: O
 
 ## Partial Order Planning (week 8, Planning)
 
-URL: https://1mystic.github.io/search-studio/learn/plan-pop.html
+URL: https://1mystic.github.io/SearchStudio/learn/plan-pop.html
 
 A planning problem gives an initial state, a goal and operators described in STRIPS form: each operator has preconditions, an add list and a delete list. In the blocks world the operators are pickup, putdown, stack and unstack, and AE means the arm is empty. Partial Order Planning searches the space of plans instead of states, adding steps and orderings only when it must.
 
@@ -1134,7 +1134,7 @@ Complete: yes (with systematic search). Optimal: shortest plan with iterative de
 
 ## AO* (week 9, Problem decomposition)
 
-URL: https://1mystic.github.io/search-studio/learn/andor-ao-star.html
+URL: https://1mystic.github.io/SearchStudio/learn/andor-ao-star.html
 
 Some problems split into subproblems that must all be solved (AND), while others offer alternative ways to proceed (OR). AO* searches such AND–OR graphs for the cheapest solution graph, revising its choices as costs become known.
 
@@ -1167,7 +1167,7 @@ Complete: yes. Optimal: yes with admissible h. Time: exponential in general. Spa
 
 ## Forward chaining (week 10, Rule-based systems)
 
-URL: https://1mystic.github.io/search-studio/learn/rules-forward-chaining.html
+URL: https://1mystic.github.io/SearchStudio/learn/rules-forward-chaining.html
 
 A rule-based system holds facts in working memory and knowledge as if–then rules. Forward chaining starts from the facts and keeps firing rules whose conditions match until nothing new can be derived.
 
@@ -1194,7 +1194,7 @@ Complete: derives every consequence (add-only rules). Optimal: n/a. Time: match 
 
 ## Rete algorithm (week 10, Rule-based systems)
 
-URL: https://1mystic.github.io/search-studio/learn/rules-rete.html
+URL: https://1mystic.github.io/SearchStudio/learn/rules-rete.html
 
 Most cycles of a rule system change only a few facts, yet naive matching re-checks every rule against everything. The Rete algorithm compiles the rules into a network that remembers partial matches, so each new fact is matched only where it matters.
 
@@ -1223,7 +1223,7 @@ Complete: same matches as naive matching. Optimal: n/a. Time: proportional to ch
 
 ## Backtracking (week 11, Constraint processing)
 
-URL: https://1mystic.github.io/search-studio/learn/csp-backtracking.html
+URL: https://1mystic.github.io/SearchStudio/learn/csp-backtracking.html
 
 A constraint satisfaction problem has variables, each with a domain of values, and constraints saying which combinations are allowed. A solution assigns every variable a value from its domain so that every constraint holds. Backtracking is depth-first search over partial assignments.
 
@@ -1252,7 +1252,7 @@ Complete: yes. Optimal: n/a (any solution). Time: O(dⁿ). Space: O(n).
 
 ## Forward checking (week 11, Constraint processing)
 
-URL: https://1mystic.github.io/search-studio/learn/csp-forward-checking.html
+URL: https://1mystic.github.io/SearchStudio/learn/csp-forward-checking.html
 
 A constraint satisfaction problem has variables, each with a domain of values, and constraints saying which combinations are allowed. A solution assigns every variable a value from its domain so that every constraint holds. Forward checking combines search with a little reasoning: it looks ahead after each assignment.
 
@@ -1280,7 +1280,7 @@ Complete: yes. Optimal: n/a. Time: O(dⁿ) worst case. Space: O(n·d) for domain
 
 ## Arc consistency (AC-1, AC-3) (week 11, Constraint processing)
 
-URL: https://1mystic.github.io/search-studio/learn/csp-ac3.html
+URL: https://1mystic.github.io/SearchStudio/learn/csp-ac3.html
 
 A constraint satisfaction problem has variables, each with a domain of values, and constraints saying which combinations are allowed. A solution assigns every variable a value from its domain so that every constraint holds. Arc consistency removes values that cannot possibly be part of any solution, before or during search.
 
@@ -1313,7 +1313,7 @@ Complete: no (filtering only). Optimal: n/a. Time: O(e·d³). Space: O(e).
 
 ## Waltz algorithm (week 11, Constraint processing)
 
-URL: https://1mystic.github.io/search-studio/learn/csp-waltz.html
+URL: https://1mystic.github.io/SearchStudio/learn/csp-waltz.html
 
 How do we see 3D shapes in a line drawing? Waltz showed that each junction of lines allows only a few physical interpretations, and that neighbouring junctions must agree. Propagating that agreement usually leaves a single interpretation.
 
@@ -1344,7 +1344,7 @@ Complete: filtering only. Optimal: n/a. Time: linear for planar drawings. Space:
 
 ## Model-based diagnosis (week 11, Constraint processing)
 
-URL: https://1mystic.github.io/search-studio/learn/csp-diagnosis.html
+URL: https://1mystic.github.io/SearchStudio/learn/csp-diagnosis.html
 
 When a device misbehaves, model-based diagnosis asks: which components, if broken, would explain what we observe? It uses models of how each component should behave and looks for contradictions.
 

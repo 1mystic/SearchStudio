@@ -13,7 +13,7 @@ Thank you for helping. Everything here is public domain ([Unlicense](LICENSE)), 
 ## Set up
 
 ```bash
-git clone https://github.com/1mystic/search-studio && cd search-studio
+git clone https://github.com/1mystic/SearchStudio && cd search-studio
 npm run watch      # rebuilds on every save; Node 18+, nothing to install
 npm run serve      # in another terminal, then open the printed address
 ```

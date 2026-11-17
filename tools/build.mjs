@@ -13,7 +13,7 @@ import * as SEO from "./seo.mjs";
 
 const args = new Set(process.argv.slice(2));
 const PKG = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
-const SITE = (process.env.SITE_URL || PKG.homepage || "https://1mystic.github.io/search-studio/").replace(/\/?$/, "/");
+const SITE = (process.env.SITE_URL || PKG.homepage || "https://1mystic.github.io/SearchStudio/").replace(/\/?$/, "/");
 const UI = ["src/ui/render.js", "src/ui/app.js"];
 const read = f => fs.readFileSync(path.join(ROOT, f), "utf8");
 const write = (f, s) => { fs.mkdirSync(path.dirname(path.join(ROOT, f)), { recursive: true }); fs.writeFileSync(path.join(ROOT, f), s); };
