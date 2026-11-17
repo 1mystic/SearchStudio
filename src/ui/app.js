@@ -5,6 +5,7 @@
   const $ = (sel, el = document) => el.querySelector(sel);
   const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
   const STORE = "search-studio.v1";
+  const IC = { "skip-back": `<svg class="ic solid" viewBox="0 0 24 24" aria-hidden="true"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" x2="5" y1="19" y2="5"/></svg>`, "skip-forward": `<svg class="ic solid" viewBox="0 0 24 24" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg>`, "chevron-left": `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>`, "chevron-right": `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`, "play": `<svg class="ic solid" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>`, "pause": `<svg class="ic solid" viewBox="0 0 24 24" aria-hidden="true"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></svg>`, "arrow-left": `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>`, "arrow-right": `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`, "search": `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`, "menu": `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>`, "sun": `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`, "moon": `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>` };
 
   /* ------------------------------------------------------------ course structure */
   const WEEKS = [
@@ -14,7 +15,7 @@
     [4, "Population based methods", "Genetic algorithms, emergent systems and ant colony optimisation."],
     [5, "Finding optimal paths", "Uniform cost search, algorithm A* and the admissibility of A*."],
     [6, "Monotone condition and saving space", "The monotone condition; space saving versions of A*; sequence alignment."],
-    [7, "Game playing", "Board games; Minimax, Alpha-Beta and SSS*."],
+    [7, "Game playing", "Board games; Minimax, Alpha-Beta and SSS*; k-ply lookahead and the horizon effect; game theory and Nash equilibria."],
     [8, "Planning", "Domain independent planning: state-space planning, Goal Stack Planning, Partial Order Planning."],
     [9, "Problem decomposition", "Goal trees and AND–OR graphs; algorithm AO*."],
     [10, "Rule-based systems", "Pattern directed inference, the forward chaining engine and the Rete algorithm."],
@@ -22,7 +23,7 @@
     [12, "Lookahead, lookback and synthesis", "Forward checking and full or arc-consistency lookahead; conflict-directed backjumping; nogood recording; depth-first branch and bound; the closing discussion."],
   ];
   const FAMILY_ORDER = ["Graph search · uninformed", "Graph search · informed", "Graph search · optimal", "Graph search · space saving", "Sequence alignment",
-    "TSP · exact", "TSP · constructive", "TSP · perturbation", "TSP · local search", "TSP · genetic", "TSP · swarm",
+    "TSP · exact", "TSP · constructive", "TSP · perturbation", "TSP · local search", "TSP · genetic", "TSP · swarm", "Emergent systems",
     "SAT · exact", "SAT · local search", "SAT · stochastic", "SAT · genetic",
     "Game playing", "Planning", "Problem decomposition", "Rule-based systems", "Constraint processing",
     "Constraint processing · lookahead", "Constraint processing · lookback", "SAT · constraint processing"];
@@ -41,7 +42,7 @@
   const themeBtn = $("#theme-btn");
   function applyTheme(t) {
     document.documentElement.setAttribute("data-theme", t);
-    themeBtn.textContent = t === "light" ? "◐ Dark" : "◑ Light";
+    themeBtn.innerHTML = t === "light" ? IC.sun + " <span>Dark</span>" : IC.moon + " <span>Light</span>";
     themeBtn.setAttribute("aria-label", t === "light" ? "Switch to dark theme" : "Switch to light theme");
   }
   applyTheme(store.get().theme || (window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
@@ -267,7 +268,7 @@
     const crumbs = `<a class="fc-dir" href="#week-${a.week}">Week ${a.week}</a><span class="fc-sep">·</span><span class="fc-dir">${esc(a.family)}</span><span class="fc-sep">›</span><span class="fc-file">${esc(a.name)}</span>`;
     const srcLink = `<a class="btn ghost src-link" href="${esc(SRC_BASE + fileOf(a))}" target="_blank" rel="noopener" title="${esc(fileOf(a))} on GitHub"><svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M5.7 4.3 2 8l3.7 3.7 1-1L4 8l2.7-2.7-1-1Zm4.6 0-1 1L12 8l-2.7 2.7 1 1L14 8l-3.7-3.7Z"/></svg>View source</a>`;
     const famTag = b => esc(String(b.family).split(" · ")[0]);
-    const pager = cls => `<nav class="pager ${cls}" aria-label="Previous and next algorithm">${prev ? `<a class="pg prev" href="#algo-${esc(prev.id)}"><span>← Previous</span><b>${esc(prev.name)}</b></a>` : `<span class="pg empty"></span>`}<span class="pg-pos">${i + 1} / ${list.length}</span>${next ? `<a class="pg next" href="#algo-${esc(next.id)}"><span>Next →</span><b>${esc(next.name)}</b></a>` : `<span class="pg empty"></span>`}</nav>`;
+    const pager = cls => `<nav class="pager ${cls}" aria-label="Previous and next algorithm">${prev ? `<a class="pg prev" href="#algo-${esc(prev.id)}"><span>${IC["arrow-left"]} Previous</span><b>${esc(prev.name)}</b></a>` : `<span class="pg empty"></span>`}<span class="pg-pos">${i + 1} / ${list.length}</span>${next ? `<a class="pg next" href="#algo-${esc(next.id)}"><span>Next ${IC["arrow-right"]}</span><b>${esc(next.name)}</b></a>` : `<span class="pg empty"></span>`}</nav>`;
     const siblings = list.filter(b => b.family === a.family);
     const sameWeek = list.filter(b => b.week === a.week && b.family !== a.family);
     root.innerHTML = `<article class="learn">
@@ -288,7 +289,7 @@
             <div class="prop"><span>complete</span>${esc(props.complete || "–")}</div><div class="prop"><span>optimal</span>${esc(props.optimal || "–")}</div>
             <div class="prop"><span>time</span>${esc(props.time || a.complexity || "–")}</div><div class="prop"><span>space</span>${esc(props.space || "–")}</div></div>
           ${L.traps && L.traps.length ? `<h2><small>07</small>Traps</h2><ul class="traps">${L.traps.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
-          ${(() => { const xs = examplesFor(a); return xs.length ? `<h2><small>08</small>Examples for this algorithm</h2><ul class="ex-list">${xs.map(e => `<li><a href="${exampleLink(e, a)}"><span class="ex-name">${esc(e.name)}</span>${e.id === a.defaultExample ? '<span class="tag ok">default</span>' : ""}<span class="ex-go" aria-hidden="true">Open in studio →</span></a></li>`).join("")}</ul>` : ""; })()}
+          ${(() => { const xs = examplesFor(a); return xs.length ? `<h2><small>08</small>Examples for this algorithm</h2><ul class="ex-list">${xs.map(e => `<li><a href="${exampleLink(e, a)}"><span class="ex-name">${esc(e.name)}</span>${e.id === a.defaultExample ? '<span class="tag ok">default</span>' : ""}<span class="ex-go" aria-hidden="true">Open in studio ${IC["arrow-right"]}</span></a></li>`).join("")}</ul>` : ""; })()}
           <div class="learn-end"><a class="btn primary" href="#try-${esc(a.id)}">Try it in the studio</a>${srcLink}</div>
           ${pager("bottom")}
         </div>
@@ -541,11 +542,11 @@
   function play() {
     if (!st.run) return;
     if (st.i >= st.run.steps.length - 1) st.i = 0;
-    $("#p-play").textContent = "❚❚ Pause"; $("#p-play").setAttribute("aria-label", "Pause");
+    $("#p-play").innerHTML = IC.pause + " <span>Pause</span>"; $("#p-play").setAttribute("aria-label", "Pause");
     const tick = () => { draw(); if (st.i >= st.run.steps.length - 1) { pause(); return; } st.timer = setTimeout(() => { st.i++; tick(); }, st.speed * 1000); };
     clearTimeout(st.timer); st.timer = setTimeout(() => { st.i++; tick(); }, st.speed * 1000); draw();
   }
-  function pause() { clearTimeout(st.timer); st.timer = null; const b = $("#p-play"); if (b) { b.textContent = "▶ Play"; b.setAttribute("aria-label", "Play"); } }
+  function pause() { clearTimeout(st.timer); st.timer = null; const b = $("#p-play"); if (b) { b.innerHTML = IC.play + " <span>Play</span>"; b.setAttribute("aria-label", "Play"); } }
 
   /* ------------------------------------------------------------ exports */
   const fileBase = () => (st.algoId + "-" + st.problemId).replace(/[^a-z0-9-]+/gi, "-").toLowerCase();

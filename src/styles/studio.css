@@ -693,8 +693,7 @@ select:focus-visible { outline: 2px solid var(--yellow); outline-offset: 1px; }
 select option { background: var(--panel); color: var(--ink); }
 select::-ms-expand { display: none; }
 
-/* ---------- header and footer line up with the page content (as before); only the studio workspace goes full width */
-@media (min-width: 1600px) { body:has(.page[data-page="studio"]:not([hidden])) .top-in { max-width: none; } }
+/* ---------- header and footer line up with the page content on every page (the studio included), so nav items never move */
 
 /* ---------- example cards: long notes are clamped; the full note is in the title tooltip and in the studio */
 .card.ex p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; flex: 0 0 auto; }
@@ -807,3 +806,46 @@ button:disabled:hover, .icon-btn:disabled:hover { border-color: var(--rule-2); }
 /* reading pages (guide, about, contribute) use the same width as the learn pages, so every page's content lines up */
 .prose { max-width: 1180px; }
 .prose p, .prose li { max-width: none; }
+
+/* the scrollbar always keeps its space (even on the studio, where the page itself does not scroll), so switching pages never shifts the header */
+html { scrollbar-gutter: stable; }
+
+/* wide screens: the three studio panes sit inside one framed container */
+@media (min-width: 1600px) {
+  .page[data-page="studio"]:not([hidden]) { padding: 14px max(18px, 1.2%) 16px; box-sizing: border-box; }
+  .studio { border: 1px solid var(--rule-2); border-radius: 12px; overflow: hidden; background: var(--bg); box-shadow: 0 1px 0 color-mix(in srgb, var(--rule) 60%, transparent), 0 10px 30px -22px rgba(0, 0, 0, .55); box-sizing: border-box; }
+}
+
+/* ---------- hyperlinks: pale light yellow (a deeper amber on the light theme, to keep 4.5:1 contrast) */
+:root { --link: #f4e6a6; --link-hover: #fff6c9; }
+:root[data-theme="light"] { --link: #7a5600; --link-hover: #5a3f00; }
+a { color: var(--link); text-decoration-color: color-mix(in srgb, var(--link) 55%, transparent); }
+a:hover { color: var(--link-hover); text-decoration-color: currentColor; }
+.btn, .btn:hover, .nav a, .nav a:hover, .pg, .pg:hover, .fam, .fam:hover, .entry, .entry:hover, .chip, .chip:hover, .chip-link, .chip-link:hover, .skip, .ex-list a, .ex-list a:hover, .tree li a, .tree li a:hover, .foot-in a, .card h3 a { text-decoration: none; }
+.btn.primary, .btn.primary:hover { color: #151515; }
+:root[data-theme="light"] .btn.primary, :root[data-theme="light"] .btn.primary:hover { color: #fff; }
+
+/* ---------- studio side-panel tabs: same pill look as the main navbar (hover tint, filled active item) */
+.tabs { gap: 4px; border-bottom: 1px solid var(--rule); padding: 8px 10px; margin-top: 0; }
+.tabs button { border: 0; border-radius: 5px; padding: 7px 10px; font-family: var(--sans); font-size: 13.5px; font-weight: 500; color: var(--muted); background: transparent; }
+.tabs button:hover { color: var(--ink); background: var(--panel-2); }
+.tabs button[aria-selected="true"] { color: var(--ink); background: var(--raise); border-bottom-color: transparent; }
+.panel .tabs button { padding: 7px 10px; }
+@media (min-width: 1600px) { .studio .panel .tabs { padding: 8px 10px 8px 17px; } }
+
+/* ---------- Lucide-style inline icons (no font or network needed) */
+.ic { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.2em; }
+.ic.solid { fill: currentColor; stroke-width: 1.5; }
+.icon-btn .ic { width: 16px; height: 16px; vertical-align: middle; }
+.pager .pg span .ic, .ex-go .ic { width: 14px; height: 14px; vertical-align: -0.2em; }
+.pager .pg.next span { display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end; } .pager .pg.prev span { display: inline-flex; align-items: center; gap: 6px; }
+.ex-go { display: inline-flex; align-items: center; gap: 6px; }
+.icon-btn.play { gap: 8px; }
+
+/* action chips share the radius of every other button */
+.chip-link { border-radius: 6px; }
+
+/* full-width action button: label centred, arrow pinned to the right end */
+.btn.wide-go { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px 40px; font-size: 14px; font-weight: 600; letter-spacing: .01em; }
+.btn.wide-go .ic { position: absolute; right: 14px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); transition: transform .15s ease; }
+.btn.wide-go:hover .ic { transform: translate(3px, -50%); }

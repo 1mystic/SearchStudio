@@ -10,9 +10,9 @@
       <a href="#library">Learn</a><a href="#studio">Studio</a><a href="#course">Course map</a><a href="#guide">Guide</a><a href="#about">About</a><a href="#contribute">Contribute</a>
     </nav>
     <div class="top-tools">
-      <button class="icon-btn" id="find-btn" type="button" aria-label="Find an algorithm"><span aria-hidden="true">⌕</span> <span class="hide-sm">Find</span> <kbd class="hide-sm">/</kbd></button>
-      <button class="icon-btn" id="theme-btn" type="button">◑ Light</button>
-      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-controls="nav" aria-expanded="false" aria-label="Menu">☰</button>
+      <button class="icon-btn" id="find-btn" type="button" aria-label="Find an algorithm"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> <span class="hide-sm">Find</span> <kbd class="hide-sm">/</kbd></button>
+      <button class="icon-btn" id="theme-btn" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> <span>Light</span></button>
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-controls="nav" aria-expanded="false" aria-label="Menu"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
     </div>
   </div>
 </header>
@@ -41,7 +41,7 @@
           <div id="panel-random" class="subpanel" hidden>
             <div class="two-col" id="rnd-fields"></div>
             <div class="field"><label for="rnd-seed">Seed</label><div class="row nowrap"><input id="rnd-seed" class="inp" type="number" value="1"><button class="icon-btn" id="rnd-seed-new" type="button" aria-label="New random seed">⟳</button></div><span class="help">Same settings and seed, same problem.</span></div>
-            <button class="btn small primary" id="rnd-go" type="button">Generate</button>
+            <button class="btn small primary wide-go" id="rnd-go" type="button"><span>Generate</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
           </div>
           <div id="panel-edit" class="subpanel" hidden>
             <div class="field"><label for="edit-name">Name</label><input id="edit-name" class="inp"></div>
@@ -65,11 +65,11 @@
         <div class="stage" id="stage" aria-live="polite"></div>
         <div class="player" role="group" aria-label="Step controls">
           <div class="pbtns">
-            <button class="icon-btn" id="p-first" type="button" aria-label="First step">⏮</button>
-            <button class="icon-btn" id="p-prev" type="button" aria-label="Previous step">◀</button>
-            <button class="icon-btn play" id="p-play" type="button" aria-label="Play">▶ Play</button>
-            <button class="icon-btn" id="p-next" type="button" aria-label="Next step">▶</button>
-            <button class="icon-btn" id="p-last" type="button" aria-label="Last step">⏭</button>
+            <button class="icon-btn" id="p-first" type="button" aria-label="First step"><svg class="ic solid" viewBox="0 0 24 24" aria-hidden="true"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" x2="5" y1="19" y2="5"/></svg></button>
+            <button class="icon-btn" id="p-prev" type="button" aria-label="Previous step"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+            <button class="icon-btn play" id="p-play" type="button" aria-label="Play"><svg class="ic solid" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg> <span>Play</span></button>
+            <button class="icon-btn" id="p-next" type="button" aria-label="Next step"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="icon-btn" id="p-last" type="button" aria-label="Last step"><svg class="ic solid" viewBox="0 0 24 24" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg></button>
           </div>
           <input type="range" id="p-range" min="0" max="0" value="0" aria-label="Step">
           <div class="pinfo"><span id="p-count">–</span>

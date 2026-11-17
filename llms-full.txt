@@ -1044,6 +1044,36 @@ Complete: yes on a finite space with CLOSED. Optimal: no. Time: exponential wors
 - Trap: A heuristic that is 0 everywhere turns the order into ties, i.e. alphabetical order of states.
 - Trap: For water jugs there is no useful h (it is 0); for missionaries and cannibals the studio uses the full-boat crossing bound.
 
+## Game of Life: generation stepper (week 4, Emergent systems)
+
+URL: https://1mystic.github.io/SearchStudio/learn/life-stepper.html
+
+The Game of Life is a grid of cells, each alive or dead. There is no player and no goal. Every cell applies the same tiny rule to its eight neighbours, all at the same moment, and patterns appear that nobody wrote down: blocks that never change, blinkers that flash, gliders that walk across the grid. It is the standard picture of an emergent system: global behaviour from simple local rules.
+
+Definition: State = the set of live cells. Next state: a live cell survives with 2 or 3 live neighbours (S23); a dead cell with exactly 3 live neighbours becomes alive (B3); everything else is dead in the next generation. The rule reads the old generation only, so the update is simultaneous.
+
+Pseudocode:
+
+```
+repeat for each generation:
+    for each cell, n ← number of live neighbours (of 8)
+        if the cell is alive:  survives if n = 2 or n = 3, else dies   (S23)
+        if the cell is dead:   is born if n = 3                         (B3)
+    all cells change together: the new grid is computed from the old one
+    population ← number of live cells
+```
+
+- next(c) = 1 if (alive(c) and n(c) ∈ {2, 3}) or (dead(c) and n(c) = 3), else 0: alive next time if it has the right number of neighbours. This is the whole rule, written as B3/S23: Birth on 3, Survival on 2 or 3.
+- population(t) = number of live cells in generation t: how many cells are alive. Plotted over time it shows growth, decay or a steady state (still lifes and oscillators) at a glance.
+
+It shows that you can get rich behaviour without a plan or a controller, which is the core idea of emergent and self-organising systems. Gliders can even carry information, and the rule is rich enough to compute anything a computer can.
+
+Complete: n/a (a simulation, not a search). Optimal: n/a. Time: O(cells) per generation. Space: O(cells).
+
+- Trap: The update is simultaneous: do not use a cell's new state while counting another cell's neighbours.
+- Trap: A cell is not a neighbour of itself: a live cell counts only the other eight.
+- Trap: On a bounded grid cells beyond the edge count as dead (unless the grid wraps around), so patterns can behave differently near the border.
+
 ## Iterated hill climbing (week 4, SAT · stochastic)
 
 URL: https://1mystic.github.io/SearchStudio/learn/sat-ihc.html
@@ -1788,6 +1818,38 @@ Complete: yes if U ≥ C*. Optimal: yes with admissible h. Time: ≈ 2 × BFHS. 
 - Trap: A sub-search uses h = 0, so it expands more nodes than the first run did.
 - Trap: The relay layer ⌊L/2⌋ is by number of moves, not by cost; on weighted graphs the halves can have unequal cost.
 
+## Divide and Conquer Beam Search (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-dc-beam.html
+
+Beam search bounds memory by keeping only w nodes per layer, but then the path cannot be read from parent pointers without storing every layer. Divide and Conquer Beam Search keeps one extra node instead: the middle node of the best path found, the relay. Each half is then a smaller beam search of the same kind. **Supplementary:** this is Zhou and Hansen's divide-and-conquer beam search; the course covers beam search and divide-and-conquer frontier search separately.
+
+Definition: Run beam search from S to T: generate the children of the layer, drop those with f = g + h above the bound U, drop duplicates found in the current or previous layer, and keep the w best by f. Continue until the layers run out, remembering the best goal. Repeat the run with every node of layer ⌊L/2⌋ acting as a relay that its descendants inherit. The best goal's relay R splits the problem into S→R (cost g(R)) and R→T (cost C − g(R)); solve both recursively with h = 0 and their exact costs as bounds. If a half cannot be re-found at width w, the width is doubled for that half until it can.
+
+Pseudocode:
+
+```
+DCBS(S, T, U, w):
+    run beam search from S to T, layer by layer, keeping the w best nodes by f in each layer
+        (nodes with f > U are never generated; only the current and previous layers are stored)
+    if no goal was reached: fail
+    if the path has ≤ 1 move: return [S, T]
+    run it again, each node on layer ⌊L/2⌋ becoming its own relay, passed on to its descendants
+    R ← the relay of the best goal, with g(R)
+    return DCBS(S, R, g(R), w) ++ DCBS(R, T, C − g(R), w)       # drop the repeated R
+```
+
+- |beam| ≤ w,   stored nodes ≤ 3w: the new layer plus the two kept layers. At most w nodes survive in each layer and only the current and previous layers are kept for duplicate detection, so memory does not grow with depth.
+- C = g(R) + cost(R→T): the path found splits at the relay into two parts. Each part of the path found is itself a path of the stated cost, so joining the solved halves gives a path of cost C. It is optimal only if beam search found an optimal path.
+
+Shows how to recover the path from a search that stores almost nothing. A very wide beam behaves like BFHS and finds the optimum; a narrow beam may cut the only route, and then the search falls back to the quick solution or reports failure.
+
+Complete: no (yes when w ≥ number of nodes). Optimal: no for small w, yes for a wide beam with admissible h. Time: ≈ 2 × beam search. Space: O(w).
+
+- Trap: Beam search is incomplete: with a small w the beam can lose every route to the goal. Then DC beam search returns the greedy quick solution that gave U, or says it found nothing.
+- Trap: The halves are searched with h = 0 (h aims at T, not at the relay), so a narrow beam may need widening to re-find a half.
+- Trap: A wider beam is not always cheaper in memory terms: peak storage grows with w.
+
 ## Beam Stack Search (week 6, Graph search · space saving)
 
 URL: https://1mystic.github.io/SearchStudio/learn/search-beam-stack.html
@@ -2107,6 +2169,39 @@ Complete: yes. Optimal: minimax value. Time: ≤ alpha-beta leaves. Space: O(b^(
 - Trap: SSS* never evaluates more leaves than alpha-beta with the same left-to-right order (game-four-ply: 8 against 10) but keeps a large OPEN list.
 - Trap: When a MAX parent is solved, remove all its other descendants from OPEN.
 
+## k-ply tic-tac-toe (static evaluator, horizon effect) (week 7, Game playing)
+
+URL: https://1mystic.github.io/SearchStudio/learn/ttt-kply.html
+
+Real games are too deep to search to the end, so a program searches only k plies ahead and judges the positions at that frontier with a static evaluation function. In tic-tac-toe a simple evaluator counts the lines that are still open: e(n) = (rows, columns and diagonals not yet blocked for MAX) − (those not yet blocked for MIN). Minimax then backs these numbers up. The weakness is the horizon effect: a loss (or win) that arrives just beyond k plies is invisible, so a shallow search can happily walk into it.
+
+Definition: MAX is X, MIN is O. A line is open for a player if it contains none of the opponent's marks. e(n) is the number of lines open for MAX minus the number open for MIN; a won position is +∞ (MAX) or −∞ (MIN) and a full board without a winner is 0. A k-ply search looks k moves ahead (counting the move being chosen), evaluates the frontier positions with e and backs up with max at MAX nodes and min at MIN nodes.
+
+Pseudocode:
+
+```
+e(n) = (rows, columns, diagonals open for MAX) − (those open for MIN)
+        +∞ if MAX has three in a row, −∞ if MIN has
+Search(n, depth):
+    if n is won or full: return its value (±∞ or 0)
+    if depth = 0:        return e(n)            ← the horizon: static evaluation
+    MAX node: max over moves of Search(child, depth − 1)
+    MIN node: min over moves of Search(child, depth − 1)
+choose the root move with the best backed-up value (ties: alphabetical cell order)
+```
+
+- e(n) = openlines(MAX) − openlines(MIN): lines still winnable for X minus lines still winnable for O. More winnable lines means more chances to win and fewer to lose. The empty board has 8 lines open for each side, so e = 0; X alone in the centre keeps 8 lines but takes 4 from O, so e = 8 − 4 = 4.
+- v(n, d) = e(n) if d = 0;  max or min over children of v(child, d − 1) otherwise: depth-limited minimax. Minimax is exact only at the leaves of the game; at the frontier it trusts e.
+
+It is how chess programs and every game player with a big tree work: look as deep as the time allows and guess at the frontier. The horizon effect is the price: the guess is only as good as e, and some dangers (forks, forced sequences) take more plies to show up than the horizon allows.
+
+Complete: no (only looks k plies ahead). Optimal: only when k reaches the end of the game. Time: O(b^k). Space: O(k).
+
+- Trap: k counts plies (single moves), not pairs of moves: k = 2 is your move and one reply.
+- Trap: Values are always from MAX's point of view. When O is to move, O picks the smallest value, not the largest.
+- Trap: A higher k is not a guarantee: the evaluator can still be wrong at the frontier. Only the full-depth search is exact.
+- Trap: e counts open lines, not threats: two marks in a row and one mark in a row look similar to it, which is exactly why it misses forks.
+
 ## Expectiminimax (supplementary) (week 7, Game playing)
 
 URL: https://1mystic.github.io/SearchStudio/learn/game-expectiminimax.html
@@ -2135,6 +2230,37 @@ Complete: yes (finite tree). Optimal: maximises expected value against an optima
 - Trap: Probabilities on the edges of one chance node must sum to 1.
 - Trap: Treating chance nodes as MIN, MAX or a plain average gives a wrong value or a wrong move: the last caption on example game-chance-gamble lists them (4, 8 and 5 against the true 6.5).
 - Trap: Minimax would be wrong here: it treats the roll as a choice. Pruning is also harder, because an average is only bounded if the leaf values are.
+
+## Dominant strategies and Nash equilibria (supplementary) (week 7, Game playing)
+
+URL: https://1mystic.github.io/SearchStudio/learn/game-nash.html
+
+Supplementary material: this topic is not in the course notes but is the natural next step from minimax. In minimax one player's gain is the other's loss. In a general two-player game both players choose at the same time and the payoffs need not add up to zero. A Nash equilibrium is a pair of choices from which neither player gains by changing alone. The Prisoner's Dilemma shows the surprise: the only equilibrium can be worse for both than another outcome.
+
+Definition: A strategy s is strictly dominated by t if t gives a strictly higher payoff than s against every strategy of the opponent; a rational player never plays a dominated strategy, so it can be removed (and the removal can make more strategies dominated: iterated elimination). A pair (r, c) is a pure Nash equilibrium if r is a best response to c and c is a best response to r. An outcome is Pareto-dominated if some other outcome is at least as good for both players and strictly better for one.
+
+Pseudocode:
+
+```
+repeat: remove a strictly dominated strategy of either player
+        (s is dominated by t if t pays more than s against EVERY remaining opponent strategy)
+until nothing can be removed
+for each column: mark the row player's best payoff;  for each row: mark the column player's best payoff
+pure Nash equilibrium = a cell with both payoffs marked
+equilibrium is Pareto-inefficient if another cell pays both players at least as much and one strictly more
+```
+
+- s is strictly dominated by t  ⇔  u(t, o) > u(s, o) for every opponent strategy o: t beats s whatever the other player does. If this holds, s can never be the right choice, so it can be ignored without changing the outcome.
+- (r*, c*) is a pure Nash equilibrium  ⇔  u₁(r*, c*) ≥ u₁(r, c*) for all r  and  u₂(r*, c*) ≥ u₂(r*, c) for all c: each choice is a best response to the other. No player can improve by deviating alone, so the pair is stable.
+
+It shows what rational play looks like when both sides move at once, and that individually rational choices can be collectively bad (the Prisoner's Dilemma), which is why rules, contracts and repetition matter.
+
+Complete: finds every pure equilibrium. Optimal: no (equilibrium is not optimal). Time: O(r·c·(r + c)). Space: O(r·c).
+
+- Trap: Dominance must be strict and against every opponent strategy; being better against most of them is not enough.
+- Trap: Equilibrium does not mean best: the equilibrium of the Prisoner's Dilemma is worse for both players than mutual cooperation.
+- Trap: A game can have several pure equilibria (Battle of the Sexes) or none (Matching Pennies). Without a pure equilibrium, players must randomise: a mixed equilibrium always exists (Nash's theorem), but this tool finds only pure ones.
+- Trap: Payoffs are written (row player, column player). Read the first number for the row player.
 
 ## Forward state-space planning (week 8, Planning)
 
@@ -2329,6 +2455,38 @@ Complete: no. Optimal: no. Time: depends on the differences. Space: depth of sub
 - Trap: MEA is not complete: it does not protect earlier achievements, so it can undo its own work and cycle (the Sussman anomaly). Run example plan-sussman to watch it fail and plan-reverse to watch it succeed.
 - Trap: The result depends on the importance ordering and on the difference table; a different table can succeed where this one fails.
 - Trap: A sub-goal may clobber a fact achieved earlier: after each operator, recompute all differences.
+
+## Multi-arm plan scheduling (makespan) (week 8, Planning)
+
+URL: https://1mystic.github.io/SearchStudio/learn/plan-multi-arm.html
+
+A sequential plan does one action per time step with a single arm. If the robot has k arms, some actions can happen at the same time, and what matters is the makespan: the number of time steps until the goal holds. The question is which actions may overlap. An action can run only when its preconditions hold, and two arms must not work on the same blocks at once. Moves that share no block are independent and can run in parallel; moves that share a block must keep the order the plan gave them.
+
+Definition: A move is a pick-up (pickup or unstack) together with the put-down (putdown or stack) that follows it: the arm is busy for both steps. Move B depends on an earlier move A if they mention a common block. A schedule gives every move a start step and an arm such that dependent moves do not overlap, no arm is asked to do two things at once, and each action's preconditions hold when it runs. The makespan is the number of time steps used. (Scheduling a plan onto several arms is not part of the course notes: this is an extension of the course's single-arm STRIPS operators.)
+
+Pseudocode:
+
+```
+plan ← plan from another planner;  group each pick-up with the put-down that follows it into one move
+move B must wait for every earlier move A that shares a block with it
+for t = 1, 2, 3, ...
+    for each free arm, in order:
+        take the first not-yet-started move (in plan order) whose earlier moves have all finished
+        start it on this arm: pick-up at t, put-down at t + 1
+makespan ← last time step used
+```
+
+- makespan ≤ sequential length;  makespan ≥ longest dependency chain: parallel arms never hurt, and cannot beat the chain of forced orderings. At every step at least one ready move can run, so no step is wasted; but moves that depend on each other must follow one another whatever the number of arms.
+- with k = 1 arm: makespan = sequential length: one arm does one action per step. A sanity check: with one arm the schedule collapses to the original plan.
+
+Plans are not only about getting to the goal: in practice time matters. Splitting the work over several arms shows which parts of a plan are really independent. It also shows why some plans cannot be sped up: the Sussman anomaly is one chain of dependent moves, so extra arms do not help.
+
+Complete: yes (always produces a valid schedule). Optimal: no (greedy list scheduling). Time: O(m²). Space: O(m).
+
+- Trap: Shared blocks are what link moves: moving C and moving B look separate, but if B must land on C, the second move waits for the first.
+- Trap: More arms do not always help. The longest chain of dependent moves is a lower bound on the makespan.
+- Trap: The plan itself is not changed, only when its actions run. A different plan (for example from goal-stack planning) can leave more room for parallel work than the shortest plan.
+- Trap: This simple scheduler starts moves in plan order. It always meets the sequential bound, but it is not guaranteed to find the shortest possible schedule.
 
 ## AO* (week 9, Problem decomposition)
 
@@ -2549,6 +2707,38 @@ Complete: no (filtering only). Optimal: n/a. Time: O(e·d³) for AC-3 (AC-1: O(n
 - Trap: Arc consistency does not guarantee a solution exists, nor that it finds one. Three outcomes to compare: 'Ordering chain' is solved by AC-3 alone (every domain becomes one value); 'Variable ordering' is pruned (D = 1, E = 2) but A, B, C stay ambiguous so search is needed; on the Australia map nothing is deleted at all. The 'Two colours on a triangle' example passes arc consistency yet has no solution: only path consistency sees it.
 - Trap: AC-1 and AC-3 delete exactly the same values; AC-3 only does less work (fewer revisions), which you can see in the revisions counter by switching the algorithm.
 
+## Matching diagram and arc consistency (week 11, Constraint processing)
+
+URL: https://1mystic.github.io/SearchStudio/learn/csp-matching-diagram.html
+
+A constraint is a relation: the set of value pairs it allows. The matching diagram draws that relation as lines between two columns of dots, so that 'this value has a supporting value in the neighbour' becomes 'this dot has at least one line going to the neighbouring column'. Arc consistency is then just: remove dots with no line, and keep going while that orphans more dots. **Supplementary:** the matching-diagram drawing is a teaching picture of the course's arc consistency, not a separate algorithm.
+
+Definition: For a binary CSP, a matching diagram has one column per variable, one dot per value in its domain, and a line between (X = a) and (Y = b) exactly when the constraint between X and Y allows the pair (a, b). Revise(X, Y) deletes every dot of column X that has no line to a live dot of column Y. Repeating Revise over all arcs (AC-3) until nothing changes gives arc consistency.
+
+Pseudocode:
+
+```
+for each variable X: draw a column with one dot per value in D(X)
+for each constraint C(X, Y): join (X = a) and (Y = b) by a line when (a, b) is allowed
+AC-3 on the diagram:
+    Q ← every arc (X, Y)
+    while Q not empty
+        (X, Y) ← pop(Q)
+        for each dot (X = a) with no line to any live dot of column Y: delete it
+        if something was deleted: add every arc (Z, X), Z ≠ Y, to Q
+```
+
+- a ∈ D(X) survives Revise(X, Y)  ⇔  ∃ b ∈ D(Y): (a, b) ∈ R(X, Y): a dot survives if it has a line to some live dot in the neighbouring column. In any solution with X = a the variable Y takes some value b of its domain, and the pair must be allowed; with no such b the value a can never be part of a solution.
+- lines(X, Y) = { (a, b) : (a, b) allowed by C(X, Y) }: the relation drawn as lines. Lines make the relation visible: a constraint like X < Y over {1,2,3} has 3 lines, and the dots 3 (in X) and 1 (in Y) have none.
+
+The picture explains why arc consistency solves the ordering chain (dots peel away like dominoes) and does nothing on map colouring (every dot keeps a line to every neighbouring column).
+
+Complete: no (filtering only). Optimal: n/a. Time: O(e·d³). Space: O(n·d + lines).
+
+- Trap: A dot needs a line to at least one live dot of the neighbouring column, not to all of them.
+- Trap: Lines to a deleted dot no longer count; that is why deletions cascade.
+- Trap: Arc consistency can leave several dots in every column and still have no solution (compare Path consistency on the two-colour triangle).
+
 ## Path consistency (PC, i-consistency) (week 11, Constraint processing)
 
 URL: https://1mystic.github.io/SearchStudio/learn/csp-path-consistency.html
@@ -2612,6 +2802,36 @@ Complete: filtering only. Optimal: n/a. Time: linear for planar drawings. Space:
 - Trap: Arrow labels are relative to direction: 'out' at one end is 'in' at the other.
 - Trap: Arc consistency can leave several labellings; a search step picks among them. Compare the two cube examples: with the background constraint every junction ends with one labelling; without it junction O keeps one but P to U keep 2 or 3 each (several 3-D readings of the same drawing survive).
 - Trap: Waltz filtering is only as good as the catalogue: it assumes trihedral vertices in general position, so drawings of other objects can be labelled wrongly or not at all.
+
+## Strong k-consistency check (k ≤ 3) (week 11, Constraint processing)
+
+URL: https://1mystic.github.io/SearchStudio/learn/csp-k-consistency.html
+
+Node, arc and path consistency are the first three members of one family. A network is i-consistent when every consistent assignment to any i − 1 variables can be extended to any i-th variable. It is strongly k-consistent when it is i-consistent for every i ≤ k. This page checks the definition literally and shows each assignment that fails to extend. **Supplementary:** the course introduces 2- and 3-consistency; the general definition and the idea of strong k-consistency (Freuder) go slightly beyond it.
+
+Definition: Level i = 1: every variable has a non-empty domain (there are no unary constraints in this problem type). Level i = 2: every value of every variable has a supporting value in every other variable (arc consistency). Level i = 3: every consistent pair (X = a, Y = b) can be extended to every third variable Z (path consistency). A failing assignment A with variable V means that no value of V is compatible with A: for i = 2 it implies deleting the value, for i = 3 it implies the nogood {X = a, Y = b}, i.e. the pair is forbidden, which acts as a new constraint between X and Y.
+
+Pseudocode:
+
+```
+for j = 1 .. k
+    for each set S of j − 1 variables and each consistent assignment A to S
+        for each variable V not in S
+            if no value v in D(V) makes A ∪ {V = v} consistent: report (A, V) as a failure
+    if there is no failure: the network is j-consistent
+strongly k-consistent  ⇔  j-consistent for every j ≤ k
+```
+
+- i-consistent ⇔ ∀ S, |S| = i − 1, ∀ consistent A on S, ∀ V ∉ S, ∃ v ∈ D(V): A ∪ {V = v} consistent: every consistent partial solution of size i − 1 can grow by one more variable. A solution restricted to any i − 1 variables is a consistent assignment, and it extends to every other variable; an assignment that cannot extend is therefore in no solution and can be forbidden without losing solutions.
+- strongly k-consistent ⇔ j-consistent for all j ≤ k: all the lower levels hold too. Strong k-consistency on a network of k variables lets a solution be built without backtracking (Freuder); mere k-consistency without the lower levels guarantees nothing.
+
+The two-colour triangle is 2-consistent (arc consistency finds nothing) but not 3-consistent: the pair (X = a, Y = b) cannot be extended to Z, which is exactly how path consistency proves there is no solution. The ordering chain X < Y < Z is not even 2-consistent until arc consistency has reduced it; afterwards it is strongly 3-consistent.
+
+Complete: no (a test, not a solver). Optimal: n/a. Time: O(n^k · d^k). Space: O(n).
+
+- Trap: Strong k-consistency needs every level up to k; a network can be 3-consistent and not 2-consistent.
+- Trap: Only consistent assignments count: a pair that already violates a constraint is not a failure.
+- Trap: k-consistency for small k does not make search backtrack-free unless k reaches the width-related bound; it only removes some dead ends.
 
 ## Model-based diagnosis (week 11, Constraint processing)
 

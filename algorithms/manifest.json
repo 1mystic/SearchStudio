@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-17T10:28:21.176Z",
+ "generated": "2026-11-17T10:51:24.519Z",
  "algorithms": [
   {
    "id": "csp-backtracking",
@@ -26,6 +26,14 @@
    "summary": "Delete every value that has no supporting value in a neighbouring variable. Revise(X, Y) removes unsupported values of X with respect to Y. AC-1 sweeps all arcs until nothing changes; AC-3 keeps a queue and re-examines only the arcs into a variable whose domain shrank."
   },
   {
+   "id": "csp-matching-diagram",
+   "name": "Matching diagram and arc consistency",
+   "family": "Constraint processing",
+   "problem": "csp",
+   "file": "algorithms/csp/matching-diagram.js",
+   "summary": "Draw each variable's domain as a column of dots and join two dots by a line when the pair is allowed by a binary constraint. Then run arc consistency on the picture: a dot with no line towards a neighbouring column has no support and is deleted, which may orphan dots in other columns."
+  },
+  {
    "id": "csp-path-consistency",
    "name": "Path consistency (PC, i-consistency)",
    "family": "Constraint processing",
@@ -40,6 +48,14 @@
    "problem": "linedrawing",
    "file": "algorithms/csp/waltz.js",
    "summary": "Interpret a line drawing of a polyhedral scene. Each junction starts with every labelling its type allows (L, fork, arrow, T); a labelling survives only if each of its lines can get the same label from the junction at the other end. Propagate with an AC-3 style queue."
+  },
+  {
+   "id": "csp-k-consistency",
+   "name": "Strong k-consistency check (k ≤ 3)",
+   "family": "Constraint processing",
+   "problem": "csp",
+   "file": "algorithms/csp/k-consistency.js",
+   "summary": "Test i-consistency directly from the definition for i = 1, 2, 3: every consistent assignment to i − 1 variables must extend to any i-th variable. Each failing assignment is shown with what it implies: a value to delete (i = 2, arc consistency) or a forbidden pair, an induced nogood (i = 3, path consistency)."
   },
   {
    "id": "csp-diagnosis",
@@ -90,6 +106,14 @@
    "summary": "Backtracking that learns. When a variable runs out of values, the assignments in its conflict set cannot be extended to a solution: store them as a nogood. Before trying any later value, check whether the assignment would contain a stored nogood and, if so, reject it without searching."
   },
   {
+   "id": "life-stepper",
+   "name": "Game of Life: generation stepper",
+   "family": "Emergent systems",
+   "problem": "life",
+   "file": "algorithms/emergent/life-stepper.js",
+   "summary": "Every cell looks only at its eight neighbours: a dead cell with exactly 3 live neighbours is born, a live cell with 2 or 3 survives, every other live cell dies. Watch order and motion emerge from that one local rule."
+  },
+  {
    "id": "game-minimax",
    "name": "Minimax",
    "family": "Game playing",
@@ -114,12 +138,28 @@
    "summary": "A best-first algorithm for game trees. OPEN holds triples (node, LIVE or SOLVED, merit h). It refines the most promising strategy first and never evaluates a leaf that Alpha-Beta would prune; it can skip leaves Alpha-Beta evaluates."
   },
   {
+   "id": "ttt-kply",
+   "name": "k-ply tic-tac-toe (static evaluator, horizon effect)",
+   "family": "Game playing",
+   "problem": "tictactoe",
+   "file": "algorithms/games/ttt-kply.js",
+   "summary": "Look only k plies ahead, score the frontier with e(n) = (lines still open for X) − (lines still open for O), and back the values up with minimax. Then compare with a full-depth search to see what lies beyond the horizon."
+  },
+  {
    "id": "game-expectiminimax",
    "name": "Expectiminimax (supplementary)",
    "family": "Game playing",
    "problem": "game",
    "file": "algorithms/games/expectiminimax.js",
    "summary": "Supplementary (Russell & Norvig, games of chance). Minimax for games with dice or cards: MAX takes the largest child, MIN the smallest, and a chance node takes the expected value, the sum of probability × child value. With no chance nodes it is exactly Minimax."
+  },
+  {
+   "id": "game-nash",
+   "name": "Dominant strategies and Nash equilibria (supplementary)",
+   "family": "Game playing",
+   "problem": "matrixgame",
+   "file": "algorithms/games/game-nash.js",
+   "summary": "Supplementary. Remove strictly dominated strategies one at a time, then mark each player's best responses: a cell where both are best responses is a pure Nash equilibrium. Flags equilibria that both players would swap for something better."
   },
   {
    "id": "search-best-first",
@@ -256,6 +296,14 @@
    "problem": "graph",
    "file": "algorithms/search/bfhs.js",
    "summary": "BFHS keeps only boundary layers, so it cannot read the path back. DC-BFHS remembers a relay node from the middle layer of the best path, then solves start→relay and relay→goal as two smaller BFHS problems, recursively. No parent pointers are stored at all."
+  },
+  {
+   "id": "search-dc-beam",
+   "name": "Divide and Conquer Beam Search",
+   "family": "Graph search · space saving",
+   "problem": "graph",
+   "file": "algorithms/search/dc-beam.js",
+   "summary": "Beam search keeps only the w best nodes of each layer and only the latest layers, so it cannot read its path back. Divide and Conquer Beam Search remembers a relay node from the middle layer of the best path found, then solves start→relay and relay→goal as two smaller beam searches, recursively. Memory is O(w), with no parent pointers."
   },
   {
    "id": "search-beam-stack",
@@ -416,6 +464,14 @@
    "problem": "planning",
    "file": "algorithms/planning/means-ends-analysis.js",
    "summary": "Compare the current state with the goal, pick the most important difference, look up an operator that removes it in the difference table, and recursively make that operator's preconditions true first. No protection of earlier achievements, so interacting goals (Sussman) defeat it."
+  },
+  {
+   "id": "plan-multi-arm",
+   "name": "Multi-arm plan scheduling (makespan)",
+   "family": "Planning",
+   "problem": "planning",
+   "file": "algorithms/planning/multi-arm.js",
+   "summary": "Take a sequential plan from forward, backward or goal-stack planning and run it on k arms at once. Two moves may overlap only if they touch different blocks; moves that share a block keep their order. The number of time steps is the makespan."
   },
   {
    "id": "andor-ao-star",
@@ -842,6 +898,31 @@
    "type": "game"
   },
   {
+   "id": "gametheory-battle",
+   "name": "Battle of the Sexes (coordination)",
+   "type": "matrixgame"
+  },
+  {
+   "id": "gametheory-iterated",
+   "name": "Iterated elimination (3 x 3)",
+   "type": "matrixgame"
+  },
+  {
+   "id": "gametheory-pennies",
+   "name": "Matching Pennies (no pure equilibrium)",
+   "type": "matrixgame"
+  },
+  {
+   "id": "gametheory-prisoners",
+   "name": "Prisoner's Dilemma",
+   "type": "matrixgame"
+  },
+  {
+   "id": "graph-dc-beam-narrow",
+   "name": "Narrow beam loses the cheap route (DC beam search)",
+   "type": "graph"
+  },
+  {
    "id": "graph-dfid-closed",
    "name": "Y is reached twice: by a long route first, by a short route later",
    "type": "graph"
@@ -907,6 +988,21 @@
    "type": "graph"
   },
   {
+   "id": "life-blinker",
+   "name": "Blinker (period 2)",
+   "type": "life"
+  },
+  {
+   "id": "life-block",
+   "name": "Block (still life)",
+   "type": "life"
+  },
+  {
+   "id": "life-glider",
+   "name": "Glider (moves diagonally)",
+   "type": "life"
+  },
+  {
    "id": "plan-graphplan-nogoods",
    "name": "Graphplan nogoods: four blocks on the table, build a tower",
    "type": "planning"
@@ -929,6 +1025,11 @@
   {
    "id": "plan-hill-terrain",
    "name": "Blocks-world hill climbing: h1 vs h2",
+   "type": "planning"
+  },
+  {
+   "id": "plan-parallel-towers",
+   "name": "Two independent towers to turn over",
    "type": "planning"
   },
   {
@@ -1052,6 +1153,16 @@
    "type": "tsp"
   },
   {
+   "id": "ttt-empty",
+   "name": "Empty board: evaluator check",
+   "type": "tictactoe"
+  },
+  {
+   "id": "ttt-horizon",
+   "name": "Horizon effect: X to move",
+   "type": "tictactoe"
+  },
+  {
    "id": "waltz-cube-free",
    "name": "Cube, boundary not fixed",
    "type": "linedrawing"
@@ -1092,8 +1203,16 @@
    "label": "game tree"
   },
   {
+   "type": "life",
+   "label": "Life pattern"
+  },
+  {
    "type": "linedrawing",
    "label": "line drawing"
+  },
+  {
+   "type": "matrixgame",
+   "label": "matrix game"
   },
   {
    "type": "planning",
@@ -1110,6 +1229,10 @@
   {
    "type": "statespace",
    "label": "state-space problem"
+  },
+  {
+   "type": "tictactoe",
+   "label": "tic-tac-toe position"
   }
  ]
 }
