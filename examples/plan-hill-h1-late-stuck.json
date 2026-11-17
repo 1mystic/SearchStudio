@@ -1,0 +1,28 @@
+{
+ "id": "plan-hill-h1-late-stuck",
+ "type": "planning",
+ "name": "Hill climbing: h1 climbs, then gets stuck (four blocks)",
+ "note": "D is on B, A is on C. Goal: the tower A, B, C, D. h1 climbs for 3 moves (-4, -2, 0, 2) and then no move improves it: D sits on C, which is the right thing for D, but C is still on the table under it. h2 sees the wrong structure, clears D first and reaches the goal in 5 moves.",
+ "blocks": [
+  "A",
+  "B",
+  "C",
+  "D"
+ ],
+ "init": [
+  [
+   "B",
+   "D"
+  ],
+  [
+   "C",
+   "A"
+  ]
+ ],
+ "goal": [
+  "ontable(A)",
+  "on(B,A)",
+  "on(C,B)",
+  "on(D,C)"
+ ]
+}

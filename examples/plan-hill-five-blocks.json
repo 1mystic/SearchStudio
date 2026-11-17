@@ -1,0 +1,31 @@
+{
+ "id": "plan-hill-five-blocks",
+ "type": "planning",
+ "name": "Hill climbing: five blocks, h1 stuck after 4 moves, h2 solves in 7",
+ "note": "E is on B, D is on E, A is on C. Goal: the tower A, B, C, D, E. h1 climbs for 4 moves (-5 to 3) and stops at a local maximum with D and E stacked on C. h2 dismantles the wrong structures first and reaches the goal in 7 moves.",
+ "blocks": [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E"
+ ],
+ "init": [
+  [
+   "B",
+   "E",
+   "D"
+  ],
+  [
+   "C",
+   "A"
+  ]
+ ],
+ "goal": [
+  "ontable(A)",
+  "on(B,A)",
+  "on(C,B)",
+  "on(D,C)",
+  "on(E,D)"
+ ]
+}

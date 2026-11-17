@@ -1,0 +1,29 @@
+{
+ "id": "plan-hill-reverse-tower",
+ "type": "planning",
+ "name": "Hill climbing: reversed five-block tower (full climb)",
+ "note": "The tower is upside down: E at the bottom, A on top. Goal: A on the table, then B, C, D, E. Both h1 and h2 climb all the way, one block per move: h1 goes -5, -3, -1, 1, 3, 5 and reaches the goal in 5 moves.",
+ "blocks": [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E"
+ ],
+ "init": [
+  [
+   "E",
+   "D",
+   "C",
+   "B",
+   "A"
+  ]
+ ],
+ "goal": [
+  "ontable(A)",
+  "on(B,A)",
+  "on(C,B)",
+  "on(D,C)",
+  "on(E,D)"
+ ]
+}

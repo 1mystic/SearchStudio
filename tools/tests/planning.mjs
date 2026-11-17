@@ -33,6 +33,18 @@ export default ({ Studio, ok, eq, ex, run, checkRun }) => {
   eq(h2.trace, [-2, -1, 2, 6], "h2 values along the climb");
   eq(h2.moves, ["move(C,table)", "move(B,A)", "move(C,B)"], "h2 moves");
 
+  // Hill climbing: full runs (both climb to the goal) and late local maxima for h1
+  const HC = (id, h) => run("plan-hill-climbing", ex(id), { heuristic: h });
+  for (const h of ["h1", "h2"]) { const r = HC("plan-hill-reverse-tower", h); eq([r.reached, r.moves.length], [true, 5], `${h} climbs the reversed tower in 5 moves`); }
+  eq(HC("plan-hill-reverse-tower", "h1").trace, [-5, -3, -1, 1, 3, 5], "h1 values on the reversed tower");
+  eq(HC("plan-hill-reverse-tower", "h2").trace, [-15, -9, -3, 3, 9, 15], "h2 values on the reversed tower");
+  const l1 = HC("plan-hill-h1-late-stuck", "h1"), l2 = HC("plan-hill-h1-late-stuck", "h2");
+  eq([l1.reached, l1.moves.length, l1.trace], [false, 3, [-4, -2, 0, 2]], "h1 climbs 3 moves then sticks at +2");
+  eq([l2.reached, l2.moves.length], [true, 5], "h2 solves the four-block case in 5 moves");
+  const f1 = HC("plan-hill-five-blocks", "h1"), f2 = HC("plan-hill-five-blocks", "h2");
+  eq([f1.reached, f1.moves.length, f1.finalH], [false, 4, 3], "h1 sticks at +3 after 4 moves (five blocks)");
+  eq([f2.reached, f2.moves.length, f2.trace], [true, 7, [-9, -6, -4, -3, 0, 4, 9, 15]], "h2 solves five blocks in 7 moves");
+
   // Means-ends analysis: works on towers, fails honestly on the Sussman anomaly
   for (const id of ["plan-reverse", "plan-hill-terrain"]) { const m = run("plan-mea", ex(id)); ok(!!m.plan && executes(id, m.plan), `MEA plan for ${id} executes and reaches the goal`); }
   const ms = run("plan-mea", ex("plan-sussman"));
