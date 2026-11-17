@@ -1,0 +1,9 @@
+{
+ "id": "sat-unsat",
+ "type": "sat",
+ "name": "Unsatisfiable formula (all four clauses on a, b)",
+ "note": "(a ∨ b)(a ∨ ¬b)(¬a ∨ b)(¬a ∨ ¬b) rules out all four assignments of a and b, so no assignment satisfies all five clauses (the best has h = 4). DPLL backtracks out of every branch and reports UNSAT; hill climbing cannot tell this from a local maximum.",
+ "vars": ["a", "b", "c"],
+ "clauses": [["a", "b"], ["a", "-b"], ["-a", "b"], ["-a", "-b"], ["b", "c"]],
+ "start": "000"
+}
