@@ -5,6 +5,7 @@ Studio.register({
   family: "Game playing",
   week: 7,
   problem: "game",
+  check: P => (P.hasChance ? "This algorithm is limited to trees without chance nodes (MAX/MIN only): with chance nodes its answer would be wrong. Use Expectiminimax." : ""),
   order: 30,
   summary: "A best-first algorithm for game trees. OPEN holds triples (node, LIVE or SOLVED, merit h). It refines the most promising strategy first and never evaluates a leaf that Alpha-Beta would prune; it can skip leaves Alpha-Beta evaluates.",
   pseudocode: `OPEN ← [(root, LIVE, +∞)]

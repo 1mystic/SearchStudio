@@ -1,0 +1,11 @@
+{
+ "id": "game-chance",
+ "type": "game",
+ "name": "Dice game with chance nodes (supplementary)",
+ "note": "Supplementary (Russell & Norvig): MAX picks a move, a die is rolled (chance node), then MIN replies. Expectiminimax value 3.5; plain Minimax, alpha-beta and SSS* decline this tree.",
+ "root": "MAX",
+ "tree": [
+  { "chance": [[0.5, [2, 8]], [0.5, [4, 6]]] },
+  { "chance": [[0.7, [5, 9]], [0.3, [0, 10]]] }
+ ]
+}
