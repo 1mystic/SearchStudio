@@ -1,0 +1,10 @@
+{
+ "id": "space-missionaries",
+ "type": "statespace",
+ "domain": "missionaries",
+ "name": "Missionaries and cannibals (3, 3, boat of 2)",
+ "note": "Ferry everyone across; cannibals may never outnumber missionaries on a bank that has any. The shortest plan has 11 crossings.",
+ "missionaries": 3,
+ "cannibals": 3,
+ "boat": 2
+}

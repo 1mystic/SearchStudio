@@ -1,0 +1,9 @@
+{
+ "id": "space-8-puzzle",
+ "type": "statespace",
+ "domain": "8-puzzle",
+ "name": "8-puzzle, five moves from the goal",
+ "note": "Start 2 8 3 / 1 6 4 / 7 _ 5, goal 1 2 3 / 8 _ 4 / 7 6 5. The shortest solution is 5 moves; compare tiles out of place with Manhattan distance.",
+ "start": "283164705",
+ "goal": "123804765"
+}

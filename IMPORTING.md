@@ -7,7 +7,7 @@ This guide covers how to bring your own problem into the studio, and the exact J
 1. [Three ways to bring a problem in](#three-ways-to-bring-a-problem-in)
 2. [Fields every problem shares](#fields-every-problem-shares)
 3. [Which problem type each algorithm uses](#which-problem-type-each-algorithm-uses)
-4. Schemas: [TSP](#1-tsp--type-tsp) · [Graph](#2-state-space-graph--type-graph) · [Game tree](#3-game-tree--type-game) · [AND–OR graph](#4-andor-graph--type-andor) · [Planning](#5-blocks-world-planning--type-planning) · [Rule base](#6-rule-base--type-rules) · [CSP](#7-constraint-problem--type-csp) · [Line drawing](#8-line-drawing--type-linedrawing) · [Circuit](#9-circuit-diagnosis--type-circuit) · [Alignment](#10-sequence-alignment--type-alignment) · [SAT](#11-propositional-satisfiability--type-sat)
+4. Schemas: [TSP](#1-tsp--type-tsp) · [Graph](#2-state-space-graph--type-graph) · [Game tree](#3-game-tree--type-game) · [AND–OR graph](#4-andor-graph--type-andor) · [Planning](#5-blocks-world-planning--type-planning) · [Rule base](#6-rule-base--type-rules) · [CSP](#7-constraint-problem--type-csp) · [Line drawing](#8-line-drawing--type-linedrawing) · [Circuit](#9-circuit-diagnosis--type-circuit) · [Alignment](#10-sequence-alignment--type-alignment) · [SAT](#11-propositional-satisfiability--type-sat) · [State space](#12-implicit-state-space--type-statespace)
 5. [Adding a problem to the built-in examples](#adding-a-problem-to-the-built-in-examples)
 6. [Common errors](#common-errors)
 
@@ -33,7 +33,7 @@ When you import a problem whose type doesn't fit the current algorithm, the stud
 
 ```jsonc
 {
-  "type": "tsp",            // REQUIRED. One of: tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment, sat
+  "type": "tsp",            // REQUIRED. One of: tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment, sat, statespace
   "name": "My problem",     // optional: shown in the picker (default "Imported problem")
   "note": "One line.",      // optional: shown under the name
   "id": "my-problem"        // ignored on import (a new id is given); REQUIRED only for files in examples/
@@ -61,6 +61,7 @@ When you import a problem whose type doesn't fit the current algorithm, the stud
 | `circuit` | Model-based diagnosis |
 | `alignment` | Sequence alignment (DP), Sequence alignment (A*) |
 | `sat` | Brute force (truth table, ≤ 6 variables), Hill climbing (N1), Beam search, Variable Neighbourhood Descent, Best neighbour (fixed moves), Tabu search |
+| `statespace` | BFS, DFS, Simple search (no node pairs), Best First, A* — on water jugs, 8-puzzle and missionaries & cannibals |
 
 Settings such as the start city, tie-break rule, temperature or seed are **not** part of the problem. You set them in the studio's Settings card after importing.
 
@@ -633,6 +634,66 @@ start: 0000
 ```
 
 **Random 3-SAT:** the Random panel builds instances with a chosen number of variables, number of clauses and a seed. Each clause has three different variables, each negated with probability one half; the same seed gives the same instance. About 4.3 clauses per variable is the hard region.
+
+---
+
+## 12. Implicit state space — `"type": "statespace"`
+
+**Used by:** BFS, DFS, Simple search (no node pairs) on a state space (Week 2); Best First (Week 3); A* (Week 5).
+
+Here the graph is **not listed**. The problem is a start state, a goal test and a MoveGen (the rule that produces the legal moves of a state), and the studio ships these in code for three domains. You choose the domain and give its numbers. When a search runs, each step draws the part of the graph explored so far (nodes numbered in the order they were generated, state written under the current node), a picture of the current state (jug levels, board, bank counts), and OPEN and CLOSED as node pairs `(state, parent, depth)` or `(state, parent, g, f)`.
+
+How the finite picture is made: the graph can be huge (the 8-puzzle has 181 440 reachable states), so the studio enumerates reachable states breadth-first only up to a cap (`cap`, default 40) for the preview and for the problem's node list. The algorithms are not limited by that cap; they generate states lazily and stop at the *Expansion cap* setting (default 400).
+
+| Field | Required | Meaning |
+|---|:--:|---|
+| `domain` | ✔ | `"water-jug"`, `"8-puzzle"` or `"missionaries"` |
+| `cap` | | Preview size: how many reachable states to enumerate (default 40) |
+
+**`water-jug`** — pour between jugs until one empties or the other fills; every pouring costs 1.
+
+| Field | Required | Meaning |
+|---|:--:|---|
+| `capacities` | ✔ | 2 to 6 whole numbers, e.g. `[8, 5, 3]` (jugs are named A, B, C…) |
+| `start` | ✔ | levels, one per jug, e.g. `[8, 0, 0]` |
+| `goal` | ✔ | `{ "contains": 4 }` (some jug holds 4) or `{ "state": [4, 4, 0] }` (exact levels) |
+
+```json
+{ "type": "statespace", "domain": "water-jug", "name": "Water jugs 8-5-3",
+  "capacities": [8, 5, 3], "start": [8, 0, 0], "goal": { "state": [4, 4, 0] } }
+```
+
+From (8,0,0) there are 16 reachable states; 4+4 needs 7 pourings, "some jug holds 4" needs 6.
+
+**`8-puzzle`** — slide a tile into the blank; every move costs 1.
+
+| Field | Required | Meaning |
+|---|:--:|---|
+| `start` | ✔ | 9 characters, row by row, tiles 1–8 and the blank written `0` or `_` (spaces and `/` are ignored), e.g. `"283164705"` or `"283/164/7_5"` |
+| `goal` | | same format; default `"123456780"` |
+
+```json
+{ "type": "statespace", "domain": "8-puzzle", "name": "Five moves from the goal",
+  "start": "283164705", "goal": "123804765" }
+```
+
+A start from which the goal can never be reached (odd/even parity of inversions differs) is rejected on import. Best First and A* take a heuristic setting: Manhattan distance, tiles out of place, or none (the blank is never counted). Moves are generated in the order blank up, down, left, right.
+
+**`missionaries`** — ferry everyone from the left bank to the right; on a bank with any missionaries, cannibals may not outnumber them.
+
+| Field | Required | Meaning |
+|---|:--:|---|
+| `missionaries` | | default 3 |
+| `cannibals` | | default 3 (not more than missionaries) |
+| `boat` | | how many the boat carries, default 2 (it needs at least one rower) |
+
+```json
+{ "type": "statespace", "domain": "missionaries", "name": "3 and 3", "missionaries": 3, "cannibals": 3, "boat": 2 }
+```
+
+The shortest plan for 3 + 3 with a boat of 2 is 11 crossings. For missionaries the A* heuristic is the full-boat crossing bound (a **supplementary** heuristic, admissible); jugs have no heuristic, so A* behaves like BFS there.
+
+**Random problems:** the studio's problem generator makes a seeded 8-puzzle scrambled by a chosen number of random moves from the goal.
 
 ---
 

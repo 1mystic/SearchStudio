@@ -1,0 +1,10 @@
+{
+ "id": "space-water-jug",
+ "type": "statespace",
+ "domain": "water-jug",
+ "name": "Water jugs 8-5-3: split the 8 litres into 4 + 4",
+ "note": "Jug A starts full (8 L). Pour between jugs until A and B hold 4 L each. 16 states are reachable; the shortest solution is 7 pourings. (With goal {\"contains\": 4}, any jug will do and 6 pourings suffice.)",
+ "capacities": [8, 5, 3],
+ "start": [8, 0, 0],
+ "goal": { "state": [4, 4, 0] }
+}
