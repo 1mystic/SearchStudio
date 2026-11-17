@@ -27,11 +27,23 @@
       const X = id => PAD + pos[id].x * (W - 2 * PAD), Y = id => PAD * 0.8 + pos[id].y * (H - 1.6 * PAD);
       const rN = sc.r || (sc.nodes.length > 30 ? 11 : sc.nodes.length > 14 ? 14 : 19);
       const nodes = step.nodes || {};
+      // node geometry: boxes grow to fit their label (13px label font ≈ 7.4 px per character, 10 px padding each side)
+      const half = {};
+      for (const sn of sc.nodes) {
+        const n = nodes[sn.id] || {}, shape = n.shape || sn.shape || "circle", r = sn.r || rN, label = String(n.label ?? sn.label ?? sn.id);
+        if (shape === "box" || shape === "leaf") {
+          const long = label.length > 2, cw = long ? 7.4 : 10.2;
+          const w = Math.max((sn.w || (shape === "leaf" ? 1.5 : 2.4)) * r, label.length * cw + 20), h = shape === "leaf" ? 1.5 * r : 1.7 * r;
+          half[sn.id] = { box: true, hw: w / 2, hh: h / 2 };
+        } else if (shape === "point") half[sn.id] = { hw: 2, hh: 2 };
+        else half[sn.id] = { hw: r * 1.1, hh: r * 1.15, r };
+      }
+      const edgeGap = (id, ux, uy) => { const g = half[id] || { r: rN }; if (!g.box) return g.r ?? Math.max(g.hw, g.hh);
+        return Math.min(Math.abs(ux) > 1e-6 ? g.hw / Math.abs(ux) : Infinity, Math.abs(uy) > 1e-6 ? g.hh / Math.abs(uy) : Infinity) + 1; };
       const key = (u, v) => (u < v ? u + "|" + v : v + "|" + u);
       const stepEdges = step.edges || [];
       const drawn = new Set(stepEdges.filter(e => e.state !== "faint").map(e => key(e.u, e.v)));
-      const out = [`<svg class="g" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "drawing")}" xmlns="http://www.w3.org/2000/svg">`,
-        `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>`];
+      const out = [null, `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah"/></marker></defs>`];
       // underlay: scene edges not overridden by the step
       const base = sc.edges.filter(e => !drawn.has(key(e.u, e.v))).map(e => Object.assign({ state: "faint" }, e, { state: e.state || "faint" }));
       const all = base.concat(stepEdges);
@@ -42,7 +54,7 @@
         if (!pos[e.u] || !pos[e.v]) continue;
         const x1 = X(e.u), y1 = Y(e.u), x2 = X(e.v), y2 = Y(e.v);
         const L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L;
-        const ru = pos[e.u].shape === "point" ? 2 : rN, rv = pos[e.v].shape === "point" ? 2 : rN;
+        const ru = edgeGap(e.u, ux, uy), rv = edgeGap(e.v, ux, uy);
         const sx = x1 + ux * ru, sy = y1 + uy * ru, tx = x2 - ux * (rv + (e.directed ? 3 : 0)), ty = y2 - uy * (rv + (e.directed ? 3 : 0));
         const style = e.state === "pheromone" ? ` style="stroke-width:${(1 + 8 * (e.weight ?? 0.5)).toFixed(1)};opacity:${(0.25 + 0.7 * (e.weight ?? 0.5)).toFixed(2)}"` : "";
         out.push(`<line class="e ${esc(e.state || "tour")}${e.quiet ? " quiet" : ""}" x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${tx.toFixed(1)}" y2="${ty.toFixed(1)}"${e.directed ? ' marker-end="url(#ah)"' : ""}${style}/>`);
@@ -72,7 +84,7 @@
         if (st === "goal" || st === "goalcand") out.push(`<circle class="ring2 ${st}" cx="${x}" cy="${y}" r="${r + 5}"/>`);
         if (shape === "max") out.push(`<polygon class="n ${esc(st)}" points="${x},${y - r * 1.15} ${x + r * 1.1},${y + r * 0.75} ${x - r * 1.1},${y + r * 0.75}"/>`);
         else if (shape === "min") out.push(`<polygon class="n ${esc(st)}" points="${x - r * 1.1},${y - r * 0.75} ${x + r * 1.1},${y - r * 0.75} ${x},${y + r * 1.15}"/>`);
-        else if (shape === "box" || shape === "leaf") { const w = (sn.w || (shape === "leaf" ? 1.5 : 2.4)) * r, h = shape === "leaf" ? 1.5 * r : 1.7 * r; out.push(`<rect class="n ${esc(st)}" x="${x - w / 2}" y="${y - h / 2}" width="${w}" height="${h}" rx="4"/>`); }
+        else if (shape === "box" || shape === "leaf") { const w = half[id].hw * 2, h = half[id].hh * 2; out.push(`<rect class="n ${esc(st)}" x="${x - w / 2}" y="${y - h / 2}" width="${w}" height="${h}" rx="4"/>`); }
         else if (shape === "point") out.push(`<circle class="pt ${esc(st)}" cx="${x}" cy="${y}" r="4"/>`);
         else out.push(`<circle class="n ${esc(st)}" cx="${x}" cy="${y}" r="${r}"/>`);
         const label = n.label ?? sn.label ?? id;
@@ -83,6 +95,16 @@
         if (sub !== undefined && sub !== null && sub !== "") out.push(`<text class="hlab sub ${esc(st)}" x="${x}" y="${y + r + 15}" text-anchor="middle">${esc(sub)}</text>`);
       }
       if (P.type === "graph" && P.h && opts.showH && !step.scene) for (const id of P.ids) out.push(`<text class="hlab" x="${X(id)}" y="${Y(id) + rN + 15}" text-anchor="middle">h=${esc(P.h[id])}</text>`);
+      // fit the view box to what was drawn (node extents, sub-labels, h labels) so nothing is clipped and empty margins are trimmed
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const sn of sc.nodes) { const g = half[sn.id], x = X(sn.id), y = Y(sn.id), sub = (nodes[sn.id] || {}).sub ?? sn.sub, below = (sub !== undefined && sub !== null && sub !== "") || (P.type === "graph" && P.h && opts.showH && !step.scene) ? 22 : 0;
+        x0 = Math.min(x0, x - g.hw - 8); x1 = Math.max(x1, x + g.hw + 8); y0 = Math.min(y0, y - g.hh - 10); y1 = Math.max(y1, y + g.hh + 10 + below); }
+      if (!isFinite(x0)) { x0 = 0; y0 = 0; x1 = W; y1 = H; }
+      const m = 14; x0 -= m; y0 -= m; x1 += m; y1 += m;
+      const minW = 420, minH = 240;   // small graphs are not blown up: keep a minimum canvas, content centred
+      if (x1 - x0 < minW) { const c = (x0 + x1) / 2; x0 = c - minW / 2; x1 = c + minW / 2; }
+      if (y1 - y0 < minH) { const c = (y0 + y1) / 2; y0 = c - minH / 2; y1 = c + minH / 2; }
+      out[0] = `<svg class="g" viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${(x1 - x0).toFixed(0)} ${(y1 - y0).toFixed(0)}" role="img" aria-label="${esc(opts.label || "drawing")}" xmlns="http://www.w3.org/2000/svg">`;
       out.push("</svg>");
       return out.join("");
     },

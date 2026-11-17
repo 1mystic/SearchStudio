@@ -494,8 +494,6 @@ svg.blocks .arm { fill: none; stroke: var(--muted); stroke-width: 3; }
   svg.g text.nl { font-size: 24px; } svg.g text.w { font-size: 18px; stroke-width: 5px; } svg.g text.badge { font-size: 17px; } svg.g text.hlab { font-size: 14px; }
 }
 
-.ex-list { margin: 8px 0 24px; padding-left: 20px; }
-.ex-list li { margin: 4px 0; }
 /* =====================================================================
    v2 / typography: one sans family for UI and prose; mono only for code, pseudocode, ids and numbers.
    Scale: 11-12 labels, 13 UI, 15 body/captions, 18-20 stage title, 28-44 page titles.
@@ -632,7 +630,7 @@ main:has(.page[data-page="studio"]:not([hidden])) { max-width: none; padding: 0;
 
 /* ---- desktop 1100-1599: rail + stage, trace panel under the stage */
 @media (min-width: 1100px) {
-  .studio { grid-template-columns: 290px minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; column-gap: 20px; row-gap: 12px; }
+  .studio { grid-template-columns: var(--rail-w, 290px) minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; column-gap: 20px; row-gap: 12px; }
   .controls { grid-column: 1; grid-row: 1 / span 5; display: flex; flex-direction: column; position: sticky; top: calc(var(--top-h) + 16px); max-height: calc(100dvh / var(--zoom) - var(--top-h) - 32px); overflow-y: auto; padding-right: 2px; align-self: start; }
   .stage-title { grid-column: 2; grid-row: 1; margin: 0; }
   .stage { grid-column: 2; grid-row: 2; }
@@ -646,7 +644,7 @@ main:has(.page[data-page="studio"]:not([hidden])) { max-width: none; padding: 0;
   body:has(.page[data-page="studio"]:not([hidden])) { overflow: hidden; }
   body:has(.page[data-page="studio"]:not([hidden])) .foot { display: none; }
   .page[data-page="studio"]:not([hidden]) { height: calc(100dvh / var(--zoom) - var(--top-h)); }
-  .studio { height: 100%; padding: 0; gap: 0; grid-template-columns: 300px minmax(0, 1fr) clamp(380px, 22vw, 440px); grid-template-rows: 100%; align-items: stretch; }
+  .studio { height: 100%; padding: 0; gap: 0; grid-template-columns: var(--rail-w, 300px) minmax(0, 1fr) var(--side-w, clamp(360px, 24%, 440px)); grid-template-rows: 100%; align-items: stretch; }
   .controls { grid-column: 1; grid-row: 1; position: static; max-height: none; height: 100%; padding: 14px 12px 20px 16px; border-right: 1px solid var(--rule); background: var(--bg); overflow-y: auto; }
   .stage-wrap { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 14px 20px 14px; gap: 12px; }
   .stage-title, .stage, .player { grid-column: auto; grid-row: auto; order: 0; }
@@ -705,3 +703,35 @@ select::-ms-expand { display: none; }
 .lib-tools .search { width: 340px; max-width: 100%; }
 .lib-fam::first-letter { text-transform: uppercase; }
 @media (max-width: 700px) { .lib-tools { align-items: stretch; } .lib-tools .search { width: 100%; } }
+
+/* card pills stay on one line; the full wording is in the tooltip */
+.tag.pill-1 { white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+
+/* ---------- resizable studio panels: drag the rail's right edge or the trace panel's left edge (double-click resets) */
+.studio .panel { position: relative; }
+@media (min-width: 1600px) { .studio .controls { position: relative; top: auto; } }
+.rz { position: absolute; top: 0; bottom: 0; width: 9px; cursor: col-resize; z-index: 5; touch-action: none; }
+.rz::after { content: ""; position: absolute; top: 0; bottom: 0; left: 4px; width: 1px; background: transparent; transition: background .15s; }
+.rz:hover::after, .rz.on::after { background: var(--yellow); width: 2px; left: 3.5px; }
+.controls > .rz { right: 0; } .panel > .rz { left: 0; }
+body.resizing { cursor: col-resize; user-select: none; }
+@media (max-width: 1099px) { .rz { display: none; } }
+@media (max-width: 1599px) { .panel > .rz { display: none; } }
+
+/* ---------- graphs fill the stage: the drawing scales to the available width and height */
+.st-graph svg.g { width: 100%; height: auto; max-height: 100%; }
+
+/* ---------- learn page: examples as rows, and a quiet "View source" button beside the main action */
+.ex-list { list-style: none; margin: 10px 0 28px; padding: 0; border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
+.ex-list li + li { border-top: 1px solid var(--rule); }
+.ex-list a { display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--ink); text-decoration: none; }
+.ex-list a:hover { background: var(--panel-2); }
+.ex-list a:focus-visible { outline: 2px solid var(--yellow); outline-offset: -2px; }
+.ex-name { flex: 1; min-width: 0; }
+.ex-go { font-size: 12.5px; color: var(--muted); white-space: nowrap; opacity: 0; transition: opacity .15s; }
+.ex-list a:hover .ex-go, .ex-list a:focus-visible .ex-go { opacity: 1; color: var(--yellow); }
+@media (hover: none) { .ex-go { opacity: 1; } }
+.learn-end { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.btn.ghost { background: transparent; border-color: var(--rule-2); color: var(--muted); }
+.btn.ghost:hover { color: var(--ink); border-color: var(--dim); background: var(--panel); }
+.btn.ghost svg { flex: none; }

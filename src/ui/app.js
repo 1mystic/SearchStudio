@@ -206,7 +206,7 @@
   }
   const card = a => {
     const p = (a.learn && a.learn.props) || {};
-    return `<article class="card"><div class="card-top"><span class="tag">W${a.week} · ${esc(typeLabel(a.problem))}</span>${p.optimal ? `<span class="tag ${/^yes/.test(p.optimal) ? "ok" : ""}">optimal: ${esc(p.optimal)}</span>` : ""}</div>
+    return `<article class="card"><div class="card-top"><span class="tag">W${a.week} · ${esc(typeLabel(a.problem))}</span>${p.optimal && !/^n\/a/.test(p.optimal) ? `<span class="tag pill-1 ${/^yes/.test(p.optimal) ? "ok" : ""}" title="optimal: ${esc(p.optimal)}">optimal: ${esc(String(p.optimal).split(/\s*[,;:(—–]/)[0].trim())}</span>` : ""}</div>
       <h3><a href="#algo-${esc(a.id)}">${esc(a.name)}</a></h3><p>${esc(a.summary || "")}</p>
       <div class="row"><a class="btn small" href="#algo-${esc(a.id)}">Learn</a><a class="btn small primary" href="#try-${esc(a.id)}">Try it</a></div></article>`;
   };
@@ -256,7 +256,7 @@
     const ex = findProblem(defaultProblemFor(a));
     const list = ordered(), i = algoIndex(id), prev = list[i - 1], next = list[i + 1];
     const crumbs = `<a class="fc-dir" href="#week-${a.week}">Week ${a.week}</a><span class="fc-sep">·</span><span class="fc-dir">${esc(a.family)}</span><span class="fc-sep">›</span><span class="fc-file">${esc(a.name)}</span>`;
-    const srcLink = `<a class="src-link" href="${esc(SRC_BASE + fileOf(a))}" target="_blank" rel="noopener">View source</a>`;
+    const srcLink = `<a class="btn ghost src-link" href="${esc(SRC_BASE + fileOf(a))}" target="_blank" rel="noopener" title="${esc(fileOf(a))} on GitHub"><svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M5.7 4.3 2 8l3.7 3.7 1-1L4 8l2.7-2.7-1-1Zm4.6 0-1 1L12 8l-2.7 2.7 1 1L14 8l-3.7-3.7Z"/></svg>View source</a>`;
     const famTag = b => esc(String(b.family).split(" · ")[0]);
     const pager = cls => `<nav class="pager ${cls}" aria-label="Previous and next algorithm">${prev ? `<a class="pg prev" href="#algo-${esc(prev.id)}"><span>← Previous</span><b>${esc(prev.name)}</b></a>` : `<span class="pg empty"></span>`}<span class="pg-pos">${i + 1} / ${list.length}</span>${next ? `<a class="pg next" href="#algo-${esc(next.id)}"><span>Next →</span><b>${esc(next.name)}</b></a>` : `<span class="pg empty"></span>`}</nav>`;
     const siblings = list.filter(b => b.family === a.family);
@@ -279,12 +279,35 @@
             <div class="prop"><span>complete</span>${esc(props.complete || "–")}</div><div class="prop"><span>optimal</span>${esc(props.optimal || "–")}</div>
             <div class="prop"><span>time</span>${esc(props.time || a.complexity || "–")}</div><div class="prop"><span>space</span>${esc(props.space || "–")}</div></div>
           ${L.traps && L.traps.length ? `<h2><small>07</small>Traps</h2><ul class="traps">${L.traps.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
-          ${(() => { const xs = examplesFor(a); return xs.length ? `<h2><small>★</small>Examples for this algorithm</h2><ul class="ex-list">${xs.map(e => `<li><a href="${exampleLink(e, a)}">${esc(e.name)}</a>${e.id === a.defaultExample ? ' <span class="tag ok">default</span>' : ""}</li>`).join("")}</ul>` : ""; })()}
-          <div class="learn-end"><a class="btn primary" href="#try-${esc(a.id)}">Try it in the studio</a> ${srcLink}</div>
+          ${(() => { const xs = examplesFor(a); return xs.length ? `<h2><small>08</small>Examples for this algorithm</h2><ul class="ex-list">${xs.map(e => `<li><a href="${exampleLink(e, a)}"><span class="ex-name">${esc(e.name)}</span>${e.id === a.defaultExample ? '<span class="tag ok">default</span>' : ""}<span class="ex-go" aria-hidden="true">Open in studio →</span></a></li>`).join("")}</ul>` : ""; })()}
+          <div class="learn-end"><a class="btn primary" href="#try-${esc(a.id)}">Try it in the studio</a>${srcLink}</div>
           ${pager("bottom")}
         </div>
       </div>
     </article>`;
+  }
+
+  /* ------------------------------------------------------------ resizable studio panels (widths remembered per viewer) */
+  function initResizers() {
+    const studio = $(".studio"); if (!studio || studio.dataset.rz) return; studio.dataset.rz = "1";
+    const zoom = () => parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+    const saved = store.get().panels || {};
+    const apply = (k, v) => (v ? studio.style.setProperty(k, v + "px") : studio.style.removeProperty(k));
+    apply("--rail-w", saved.rail); apply("--side-w", saved.side);
+    const mk = (host, varName, key, sign, min, max) => {
+      if (!host) return; const h = document.createElement("div"); h.className = "rz"; h.setAttribute("role", "separator"); h.setAttribute("aria-orientation", "vertical"); h.title = "Drag to resize · double-click to reset"; host.appendChild(h);
+      h.addEventListener("pointerdown", e => {
+        e.preventDefault(); h.setPointerCapture(e.pointerId); h.classList.add("on"); document.body.classList.add("resizing");
+        const x0 = e.clientX, w0 = host.getBoundingClientRect().width;
+        const move = ev => { const w = Math.round(Math.max(min, Math.min(max, w0 + sign * (ev.clientX - x0) / zoom()))); apply(varName, w); };
+        const up = () => { h.releasePointerCapture(e.pointerId); h.classList.remove("on"); document.body.classList.remove("resizing"); h.removeEventListener("pointermove", move); h.removeEventListener("pointerup", up);
+          const w = parseInt(studio.style.getPropertyValue(varName)) || null; store.set({ panels: Object.assign({}, store.get().panels, { [key]: w }) }); };
+        h.addEventListener("pointermove", move); h.addEventListener("pointerup", up);
+      });
+      h.addEventListener("dblclick", () => { apply(varName, null); store.set({ panels: Object.assign({}, store.get().panels, { [key]: null }) }); });
+    };
+    mk($(".studio .controls"), "--rail-w", "rail", +1, 220, 480);
+    mk($(".studio .panel"), "--side-w", "side", -1, 280, 720);
   }
 
   /* ------------------------------------------------------------ studio */
@@ -292,6 +315,7 @@
   let studioReady = false;
   function openStudio(algoId, exId) {
     if (!studioReady) initStudio();
+    initResizers();
     const prefs = store.get();
     if (algoId && S.get(algoId)) { const a = S.get(algoId), cur = findProblem(st.problemId); if (st.algoId !== algoId) st.params = {}; st.algoId = algoId; if (!cur || cur.type !== a.problem) st.problemId = defaultProblemFor(a); }
     const want = exId && findProblem(exId); if (want && S.get(st.algoId) && want.type === S.get(st.algoId).problem) st.problemId = exId;
