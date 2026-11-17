@@ -204,7 +204,7 @@
         const nodesOnPath = pathTo(N), path = nodesOnPath.map(x => x.id), moves = [];
         for (let i = 1; i < path.length; i++) moves.push(D.moves(path[i - 1]).find(m => m.to === path[i]).label);
         const table = { title: "solution", columns: ["#", "move", "state"], rows: path.map((s, i) => [i, i ? moves[i - 1] : "start", T(s)]) };
-        snapshot(N, `Goal ${T(N.id)} picked from OPEN, so the goal test succeeds. Following the parents back gives a path of ${moves.length} moves (${moves.join(", ")}); ${CLOSED.length} nodes were expanded and ${order.length} generated.`, { path: nodesOnPath, table, stats: [{ label: "path length", value: moves.length, state: "ok" }] });
+        snapshot(N, `Goal ${T(N.id)} picked from OPEN, so the goal test succeeds. Following the parents back gives a path of ${moves.length} moves (${moves.join(", ")}); ${CLOSED.length} nodes were expanded and ${order.length} generated. ${kind === "bfs" ? "BFS takes rings in order, so no solution has fewer moves." : kind === "dfs" ? "DFS stops at the first goal it dives into, so a shorter solution may exist." : kind === "best" ? "Best First looked only at h, so a shorter solution may exist." : "With an admissible h the first goal picked is a shortest solution (unit move cost)."}`, { path: nodesOnPath, table, stats: [{ label: "path length", value: moves.length, state: "ok" }] });
         return { steps, result: { found: true, path, moves, length: moves.length, cost: N.g, expanded: CLOSED.length, generated: order.length } };
       }
       CLOSED.push(N);

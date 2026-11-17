@@ -1,0 +1,17 @@
+{
+ "id": "graph-plateau",
+ "type": "graph",
+ "name": "Plateau: two neighbours with the same h",
+ "note": "A single path S–A–B–C–G with h = 3, 2, 2, 1, 0. Hill climbing moves S to A, then sees that B has the same h (2) as A: no strict improvement, so it stops on the plateau, one step from a route that leads straight to G. Best First, Beam search and the uninformed searches all walk the chain to G (cost 4).",
+ "nodes": [
+  { "id": "S", "x": 0.5, "y": 2.0, "h": 3 },
+  { "id": "A", "x": 1.7, "y": 2.0, "h": 2 },
+  { "id": "B", "x": 2.9, "y": 2.0, "h": 2 },
+  { "id": "C", "x": 4.0, "y": 2.0, "h": 1 },
+  { "id": "G", "x": 5.1, "y": 2.0, "h": 0 }
+ ],
+ "edges": [["S", "A", 1], ["A", "B", 1], ["B", "C", 1], ["C", "G", 1]],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}

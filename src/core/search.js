@@ -75,7 +75,8 @@
           while (x) { path.unshift(x.id); x = x.parent ? byId(x.parent) : null; }
           rows.push({ cells: [CLOSED.length, N.id, "goal test succeeds", "", OPEN.length], state: "ok" });
           const cost = N.g;
-          snapshot(null, `Goal ${goal} picked from OPEN: path ${path.join(" – ")}, cost ${fmt(cost)}, ${CLOSED.length} nodes expanded`, { path, final: true, stats: [{ label: "path cost", value: fmt(cost), state: "ok" }] });
+          const why = kind === "bfs" ? ` BFS goes level by level, so this path has the fewest edges (${path.length - 1}).` : kind === "dfs" ? ` DFS stops at the first goal it dives into (${path.length - 1} edges): there is no guarantee it is the shortest or cheapest.` : kind === "best" ? ` Best First looked only at h, never at the cost paid so far, so this path is not guaranteed cheapest.` : "";
+          snapshot(null, `Goal ${goal} picked from OPEN: path ${path.join(" – ")}, cost ${fmt(cost)}, ${CLOSED.length} nodes expanded.${why}`, { path, final: true, stats: [{ label: "path cost", value: fmt(cost), state: "ok" }] });
           return { steps, result: { found: true, path, cost, expanded: CLOSED.length } };
         }
         CLOSED.push(N);
@@ -88,6 +89,14 @@
           const inOpen = OPEN.find(x => x.id === c), inClosed = CLOSED.find(x => x.id === c);
           kids.push(c);
           if (!inOpen && !inClosed) { const k = mk(c, N.id, N.depth + 1, g); added.push(k); tree.push([N.id, c]); }
+          else if (opts.reopen && kind === "dfs" && N.depth + 1 < (inOpen || inClosed).depth) {
+            // iterative deepening: a node first met by a deeper route must be reconsidered when a shallower one turns up, or the bound could miss a goal that lies within it
+            const old = inOpen || inClosed;
+            notes.push(`${c}: shallower route via ${N.id} (depth ${old.depth} → ${N.depth + 1})${inClosed ? ", reopened" : ""}`);
+            const ti = tree.findIndex(([, v]) => v === c); if (ti >= 0) tree.splice(ti, 1); tree.push([N.id, c]);
+            old.parent = N.id; old.depth = N.depth + 1; old.g = g;
+            if (inClosed) { CLOSED.splice(CLOSED.indexOf(inClosed), 1); added.push(inClosed); }
+          }
           else if ((kind === "ucs" || kind === "astar") && g < (inOpen || inClosed).g) {
             const old = inOpen || inClosed;
             notes.push(`${c}: cheaper path via ${N.id} (g ${fmt(old.g)} → ${fmt(g)})`);

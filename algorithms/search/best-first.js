@@ -40,7 +40,7 @@ while OPEN not empty
     ],
     "why": "Often reaches the goal quickly, but is not optimal and can be misled by a poor heuristic.",
     "traps": [
-      "Best First ignores g; A* adds it.",
+      "Best First ignores g, so it is not optimal even when h is admissible: on graph-greedy-detour it takes S–A–G (cost 11) and never looks at the cost-4 route S–B–G; on graph-weighted it returns cost 13 where UCS finds 12. A* adds g.",
       "Ties in h decide the path: state your tie-breaking."
     ],
     "props": {
@@ -50,6 +50,7 @@ while OPEN not empty
       "space": "O(b^m)"
     }
   },
+  defaultExample: "graph-greedy-detour",
   params: [{ key: "tie", label: "Ties", type: "select", default: "alpha", options: [["alpha", "alphabetical"], ["fifo", "first in, first out"], ["lifo", "last in, first out"]] }],
   run(P, { tie }) { return Studio.search.run(P, "best", { tie }); },
 });

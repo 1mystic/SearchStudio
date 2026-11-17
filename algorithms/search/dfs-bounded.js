@@ -33,12 +33,14 @@ return failure   (no goal within the bound)`,
     ],
     "why": "It is the building block of DFID: run it with bound 0, 1, 2, … to get the completeness of BFS with the memory of DFS. On its own it is incomplete, and the path it finds is not guaranteed to be shortest.",
     "traps": [
-      "A bound that is too small fails even though a goal exists: failure only means no goal within the bound.",
+      "A bound that is too small fails even though a goal exists: failure only means no goal within the bound (graph-dfs-deep: bound 2 fails, bound 3 finds the goal at depth 3).",
+      "Even a bound that is large enough can fail with a CLOSED list: a node first reached by a long route is closed at the bound and a later short route to it is skipped (graph-dfid-closed, bound 3 fails; DFID succeeds there because it reopens such nodes).",
       "A bound that is too large behaves like plain DFS and can find a long, winding path.",
       "The goal test applies to nodes at the bound too; only their expansion is skipped."
     ],
     "props": { "complete": "no (only if the goal is within the bound)", "optimal": "no", "time": "O(b^bound)", "space": "O(b·bound)" }
   },
+  defaultExample: "graph-dfs-deep",
   params: [{ key: "depthBound", label: "Depth bound", type: "int", default: 3, min: 0, max: 40 }],
   run(P, { depthBound }) { return Studio.search.run(P, "dfs", { depthBound: depthBound == null ? 3 : depthBound }); },
 });

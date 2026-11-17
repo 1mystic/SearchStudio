@@ -44,9 +44,10 @@ return node`,
     ],
     "why": "Constant memory and very fast, but incomplete: local optima, plateaus and ridges stop it. The fixes are exactly the Week 3 ideas: beam search, random restarts, tabu memory, simulated annealing.",
     "traps": [
-      "Hill climbing never backtracks.",
-      "A plateau (equal h) stops the course version.",
-      "Reaching a node with h = 0 that is not the goal means h is misleading there."
+      "Hill climbing never backtracks: on example graph-hill-trap it climbs to L (h = 1), a dead end, and stops with the goal unreached although S–B–C–G exists.",
+      "A plateau (equal h) stops the course version: try example graph-plateau, where B has the same h as A.",
+      "Reaching a node with h = 0 that is not the goal means h is misleading there.",
+      "Even when it reaches the goal, the path need not be cheapest: on graph-greedy-detour it takes the cheap-looking edge with cost 10 (it uses only h, never the cost g)."
     ],
     "props": {
       "complete": "no",
@@ -55,6 +56,7 @@ return node`,
       "space": "O(1)"
     }
   },
+  defaultExample: "graph-hill-trap",
   params: [],
   run(P) {
     const steps = [], path = [P.start];
@@ -66,7 +68,7 @@ return node`,
       const better = best !== undefined && P.h[best] < P.h[node];
       rows.push([node, P.h[node], kids.map(k => `${k}:${P.h[k]}`).join(" ") || "–", best ?? "–", better ? "move" : "stop"]);
       const states = {}; path.forEach(p => (states[p] = "visited")); kids.forEach(k => (states[k] = "open")); states[node] = "current"; if (P.goal) states[P.goal] = states[P.goal] === "plain" || !states[P.goal] ? "goalcand" : states[P.goal];
-      steps.push({ caption: better ? `At ${node} (h=${P.h[node]}): best neighbour ${best} has h=${P.h[best]} < ${P.h[node]} → move` : `At ${node} (h=${P.h[node]}): no neighbour has smaller h → stop${node === P.goal ? " at the goal" : ", a local optimum"}`,
+      steps.push({ caption: better ? `At ${node} (h=${P.h[node]}): best neighbour ${best} has h=${P.h[best]} < ${P.h[node]} → move` : `At ${node} (h=${P.h[node]}): no neighbour has smaller h → stop${node === P.goal ? " at the goal" : best !== undefined && P.h[best] === P.h[node] ? `: ${best} has the same h (a plateau, no strict improvement), a local optimum` : ", a local optimum"}`,
         nodes: Studio.gs.nodes(P, states, Object.fromEntries(P.ids.map(i => [i, P.h[i]]))), edges: Studio.gs.edges(P, path, kids.map(k => ({ u: node, v: k, state: k === best && better ? "candidate" : "faint" }))),
         table: { columns: ["node", "h", "neighbours h", "best", ""], rows: rows.slice(), rowStates: rows.map((r, i) => (i === rows.length - 1 ? (better ? "cur" : node === P.goal ? "ok" : "bad") : "")) },
         stats: [{ label: "h(node)", value: P.h[node] }, { label: "path", value: path.join("–") }] });
@@ -74,7 +76,7 @@ return node`,
       node = best; path.push(node);
     }
     const ok = node === P.goal;
-    steps.push({ caption: ok ? `Reached the goal ${node} along ${path.join(" – ")}` : `Stuck at ${node}: a local optimum of h (goal ${P.goal} not reached)`,
+    steps.push({ caption: ok ? `Reached the goal ${node} along ${path.join(" – ")}, cost ${Studio.fmt(Studio.gs.pathCost(P, path))}: every step improved h. Hill climbing does not promise this (it can stop at a local optimum), and the path is not guaranteed cheapest` : `Stuck at ${node} (h=${P.h[node]}): no neighbour is strictly better, so hill climbing stops at a local optimum of h and the goal ${P.goal} (h=${P.h[P.goal]}) is not reached. It never backtracks, so it is incomplete: Beam search or Best First keep alternatives`,
       nodes: Studio.gs.nodes(P, Object.fromEntries(path.map(p => [p, p === node ? (ok ? "goal" : "current") : "path"]))), edges: Studio.gs.edges(P, path),
       table: { columns: ["node", "h", "neighbours h", "best", ""], rows, rowStates: rows.map((r, i) => (i === rows.length - 1 ? (ok ? "ok" : "bad") : "")) },
       stats: [{ label: "result", value: ok ? "goal" : "stuck", state: ok ? "ok" : "bad" }] });

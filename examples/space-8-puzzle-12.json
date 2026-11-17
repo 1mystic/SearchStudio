@@ -1,0 +1,9 @@
+{
+ "id": "space-8-puzzle-12",
+ "type": "statespace",
+ "domain": "8-puzzle",
+ "name": "8-puzzle, twelve moves from the goal",
+ "note": "Start 3 5 6 / 1 _ 2 / 4 7 8, goal 1 2 3 / 4 5 6 / 7 8 _ (shortest solution: 12 moves). A* expands 16 states with Manhattan distance but 79 with tiles out of place (same 12-move answer): the sharper admissible h prunes more. With h = 0 or BFS the 400-expansion cap is hit before the goal. Best First with tiles out of place returns a 44-move solution (208 expansions); with Manhattan it happens to find 12 moves (28 expansions), but it is never guaranteed.",
+ "start": "356102478",
+ "goal": "123456780"
+}

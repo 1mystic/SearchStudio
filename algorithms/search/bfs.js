@@ -54,7 +54,8 @@ return failure`,
     ],
     "why": "Complete on finite graphs and optimal when every edge costs the same. Uses a lot of memory.",
     "traps": [
-      "Optimal in number of edges, not in total cost when edge costs differ.",
+      "Optimal in number of edges, not in total cost when edge costs differ: on graph-weighted or graph-greedy-detour the fewest-edge path is not the cheapest.",
+      "Compare with DFS on graph-dfs-deep: BFS returns the 3-edge path but must hold a whole level on OPEN.",
       "Children are added in MoveGen order (alphabetical here)."
     ],
     "props": {
@@ -64,6 +65,7 @@ return failure`,
       "space": "O(b^d)"
     }
   },
+  defaultExample: "graph-dfs-deep",
   params: [],
   run(P) { return Studio.search.run(P, "bfs"); },
 });

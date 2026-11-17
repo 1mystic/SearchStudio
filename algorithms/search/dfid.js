@@ -39,7 +39,8 @@ Studio.register({
     "why": "Combines BFS's optimal depth with DFS's small memory; the repeated work is small for branching factors above 2.",
     "traps": [
       "Count expansions over all rounds, not just the last.",
-      "With CLOSED checking, DB-DFS can miss a shallower route to a node seen earlier via a deeper path."
+      "Plain depth-bounded DFS with CLOSED can miss a goal inside the bound when a node was first reached by a deeper route; here DB-DFS reopens a node found again at a smaller depth, so the first bound that works is the true shallowest goal depth (try example graph-dfid-closed, and compare Depth-Bounded DFS there).",
+      "DFID re-expands the upper levels in every round: on a wide graph that is a small overhead, on a thin chain it is large (try graph-dfs-deep and read the dry-run table)."
     ],
     "props": {
       "complete": "yes",
@@ -48,12 +49,13 @@ Studio.register({
       "space": "O(b·d)"
     }
   },
+  defaultExample: "graph-dfs-deep",
   params: [{ key: "maxBound", label: "Largest bound to try", type: "int", default: 12, min: 0, max: 40 }],
   run(P, { maxBound }) {
     const steps = [], summary = [];
     let total = 0;
     for (let bound = 0; bound <= maxBound; bound++) {
-      const r = Studio.search.run(P, "dfs", { depthBound: bound });
+      const r = Studio.search.run(P, "dfs", { depthBound: bound, reopen: true });
       total += r.result.expanded;
       summary.push([bound, r.result.expanded, r.result.found ? r.result.path.join(" – ") : "no path"]);
       r.steps.forEach(s => {
@@ -64,7 +66,7 @@ Studio.register({
       if (r.result.found) {
         const last = steps[steps.length - 1];
         last.table = { title: "dry run", columns: ["bound", "expanded", "result"], rows: summary.concat([["total", total, ""]]), rowStates: summary.map(x => (x[2] === "no path" ? "" : "ok")).concat(["warn"]) };
-        last.caption = `bound ${bound}: path ${r.result.path.join(" – ")} found; ${total} expansions over ${bound + 1} rounds`;
+        last.caption = `bound ${bound}: path ${r.result.path.join(" – ")} found, the shallowest goal (depth ${bound}); ${total} expansions over ${bound + 1} rounds, because every round redoes the upper levels. Memory stayed at DFS size.`;
         return { steps, result: Object.assign({}, r.result, { expandedTotal: total, bound }) };
       }
       const cut = r.steps.some(s => /depth bound/.test(s.caption));

@@ -30,12 +30,13 @@ while OPEN not empty
     ],
     why: "Both heuristics are admissible for the 8-puzzle, but Best First ignores g, so it may take a long way round. Compare the length of its solution with A*'s on the same board.",
     traps: [
-      "Best First is not optimal even with an admissible h.",
+      "Best First is not optimal even with an admissible h: on example space-8-puzzle-12 it returns a 44-move solution with tiles out of place (the shortest has 12). With Manhattan distance it happens to find 12 moves there, which is luck, not a guarantee.",
       "A heuristic that is 0 everywhere turns the order into ties, i.e. alphabetical order of states.",
       "For water jugs there is no useful h (it is 0); for missionaries and cannibals the studio uses the full-boat crossing bound.",
     ],
     props: { complete: "yes on a finite space with CLOSED", optimal: "no", time: "exponential worst case", space: "exponential worst case" },
   },
+  defaultExample: "space-8-puzzle-12",
   params: [
     { key: "h", label: "Heuristic (8-puzzle)", type: "select", default: "manhattan", options: [["manhattan", "Manhattan distance"], ["misplaced", "tiles out of place"], ["none", "none (h = 0)"]] },
     { key: "tie", label: "Ties", type: "select", default: "alpha", options: [["alpha", "alphabetical"], ["fifo", "first in, first out"], ["lifo", "last in, first out"]] },
