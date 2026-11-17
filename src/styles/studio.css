@@ -7,8 +7,8 @@
   --orange: #f0a23b; --orange-fill: #4a3418; --green: #7fcb6a; --green-fill: #22381c;
   --red: #ef6a5e; --blue: #79b0e3; --violet: #c29be0; --yellow: #f2cd4b; --focus: #f2cd4b;
   --serif: "STIX Two Text", "Latin Modern Roman", Georgia, "Times New Roman", serif;
-  --sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --mono: "JetBrains Mono", "DejaVu Sans Mono", Consolas, monospace;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
   --r: 6px;
   color-scheme: dark;
 }
@@ -22,8 +22,8 @@
 }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--ink); }
-html { zoom: 1.1; } /* equivalent of 110% browser zoom, site-wide */
-body { margin: 0; font-family: var(--serif); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+
+body { margin: 0; font-family: var(--sans); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 a { color: var(--blue); text-underline-offset: 3px; }
 a:hover { color: var(--orange); }
 button, select, input, textarea { font: inherit; color: inherit; }
@@ -489,3 +489,65 @@ svg.blocks .arm { fill: none; stroke: var(--muted); stroke-width: 3; }
   svg.g circle.n { r: 25px; } svg.g circle.ring2 { r: 31px; }
   svg.g text.nl { font-size: 24px; } svg.g text.w { font-size: 18px; stroke-width: 5px; } svg.g text.badge { font-size: 17px; } svg.g text.hlab { font-size: 14px; }
 }
+
+/* =====================================================================
+   v2 / typography: one sans family for UI and prose; mono only for code, pseudocode, ids and numbers.
+   Scale: 11-12 labels, 13 UI, 15 body/captions, 18-20 stage title, 28-44 page titles.
+   ===================================================================== */
+:root { --serif-brand: "STIX Two Text", "Latin Modern Roman", Georgia, "Times New Roman", serif; --r: 8px; --r-sm: 6px; --top-h: 52px; }
+:root[data-theme="light"] { --dim: #6a665e; }
+:root:not([data-theme="light"]) { --dim: #8b8880; }
+h1, h2, h3 { font-weight: 650; letter-spacing: -.012em; line-height: 1.25; }
+.brand { font-family: var(--serif-brand); font-size: 21px; }
+.nav a, .btn, .icon-btn, .search, .seg button, .tabs button, .chip-link, .skip, .print-tip, .pinfo, .pinfo select, .made, .foot-r nav, .chip.more { font-family: var(--sans); }
+.nav a { font-size: 13.5px; font-weight: 500; }
+.btn, .icon-btn { font-size: 13px; font-weight: 500; }
+.btn { font-size: 14px; }
+.btn.small { font-size: 13px; }
+.eyebrow, .entry-k, .tree-h, .box summary, .mg-h, .prop span, .learn h2 small, .tag, .brand small, .pk-sub, .mi-m, .lib-fam small, .pg span, .pg-pos {
+  font-family: var(--sans); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-size: 11px; }
+.pk-sub, .mi-m { font-weight: 500; letter-spacing: .02em; text-transform: none; font-size: 12px; }
+.tag { font-size: 10.5px; padding: 1px 7px; border-radius: 999px; }
+.fam span, .chip span, .entry-go { font-family: var(--sans); }
+.inp, select.inp { font-family: var(--sans); font-size: 13.5px; }
+textarea.inp { font-family: var(--mono); font-size: 12.5px; }
+.lede { font-size: 18px; line-height: 1.55; }
+.prose { max-width: 72ch; }
+.prose h1 { font-size: clamp(30px, 4vw, 40px); }
+.prose h2 { font-size: 22px; }
+.prose h3 { font-size: 17px; color: var(--ink); }
+.hero h1 { font-weight: 700; letter-spacing: -.03em; line-height: 1.05; }
+.page-head h1, .lib-head h1 { font-size: clamp(28px, 3.6vw, 38px); }
+.section-h { font-size: 24px; }
+.feature h3, .card h3, .entry b, .lib-fam, .wk-b h2, .learn h2, .modal-head h2 { font-size: 17px; font-weight: 650; }
+.learn h2 { font-size: 21px; margin: 38px 0 12px; }
+.lib-fam { font-size: 17px; }
+.wk-b h2 { font-size: 21px; }
+.wk-n { font-family: var(--sans); font-weight: 700; }
+.entry b { font-size: 19px; }
+.fam b { font-weight: 600; font-size: 16px; }
+.learn .intro { font-size: 17px; line-height: 1.6; color: var(--ink); }
+.learn-head h1 { font-size: clamp(28px, 4vw, 38px); }
+.learn-body p, .prose p, .prose li { line-height: 1.65; }
+.formula .f { font-family: var(--serif-brand); }
+.tbl-plain th, .tbl th, .tbl .tcap, .stat .sl { font-style: normal; font-weight: 600; font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.tbl .tcap { font-size: 12px; margin-bottom: 6px; }
+.tbl td, .steps-tbl td:first-child { font-family: var(--mono); }
+.llab { font-style: normal; font-variant: normal; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; text-align: right; }
+.litems { font-size: 13px; }
+.stat b { font-weight: 650; }
+svg.g text { font-family: var(--sans); }
+svg.g .w, svg.g .badge, svg.g .hlab { font-family: var(--mono); }
+.stats { font-size: 13px; }
+.msg, .problem-note { font-size: 13px; }
+.field label { font-size: 12.5px; font-weight: 500; }
+.field .help { font-size: 12px; }
+.pk-main { font-size: 14.5px; font-weight: 600; }
+.mi-t { font-size: 14.5px; font-weight: 500; }
+.mi-d { font-size: 12.5px; }
+.trace-list li { font-size: 13.5px; line-height: 1.45; }
+.tabs button { font-size: 13px; font-weight: 550; }
+.tree li a b { font-weight: 500; font-size: 13.5px; }
+.card p, .export-grid .box p { font-size: 14px; }
+.chip { font-size: 13.5px; }
+.pg b { font-size: 14px; font-weight: 600; }
