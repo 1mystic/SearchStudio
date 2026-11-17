@@ -37,7 +37,7 @@ with sync_playwright() as p:
                     pg.screenshot(path=f"{shots}/{tag}-run-{aid}.png")
             # random problem + editor round trip
             pg.evaluate("location.hash = 'try-search-bfs'"); pg.wait_for_timeout(100)
-            pg.click("#btn-random"); pg.select_option("#rnd-kind", "graph"); pg.fill("#rnd-n", "12"); pg.click("#rnd-go"); pg.wait_for_timeout(150)
+            pg.evaluate("document.querySelectorAll('details.box').forEach(d => d.open = true)"); pg.click("#btn-random"); pg.select_option("#rnd-kind", "graph"); pg.fill("#rnd-n", "12"); pg.click("#rnd-go"); pg.wait_for_timeout(150)
             if pg.evaluate("!!document.querySelector('#stage .err-box')"): problems.append(f"{tag}: random graph run failed")
             pg.click("#btn-edit"); pg.wait_for_timeout(50); pg.click("#edit-save"); pg.wait_for_timeout(150)
             m = pg.text_content("#problem-msg")

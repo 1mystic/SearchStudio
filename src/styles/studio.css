@@ -23,6 +23,7 @@
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--ink); }
 
+html { --zoom: 1.1; zoom: var(--zoom); } /* the equivalent of 110% browser zoom, site-wide */
 body { margin: 0; font-family: var(--sans); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 a { color: var(--blue); text-underline-offset: 3px; }
 a:hover { color: var(--orange); }
@@ -36,13 +37,16 @@ h1, h2, h3 { font-weight: 400; line-height: 1.2; text-wrap: balance; margin: 0; 
 p { margin: 0 0 .8em; }
 [hidden] { display: none !important; }
 
-/* ---------- minimal themed scrollbar */
-* { scrollbar-width: thin; scrollbar-color: var(--rule-2) transparent; }
-::-webkit-scrollbar { width: 10px; height: 10px; }
+/* ---------- minimal themed scrollbars: slim, invisible track, thumb brightens on hover */
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--dim) 55%, transparent) transparent; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--rule-2); border-radius: 999px; border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--dim) 55%, transparent); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--dim); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:active { background: var(--muted); background-clip: padding-box; }
 ::-webkit-scrollbar-corner { background: transparent; }
+
+
 
 /* ---------- top bar */
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
@@ -154,7 +158,7 @@ main { max-width: 1320px; margin: 0 auto; padding-block: 28px 64px; padding-left
 
 /* ---------- studio */
 .studio { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 22px; align-items: start; }
-.controls { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 74px; max-height: calc(100vh - 90px); overflow-y: auto; padding-right: 4px; }
+.controls { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 74px; max-height: calc(100vh / var(--zoom) - 90px); overflow-y: auto; padding-right: 4px; }
 .box { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px; }
 .box h2 { font-size: 13px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .box h2 a { text-transform: none; letter-spacing: 0; font-size: 12px; }
@@ -449,7 +453,7 @@ body.modal-open { overflow: hidden; }
 .mi.cur .mi-t::after { content: "  ● current"; font-family: var(--mono); font-size: 11px; color: var(--yellow); }
 .modal-foot { border-top: 1px solid var(--rule); padding: 8px 16px; font-size: 13px; color: var(--muted); }
 .modal-foot:empty { display: none; }
-@media (max-width: 560px) { .modal { padding-top: calc(10px + env(safe-area-inset-top, 0px)); } .modal-card { max-height: calc(100vh - 30px); } .mi-m { grid-column: 1 / -1; text-align: left; } }
+@media (max-width: 560px) { .modal { padding-top: calc(10px + env(safe-area-inset-top, 0px)); } .modal-card { max-height: calc(100vh / var(--zoom) - 30px); } .mi-m { grid-column: 1 / -1; text-align: left; } }
 
 /* ---------- drawing extras used by games, AND-OR, blocks, CSP and line drawings */
 svg.g .n.pruned, svg.g .n.rejected, svg.g .n.bad { stroke: var(--red); stroke-dasharray: 4 3; }
@@ -561,9 +565,9 @@ svg.g .w, svg.g .badge, svg.g .hlab { font-family: var(--mono); }
    700-1099 controls become a compact 3-up bar above the stage, panels below
    <700     one column, controls are an accordion after the stage, player pinned to the bottom edge
    ===================================================================== */
-.top-in { max-width: none; height: var(--top-h); padding-block: 0; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
-.foot-in { max-width: none; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
-main { max-width: 1280px; padding-block: 32px 72px; }
+.top-in { max-width: 1320px; height: var(--top-h); padding-block: 0; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.foot-in { max-width: 1320px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+main { max-width: 1320px; padding-block: 32px 72px; }
 main:has(.page[data-page="studio"]:not([hidden])) { max-width: none; padding: 0; }
 .learn { max-width: 1180px; }
 .learn-body { max-width: 78ch; }
@@ -629,7 +633,7 @@ main:has(.page[data-page="studio"]:not([hidden])) { max-width: none; padding: 0;
 /* ---- desktop 1100-1599: rail + stage, trace panel under the stage */
 @media (min-width: 1100px) {
   .studio { grid-template-columns: 290px minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; column-gap: 20px; row-gap: 12px; }
-  .controls { grid-column: 1; grid-row: 1 / span 5; display: flex; flex-direction: column; position: sticky; top: calc(var(--top-h) + 16px); max-height: calc(100dvh - var(--top-h) - 32px); overflow-y: auto; padding-right: 2px; align-self: start; }
+  .controls { grid-column: 1; grid-row: 1 / span 5; display: flex; flex-direction: column; position: sticky; top: calc(var(--top-h) + 16px); max-height: calc(100dvh / var(--zoom) - var(--top-h) - 32px); overflow-y: auto; padding-right: 2px; align-self: start; }
   .stage-title { grid-column: 2; grid-row: 1; margin: 0; }
   .stage { grid-column: 2; grid-row: 2; }
   .player { grid-column: 2; grid-row: 3; bottom: 12px; }
@@ -641,7 +645,7 @@ main:has(.page[data-page="studio"]:not([hidden])) { max-width: none; padding: 0;
 @media (min-width: 1600px) {
   body:has(.page[data-page="studio"]:not([hidden])) { overflow: hidden; }
   body:has(.page[data-page="studio"]:not([hidden])) .foot { display: none; }
-  .page[data-page="studio"]:not([hidden]) { height: calc(100dvh - var(--top-h)); }
+  .page[data-page="studio"]:not([hidden]) { height: calc(100dvh / var(--zoom) - var(--top-h)); }
   .studio { height: 100%; padding: 0; gap: 0; grid-template-columns: 300px minmax(0, 1fr) clamp(380px, 22vw, 440px); grid-template-rows: 100%; align-items: stretch; }
   .controls { grid-column: 1; grid-row: 1; position: static; max-height: none; height: 100%; padding: 14px 12px 20px 16px; border-right: 1px solid var(--rule); background: var(--bg); overflow-y: auto; }
   .stage-wrap { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 14px 20px 14px; gap: 12px; }
@@ -656,7 +660,7 @@ main:has(.page[data-page="studio"]:not([hidden])) { max-width: none; padding: 0;
   .panel #tab-trace .trace-list { flex: 1; max-height: none; margin: 0; }
   .panel #tab-trace .problem-note { margin: 0; padding: 10px 16px; border-top: 1px solid var(--rule); flex: none; }
   .panel .trace-list li { padding: 9px 16px; }
-  svg.g { max-height: calc(100dvh - var(--top-h) - 300px); }
+  svg.g { max-height: calc(100dvh / var(--zoom) - var(--top-h) - 300px); }
 }
 
 /* ---- small screens */
@@ -676,3 +680,28 @@ main:has(.page[data-page="studio"]:not([hidden])) { max-width: none; padding: 0;
 .controls { align-items: stretch; }
 @media (min-width: 700px) and (max-width: 1099px) { .controls { align-items: start; } }
 svg.g { margin-inline: auto; }
+
+/* ---------- minimal select dropdowns: no native arrow, a thin chevron, same border and focus ring as inputs (kept last so it wins over .inp) */
+select, select.inp, .pinfo select { -webkit-appearance: none; appearance: none; cursor: pointer; padding-right: 30px;
+  background-color: var(--bg);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat;
+  text-overflow: ellipsis; }
+select:hover { border-color: var(--dim); }
+select:focus-visible { outline: 2px solid var(--yellow); outline-offset: 1px; }
+select option { background: var(--panel); color: var(--ink); }
+select::-ms-expand { display: none; }
+
+/* ---------- header and footer line up with the page content (as before); only the studio workspace goes full width */
+@media (min-width: 1600px) { body:has(.page[data-page="studio"]:not([hidden])) .top-in { max-width: none; } }
+
+/* ---------- example cards: long notes are clamped; the full note is in the title tooltip and in the studio */
+.card.ex p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; flex: 0 0 auto; }
+.card.ex .row { margin-top: auto; padding-top: 6px; }
+.card.ex h3 { font-size: 18px; line-height: 1.3; }
+
+/* ---------- library toolbar: filter and view switch flush right and equal width; group headings start with a capital */
+.lib-tools { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.lib-tools .search { width: 340px; max-width: 100%; }
+.lib-fam::first-letter { text-transform: uppercase; }
+@media (max-width: 700px) { .lib-tools { align-items: stretch; } .lib-tools .search { width: 100%; } }

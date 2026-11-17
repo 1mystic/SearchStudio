@@ -119,7 +119,7 @@
   }
   function drawPicker() {
     const q = $("#modal-search").value.trim().toLowerCase();
-    const list = modal.items.filter(it => !q || it.search.includes(q));
+    const terms = q.split(/\s+/).filter(Boolean), list = modal.items.filter(it => terms.every(t => it.search.includes(t)));
     const groupOf = modal.groupings[modal.mode];
     const groups = new Map();
     list.forEach(it => { const g = groupOf(it); if (!groups.has(g)) groups.set(g, []); groups.get(g).push(it); });
@@ -148,9 +148,22 @@
   const algoItems = () => ordered().map(a => ({ id: a.id, title: a.name, meta: `W${a.week} · ${a.family}`, desc: a.summary, search: (a.name + " " + a.family + " week " + a.week + " " + (a.summary || "")).toLowerCase(), a }));
   const algoGroupings = { "By week": it => `Week ${it.a.week} · ${weekTitle(it.a.week)}`, "By family": it => it.a.family, "By problem": it => typeLabel(it.a.problem) };
   function pickAlgorithm(onPick, cur) { openPicker({ title: "Choose an algorithm", items: algoItems(), groupings: algoGroupings, onPick, current: cur }); }
-  $("#find-btn").addEventListener("click", () => pickAlgorithm(id => (location.hash = "algo-" + id)));
+  /* Find: algorithms and examples together; an example opens in the studio on the algorithm that names it as default */
+  const exampleItems = () => S.examples.map(e => { const own = algosFor(e); return { id: "ex:" + e.id, title: e.name, meta: `Example · ${typeLabel(e.type)}${own[0] ? " · opens in " + own[0].name : ""}`, desc: describe(e),
+    search: ("example " + e.name + " " + typeLabel(e.type) + " " + describe(e) + " " + own.map(a => a.name).join(" ")).toLowerCase(), ex: e }; });
+  const findGroupings = {
+    "All": it => (it.ex ? `Examples · ${typeLabel(it.ex.type)}` : `Algorithms · Week ${it.a.week} · ${weekTitle(it.a.week)}`),
+    "By problem": it => (it.ex ? `Examples · ${typeLabel(it.ex.type)}` : `Algorithms · ${typeLabel(it.a.problem)}`),
+  };
+  function findAnything(inStudio) {
+    openPicker({ title: "Find an algorithm or an example", items: algoItems().concat(exampleItems()), groupings: findGroupings, onPick: id => {
+      if (id.startsWith("ex:")) { const e = findProblem(id.slice(3)), a = e && algosFor(e)[0]; if (e && a) location.hash = exampleLink(e, a).slice(1); return; }
+      location.hash = (inStudio ? "try-" : "algo-") + id;
+    } });
+  }
+  $("#find-btn").addEventListener("click", () => findAnything(false));
   document.addEventListener("keydown", e => {
-    if (e.key === "/" && !e.target.closest("input,textarea,select,[contenteditable]") && modal.el.hidden) { e.preventDefault(); pickAlgorithm(id => (location.hash = (current.startsWith("try-") || current === "studio" ? "try-" : "algo-") + id)); }
+    if (e.key === "/" && !e.target.closest("input,textarea,select,[contenteditable]") && modal.el.hidden) { e.preventDefault(); findAnything(current.startsWith("try-") || current === "studio"); }
   });
 
   /* ------------------------------------------------------------ home */
@@ -199,8 +212,8 @@
   };
   const exampleCard = e => {
     const T = S.types[e.type] || {}, own = algosFor(e), first = own[0], note = describe(e);
-    return `<article class="card"><div class="card-top"><span class="tag">${esc(typeLabel(e.type))}</span></div>
-      <h3>${esc(e.name)}</h3><p>${esc(note)}</p>
+    return `<article class="card ex"><div class="card-top"><span class="tag">${esc(typeLabel(e.type))}</span></div>
+      <h3>${esc(e.name)}</h3><p title="${esc(note)}">${esc(note)}</p>
       <div class="row">${first ? `<a class="btn small primary" href="${exampleLink(e, first)}">Open in studio</a>` : ""}${own.slice(1, 4).map(a => `<a class="btn small" href="${exampleLink(e, a)}">${esc(a.name)}</a>`).join("")}</div></article>`;
   };
   function drawExamples(q) {
