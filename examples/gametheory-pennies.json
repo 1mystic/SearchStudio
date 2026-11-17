@@ -1,0 +1,9 @@
+{
+ "id": "gametheory-pennies",
+ "type": "matrixgame",
+ "name": "Matching Pennies (no pure equilibrium)",
+ "note": "The row player wins when the coins match, the column player when they differ. In every cell one player wants to switch, so no cell has both payoffs marked: there is no pure Nash equilibrium. Play must be randomised (a 50-50 mix is the mixed equilibrium, not computed here).",
+ "rows": ["Heads", "Tails"],
+ "cols": ["Heads", "Tails"],
+ "payoff": [[[1, -1], [-1, 1]], [[-1, 1], [1, -1]]]
+}

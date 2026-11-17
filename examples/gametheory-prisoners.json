@@ -1,0 +1,9 @@
+{
+ "id": "gametheory-prisoners",
+ "type": "matrixgame",
+ "name": "Prisoner's Dilemma",
+ "note": "Payoffs are years of freedom lost, as negative numbers (higher is better). Defect strictly dominates Cooperate for both players, so iterated elimination leaves only (Defect, Defect), the unique Nash equilibrium. It is flagged Pareto-inefficient: (Cooperate, Cooperate) pays (-1, -1), better for both than (-2, -2).",
+ "rows": ["Cooperate", "Defect"],
+ "cols": ["Cooperate", "Defect"],
+ "payoff": [[[-1, -1], [-3, 0]], [[0, -3], [-2, -2]]]
+}

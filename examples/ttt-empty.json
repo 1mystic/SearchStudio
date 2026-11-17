@@ -1,0 +1,8 @@
+{
+ "id": "ttt-empty",
+ "type": "tictactoe",
+ "name": "Empty board: evaluator check",
+ "note": "On the empty board every line is open for both players, so e = 8 - 8 = 0. Run k = 1 and look at the values: X in the centre (B2) scores 8 - 4 = 4, a corner 8 - 5 = 3, an edge 8 - 6 = 2, so the centre is chosen.",
+ "board": ".........",
+ "toMove": "X"
+}

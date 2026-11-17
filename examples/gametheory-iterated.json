@@ -1,0 +1,9 @@
+{
+ "id": "gametheory-iterated",
+ "type": "matrixgame",
+ "name": "Iterated elimination (3 x 3)",
+ "note": "No row strategy is dominated at first, but Right strictly dominates Center for the column player. Once Center is gone, Top dominates Bottom and then Middle for the row player, and finally Left dominates Right. One cell is left: (Top, Left) with payoffs (4, 3), also the unique Nash equilibrium. It is Pareto-inefficient: (Middle, Center) pays (8, 4), better for both, but is not stable.",
+ "rows": ["Top", "Middle", "Bottom"],
+ "cols": ["Left", "Center", "Right"],
+ "payoff": [[[4, 3], [5, 1], [6, 2]], [[2, 1], [8, 4], [3, 6]], [[3, 0], [9, 6], [2, 8]]]
+}
