@@ -75,6 +75,27 @@ B G 1</pre>
     <li><b>Current step as SVG</b>: the graph drawing, for slides.</li>
   </ul>
 
+  <h2>6. Which algorithm for which question</h2>
+  <p>A closing summary of the course: start from the question you need to answer, then pick the method. Each name opens its learn page.</p>
+  <div class="tbl-plain"><table>
+    <thead><tr><th>If you need to…</th><th>Use</th><th>Why, and the catch</th></tr></thead>
+    <tbody>
+      <tr><td>Find <i>any</i> path; the space is small or shallow</td><td><a href="#algo-search-bfs">BFS</a> (fewest moves) · <a href="#algo-search-dfs">DFS</a> (little memory) · <a href="#algo-search-dfid">DFID</a> (both)</td><td>BFS needs memory for a whole layer; DFS can wander deep; DFID repeats work but is complete with linear space.</td></tr>
+      <tr><td>Find the <i>cheapest</i> path, no heuristic</td><td><a href="#algo-search-ucs">Uniform Cost Search</a> · <a href="#algo-search-dijkstra">Dijkstra</a></td><td>Optimal when every edge cost is positive. Expands in order of g.</td></tr>
+      <tr><td>Cheapest path with a good estimate h</td><td><a href="#algo-search-astar">A*</a> · <a href="#algo-search-weighted-astar">Weighted A*</a></td><td>Admissible h keeps A* optimal; w·h trades optimality (cost ≤ w·C*) for speed.</td></tr>
+      <tr><td>A* runs out of memory</td><td><a href="#algo-search-ida-star">IDA*</a> · <a href="#algo-search-rbfs">RBFS</a> · <a href="#algo-search-bfhs">BFHS</a> · <a href="#algo-search-beam-stack">Beam Stack</a> · <a href="#algo-search-dfbnb">DFBnB</a></td><td>Linear or layer-sized memory, paid for with re-expansion.</td></tr>
+      <tr><td>A good-enough answer fast; no optimality needed</td><td><a href="#algo-search-best-first">Best First</a> · <a href="#algo-search-hill-climbing">Hill Climbing</a> · <a href="#algo-search-beam">Beam Search</a></td><td>Greedy on h: quick, but can be non-optimal or stuck on a local optimum or plateau.</td></tr>
+      <tr><td>Optimise a solution, not a path (TSP, SAT)</td><td><a href="#algo-tsp-two-edge-exchange">2-opt</a> · <a href="#algo-tsp-vnd">VND</a> · <a href="#algo-tsp-tabu">Tabu</a> · <a href="#algo-tsp-sa">Simulated annealing</a></td><td>Perturbation methods. VND and tabu escape local optima deterministically, SA stochastically.</td></tr>
+      <tr><td>A population or a swarm helps</td><td><a href="#algo-tsp-ga">Genetic algorithm</a> · <a href="#algo-sat-ga">GA on bit strings</a> · <a href="#algo-tsp-aco">Ant colony</a></td><td>Keep diversity (mutation, evaporation) or the population converges prematurely.</td></tr>
+      <tr><td>Must prove the optimum for a TSP or the satisfiability of a formula</td><td><a href="#algo-tsp-branch-and-bound">Branch &amp; Bound</a> · <a href="#algo-tsp-brute-force">Brute force</a> · <a href="#algo-sat-dpll">DPLL</a></td><td>Exact but exponential in the worst case; bounds and propagation prune most of the tree.</td></tr>
+      <tr><td>Two players take turns</td><td><a href="#algo-game-alpha-beta">Alpha-Beta</a> · <a href="#algo-game-sss-star">SSS*</a> · <a href="#algo-game-expectiminimax">Expectiminimax</a> (with chance)</td><td>Same value as Minimax; good move ordering prunes more.</td></tr>
+      <tr><td>Reach a goal <i>state</i> by actions (planning)</td><td><a href="#algo-plan-gsp">Goal Stack</a> · <a href="#algo-plan-pop">Partial Order</a> · <a href="#algo-plan-graphplan">Graphplan</a></td><td>Goal stacking can clobber earlier goals (Sussman); POP and Graphplan handle interacting goals.</td></tr>
+      <tr><td>Split a problem into sub-problems (AND–OR)</td><td><a href="#algo-andor-ao-star">AO*</a> · <a href="#algo-rules-backward-chaining">Backward chaining</a></td><td>Solve every AND child; pick the cheapest OR alternative.</td></tr>
+      <tr><td>Derive what follows from facts and rules</td><td><a href="#algo-rules-forward-chaining">Forward chaining</a> · <a href="#algo-rules-rete">Rete</a></td><td>Data-driven; Rete avoids re-matching every rule each cycle.</td></tr>
+      <tr><td>Assign values that satisfy constraints</td><td><a href="#algo-csp-forward-checking">Forward checking</a> · <a href="#algo-csp-lookahead-mac">MAC</a> · <a href="#algo-csp-cbj">Backjumping</a> · <a href="#algo-csp-ac3">AC-3</a></td><td>Propagate before you branch, and jump back to the real culprit when stuck.</td></tr>
+    </tbody>
+  </table></div>
+
   <h2>Conventions used everywhere</h2>
   <ul>
     <li>Ties are broken alphabetically unless a setting says otherwise; MoveGen lists neighbours alphabetically.</li>

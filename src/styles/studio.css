@@ -759,3 +759,22 @@ button:disabled:hover, .icon-btn:disabled:hover { border-color: var(--rule-2); }
 
 /* wide screens: give the drawing the larger share of the stage */
 @media (min-width: 1600px) { .stage-inner { grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); } }
+
+/* caption box: a full accent border instead of a left bar */
+.st-cap { border: 1px solid color-mix(in srgb, var(--yellow) 70%, var(--rule)); border-left-width: 1px; border-radius: var(--r); }
+.st-cap:empty { border-color: transparent; background: transparent; }
+
+/* comfortable side margins on laptop and desktop screens; header, page content and footer share them so they stay aligned */
+@media (min-width: 700px) {
+  main, .top-in, .foot-in { padding-left: max(32px, 4%, env(safe-area-inset-left, 0px)); padding-right: max(32px, 4%, env(safe-area-inset-right, 0px)); }
+}
+
+/* 1100-1599: the caption sits right under the drawing (above the lists) so the sticky player never hides it */
+@media (min-width: 1100px) and (max-width: 1599px) {
+  .stage-inner { grid-template-areas: "graph side" "cap cap" "lists lists"; }
+  .stage-inner.has-chart { grid-template-areas: "graph side" "graph chart" "cap cap" "lists lists"; }
+  .stage-inner.wide { grid-template-areas: "graph chart" "side side" "cap cap" "lists lists"; }
+  .stage-inner.nodraw { grid-template-areas: "side" "cap" "lists"; }
+  .stage-inner:not(.nodraw) .st-side { max-height: calc(100dvh / var(--zoom) * 0.42); overflow: auto; }
+  .st-graph svg.g { max-height: calc(100dvh / var(--zoom) * 0.42); }
+}
