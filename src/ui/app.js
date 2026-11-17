@@ -72,6 +72,7 @@
   const describe = p => (p.note || (S.types[p.type] && S.types[p.type].describe ? S.types[p.type].describe(p) : ""));
   const ordered = () => S.algorithms.slice();
   const algoIndex = id => ordered().findIndex(a => a.id === id);
+  const SRC_BASE = "https://github.com/1mystic/SearchStudio/blob/main/";
   const fileOf = a => (S.files && S.files[a.id]) || `algorithms/${a.id}.js`;
 
   /* ------------------------------------------------------------ router */
@@ -241,16 +242,17 @@
     const L = a.learn || {}, props = L.props || {};
     const ex = findProblem(defaultProblemFor(a));
     const list = ordered(), i = algoIndex(id), prev = list[i - 1], next = list[i + 1];
-    const parts = fileOf(a).split("/");
-    const crumbs = parts.map((p, k) => k === parts.length - 1 ? `<span class="fc-file">${esc(p)}</span>` : k === 0 ? `<a class="fc-dir" href="#library">${esc(p)}</a>` : `<span class="fc-dir">${esc(p)}</span>`).join('<span class="fc-sep">/</span>');
+    const crumbs = `<a class="fc-dir" href="#week-${a.week}">Week ${a.week}</a><span class="fc-sep">·</span><span class="fc-dir">${esc(a.family)}</span><span class="fc-sep">›</span><span class="fc-file">${esc(a.name)}</span>`;
+    const srcLink = `<a class="src-link" href="${esc(SRC_BASE + fileOf(a))}" target="_blank" rel="noopener">View source</a>`;
+    const famTag = b => esc(String(b.family).split(" · ")[0]);
     const pager = cls => `<nav class="pager ${cls}" aria-label="Previous and next algorithm">${prev ? `<a class="pg prev" href="#algo-${esc(prev.id)}"><span>← Previous</span><b>${esc(prev.name)}</b></a>` : `<span class="pg empty"></span>`}<span class="pg-pos">${i + 1} / ${list.length}</span>${next ? `<a class="pg next" href="#algo-${esc(next.id)}"><span>Next →</span><b>${esc(next.name)}</b></a>` : `<span class="pg empty"></span>`}</nav>`;
     const siblings = list.filter(b => b.family === a.family);
     const sameWeek = list.filter(b => b.week === a.week && b.family !== a.family);
     root.innerHTML = `<article class="learn">
-      <div class="filebar"><div class="filecrumb" aria-label="Source file"><span class="fc-ic" aria-hidden="true">▤</span>${crumbs}</div>${pager("top")}</div>
+      <div class="filebar"><div class="filecrumb" aria-label="Breadcrumb">${crumbs}</div>${pager("top")}</div>
       <div class="learn-grid">
-        <aside class="tree" aria-label="Related algorithms"><p class="tree-h">${esc(a.family)}</p><ul>${siblings.map(b => `<li${b.id === a.id ? ' class="on"' : ""}><a href="#algo-${esc(b.id)}"${b.id === a.id ? ' aria-current="page"' : ""}><code>${esc(fileOf(b).split("/").pop())}</code><span>${esc(b.name)}</span></a></li>`).join("")}</ul>
-          ${sameWeek.length ? `<p class="tree-h">Also in week ${a.week}</p><ul>${sameWeek.map(b => `<li><a href="#algo-${esc(b.id)}"><code>${esc(fileOf(b).split("/").pop())}</code><span>${esc(b.name)}</span></a></li>`).join("")}</ul>` : ""}</aside>
+        <aside class="tree" aria-label="Related algorithms"><p class="tree-h">${esc(a.family)}</p><ul>${siblings.map(b => `<li${b.id === a.id ? ' class="on"' : ""}><a href="#algo-${esc(b.id)}"${b.id === a.id ? ' aria-current="page"' : ""}><b>${esc(b.name)}</b></a></li>`).join("")}</ul>
+          ${sameWeek.length ? `<p class="tree-h">Also in week ${a.week}</p><ul>${sameWeek.map(b => `<li><a href="#algo-${esc(b.id)}"><b>${esc(b.name)}</b><span class="tag">${famTag(b)}</span></a></li>`).join("")}</ul>` : ""}</aside>
         <div class="learn-body">
           <div class="learn-head"><div><p class="eyebrow"><a href="#week-${a.week}">Week ${a.week}</a> · ${esc(a.family)}</p><h1>${esc(a.name)}</h1></div>
             <a class="btn primary" href="#try-${esc(a.id)}">Try it${ex ? " on " + esc(ex.name) : ""}</a></div>
@@ -265,7 +267,7 @@
             <div class="prop"><span>time</span>${esc(props.time || a.complexity || "–")}</div><div class="prop"><span>space</span>${esc(props.space || "–")}</div></div>
           ${L.traps && L.traps.length ? `<h2><small>07</small>Traps</h2><ul class="traps">${L.traps.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
           ${(() => { const xs = examplesFor(a); return xs.length ? `<h2><small>★</small>Examples for this algorithm</h2><ul class="ex-list">${xs.map(e => `<li><a href="${exampleLink(e, a)}">${esc(e.name)}</a>${e.id === a.defaultExample ? ' <span class="tag ok">default</span>' : ""}</li>`).join("")}</ul>` : ""; })()}
-          <div class="learn-end"><a class="btn primary" href="#try-${esc(a.id)}">Try it in the studio</a></div>
+          <div class="learn-end"><a class="btn primary" href="#try-${esc(a.id)}">Try it in the studio</a> ${srcLink}</div>
           ${pager("bottom")}
         </div>
       </div>
@@ -304,6 +306,8 @@
   function refresh() { fillPickers(); buildParams(); runNow(); }
   function initStudio() {
     studioReady = true;
+    /* phones: only Algorithm stays open, the rest is an accordion */
+    if (window.matchMedia("(max-width: 699px)").matches) $$(".controls details.box").forEach((d, i) => { if (i) d.open = false; });
     $("#pick-algo").addEventListener("click", () => pickAlgorithm(setAlgo, st.algoId));
     $("#pick-problem").addEventListener("click", () => {
       const a = S.get(st.algoId);

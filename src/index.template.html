@@ -1,8 +1,6 @@
 <title>Search Studio — learn and trace AI search algorithms step by step</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <!--SEO-->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap">
 <!--STYLES-->
 <a class="skip" href="#main">Skip to content</a>
 <header class="top">
@@ -27,13 +25,13 @@
   <section class="page" data-page="studio" hidden>
     <div class="studio">
       <aside class="controls" aria-label="Algorithm, problem and settings">
-        <section class="box">
-          <h2>Algorithm</h2>
+        <details class="box" open>
+          <summary>Algorithm</summary>
           <button class="picker" id="pick-algo" type="button" aria-haspopup="dialog"><span class="pk-main" id="pick-algo-name">–</span><span class="pk-sub" id="pick-algo-sub"></span><span class="pk-chev" aria-hidden="true">▾</span></button>
           <div class="row tight"><a class="chip-link" id="learn-link" href="#library">Learn page</a><button class="chip-link" type="button" data-tab-open="tab-pseudo">Pseudocode</button></div>
-        </section>
-        <section class="box">
-          <h2>Problem</h2>
+        </details>
+        <details class="box" open>
+          <summary>Problem</summary>
           <button class="picker" id="pick-problem" type="button" aria-haspopup="dialog"><span class="pk-main" id="pick-problem-name">–</span><span class="pk-sub" id="problem-note"></span><span class="pk-chev" aria-hidden="true">▾</span></button>
           <div class="row tight">
             <button class="chip-link" id="btn-random" type="button">Random</button>
@@ -56,11 +54,11 @@
             <button class="btn small primary" id="imp-go" type="button">Import</button>
           </div>
           <p class="msg" id="problem-msg" role="status"></p>
-        </section>
-        <section class="box">
-          <h2>Settings</h2>
+        </details>
+        <details class="box" open>
+          <summary>Settings</summary>
           <form id="params" onsubmit="return false"></form>
-        </section>
+        </details>
       </aside>
       <div class="stage-wrap">
         <div class="stage-title"><h1 id="stage-h1">Studio</h1><p id="stage-sub"></p></div>
@@ -78,6 +76,8 @@
             <label for="p-speed" class="sr">Seconds per step</label>
             <select id="p-speed"><option value="0.5">0.5 s</option><option value="1.2" selected>1.2 s</option><option value="2">2 s</option><option value="3.5">3.5 s</option></select></div>
         </div>
+      </div>
+      <aside class="panel" aria-label="Trace, pseudocode and export">
         <div class="tabs" role="tablist">
           <button type="button" role="tab" data-tab="tab-trace" aria-selected="true">Trace</button>
           <button type="button" role="tab" data-tab="tab-pseudo" aria-selected="false">Pseudocode</button>
@@ -94,7 +94,7 @@
           </div>
           <p class="msg" id="export-msg" role="status"></p>
         </div>
-      </div>
+      </aside>
     </div>
   </section>
   <section class="page" data-page="guide" hidden><!--PAGE:guide--></section>
