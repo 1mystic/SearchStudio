@@ -8,7 +8,7 @@
   <a href="https://1mystic.github.io/SearchStudio/#course">Course map</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
   <br>
-  <img alt="46 algorithms" src="https://img.shields.io/badge/algorithms-46-f2cd4b?style=flat-square&labelColor=151515">
+  <img alt="91 algorithms" src="https://img.shields.io/badge/algorithms-91-f2cd4b?style=flat-square&labelColor=151515">
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-none-7fcb6a?style=flat-square&labelColor=151515">
   <img alt="Public domain" src="https://img.shields.io/badge/license-Unlicense-f0a23b?style=flat-square&labelColor=151515">
 </p>
@@ -35,23 +35,24 @@ Light and dark themes, keyboard friendly (`/` finds an algorithm, `←` `→` st
 | Week | Algorithms |
 |:--:|---|
 | 1 | Introduction: the Turing Test, the Winograd Schema Challenge (reading only) |
-| 2 | Breadth First Search · Depth First Search · Depth First Iterative Deepening |
-| 3 | Best First Search · Hill Climbing · Beam Search · TSP: Nearest Neighbour · Greedy · Savings · Brute force · 2-city exchange · 2-opt · Or-opt · 3-edge exchange · VND · Beam search · Tabu search · Iterated hill climbing · Random walk · Simulated annealing |
-| 4 | Genetic algorithm · Crossover lab (CX, PMX, OX, AEX, HX, ordinal) · Ant colony optimisation |
-| 5 | Uniform Cost Search · A* |
-| 6 | Admissibility & monotone check · IDA* · RBFS · Divide & Conquer Frontier Search · Sequence alignment (DP and A*) |
-| 7 | Minimax · Alpha-Beta pruning · SSS* |
-| 8 | Forward and backward state-space planning · Goal Stack Planning · Partial Order Planning |
-| 9 | AO* on AND–OR graphs |
-| 10 | Forward chaining · Rete |
-| 11 | Backtracking · Forward checking · Arc consistency (AC-1, AC-3) · Waltz labelling · Model-based diagnosis |
+| 2 | **Graph search · uninformed:** Breadth First Search · Depth First Search · Depth-Bounded DFS · Depth First Iterative Deepening · BFS on a state space · DFS on a state space · Simple search (no node pairs) |
+| 3 | **Graph search · informed:** Best First Search · Hill Climbing · Beam Search · Best First on a state space<br>**Planning:** Hill climbing in the blocks world (h1 vs h2)<br>**SAT · exact:** Brute force (truth table)<br>**SAT · local search:** Hill climbing (N1) · Beam search · Variable Neighbourhood Descent (N1 → N1–n) · Best neighbour, fixed moves · Tabu search<br>**SAT · stochastic:** Random walk<br>**TSP · constructive:** Nearest Neighbour · Greedy heuristic · Savings heuristic<br>**TSP · exact:** Brute force (exact)<br>**TSP · local search:** Variable neighbourhood descent · Beam search · Tabu search · Iterated hill climbing · Best neighbour, k moves · Random walk · Simulated annealing<br>**TSP · perturbation:** 2-city exchange · 2-edge exchange (2-opt) · Or-opt (move a city) · 3-edge exchange |
+| 4 | **SAT · genetic:** Genetic algorithm<br>**SAT · stochastic:** Iterated hill climbing · Stochastic hill climbing (fixed T) · Simulated annealing<br>**TSP · genetic:** Genetic algorithm · Crossover lab · Representation lab<br>**TSP · local search:** Stochastic hill climbing<br>**TSP · swarm:** Ant colony optimisation |
+| 5 | **Graph search · informed:** A* on a state space<br>**Graph search · optimal:** Uniform Cost Search · Dijkstra's Algorithm · Branch & Bound (state space) · British Museum (brute force on paths) · A* · Weighted A* · Heuristic comparison (A* with h = 0, h, h*)<br>**TSP · exact:** Branch & bound (exact) |
+| 6 | **Graph search · optimal:** Admissibility & monotone check<br>**Graph search · space saving:** A* with upper-bound pruning of OPEN · Breadth First Heuristic Search (BFHS) · Divide and Conquer BFHS (DC-BFHS) · Beam Stack Search · Smart Memory Graph Search (SMGS) · Frontier Search · IDA* · Recursive Best-First Search · Divide & Conquer Frontier Search<br>**Sequence alignment:** Sequence alignment (dynamic programming) · Sequence alignment (A*) |
+| 7 | **Game playing:** Minimax · Alpha-Beta pruning · SSS* · Expectiminimax (supplementary) |
+| 8 | **Planning:** Forward state-space planning · Backward state-space planning · Goal Stack Planning · Graphplan · Partial Order Planning · Means-ends analysis |
+| 9 | **Problem decomposition:** AO* · Backward chaining (goal tree) |
+| 10 | **Rule-based systems:** Forward chaining · Rete algorithm |
+| 11 | **Constraint processing:** Backtracking · Forward checking · Arc consistency (AC-1, AC-3) · Path consistency (PC, i-consistency) · Waltz algorithm · Model-based diagnosis<br>**SAT · constraint processing:** SAT as a CSP: backtracking with unit propagation (DPLL) |
+| 12 | **Constraint processing · lookahead:** Partial look-ahead · Full look-ahead · Arc-consistency look-ahead (MAC)<br>**Constraint processing · lookback:** Conflict-directed backjumping · Nogood recording<br>**Graph search · optimal:** Depth-First Branch and Bound |
 
 Conventions used everywhere: OPEN and CLOSED hold node pairs `(node, parent, depth or g)`, ties break alphabetically, the goal test happens when a node is *picked* from OPEN, simulated annealing accepts a worse move with probability `1 / (1 + e^(−ΔE/T))`, and savings are `S(i,j) = C(b,i) + C(b,j) − C(i,j)`.
 
 ## Quick start
 
 ```bash
-git clone https://github.com/1mystic/SearchStudio && cd search-studio
+git clone https://github.com/1mystic/SearchStudio && cd SearchStudio
 npm run build     # validate + test + build (Node 18+, no npm install needed)
 npm run serve     # then open the printed localhost address
 # or just open dist/search-studio.html: the whole site in one file
