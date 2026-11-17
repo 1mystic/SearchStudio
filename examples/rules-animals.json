@@ -3,6 +3,7 @@
  "type": "rules",
  "name": "Animal identification",
  "note": "A small identification system in the style of Winston's zookeeper.",
+ "goal": "(is cheetah rex)",
  "facts": [
   "(has hair rex)",
   "(eats meat rex)",

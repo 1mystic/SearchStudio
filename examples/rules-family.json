@@ -3,6 +3,7 @@
  "type": "rules",
  "name": "Family relations",
  "note": "Facts about parents; rules derive grandparents, fathers and grandfathers.",
+ "goal": "(grandfather tom ?who)",
  "facts": [
   "(parent tom bob)",
   "(parent bob ann)",
