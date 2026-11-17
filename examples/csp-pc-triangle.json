@@ -1,0 +1,58 @@
+{
+ "id": "csp-pc-triangle",
+ "type": "csp",
+ "name": "Two colours on a triangle: arc consistency passes, path consistency fails",
+ "note": "X, Y, Z must all differ but only a and b exist. Every value has a partner on every edge, so arc consistency deletes nothing. Path consistency composes two edges through the third variable and finds that no pair survives: the network has no solution.",
+ "variables": [
+  {
+   "id": "X",
+   "domain": [
+    "a",
+    "b"
+   ],
+   "x": 0,
+   "y": 1
+  },
+  {
+   "id": "Y",
+   "domain": [
+    "a",
+    "b"
+   ],
+   "x": 2,
+   "y": 1
+  },
+  {
+   "id": "Z",
+   "domain": [
+    "a",
+    "b"
+   ],
+   "x": 1,
+   "y": 0
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "X",
+    "Y"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "Y",
+    "Z"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "X",
+    "Z"
+   ],
+   "rel": "neq"
+  }
+ ]
+}
