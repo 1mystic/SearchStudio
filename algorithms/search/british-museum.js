@@ -6,6 +6,7 @@ Studio.register({
   week: 5,
   problem: "graph",
   order: 43,
+  defaultExample: "graph-dijkstra",
   summary: "Try every simple path from S to the goal and keep the cheapest. Always right, hopelessly slow on big graphs: the yardstick the clever algorithms are measured against.",
   pseudocode: `best ← none;  cost* ← ∞
 DFS over simple paths from S (a node may not repeat on the current path):

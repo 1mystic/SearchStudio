@@ -6,6 +6,7 @@ Studio.register({
   week: 12,
   problem: "graph",
   order: 66,
+  defaultExample: "graph-weighted",
   summary: "Depth-first search that remembers the best solution cost U found so far and abandons any path whose g + h is already ≥ U. Linear memory, and optimal when h is admissible.",
   pseudocode: `U ← ∞;  best ← none
 DFBnB(N, g, path):
@@ -33,8 +34,9 @@ return best`,
     "traps": [
       "The first goal found is not the answer: keep searching with the bound.",
       "With an inadmissible h the pruning can discard the optimal path; with h = 0 ('g only') it is always safe.",
-      "A bad child ordering finds a poor U late and prunes little.",
-      "Prune with ≥ U: a path equal to U cannot improve the answer."
+      "A bad child ordering finds a poor U late and prunes little. On the 'Weighted graph' U improves twice (first S–A–C–E–G = 13, then the optimum S–B–E–G = 12) and every later branch is cut by g + h ≥ U.",
+      "Prune with ≥ U: a path equal to U cannot improve the answer.",
+      "Unlike A*, the first solution is usually not optimal; the search only stops when every branch is pruned. Use 'g only' to see the bound work without a heuristic: more branches survive."
     ],
     "props": { "complete": "yes (finite graph)", "optimal": "yes with admissible h", "time": "exponential worst case", "space": "O(b·d)" }
   },

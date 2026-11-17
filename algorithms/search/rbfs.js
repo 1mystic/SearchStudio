@@ -6,6 +6,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 75,
+  defaultExample: "graph-rbfs-switch",
   summary: "Explore the best child while its f stays below the best alternative elsewhere; when it exceeds that limit, back up its f value and switch. Keeps only the current path and its siblings.",
   pseudocode: `RBFS(N, fm(N), limit):
     if GoalTest(N): return SUCCESS
@@ -41,15 +42,16 @@ call RBFS(S, h(S), ∞)`,
     ],
     "formulas": [
       {
-        "f": "fm(N) = backed-up minimum of f over N's explored subtree",
-        "read": "the best f value seen below N",
-        "why": "Lets RBFS return to a forgotten subtree knowing exactly how promising it was."
+        "f": "F(C) = max( g(C) + h(C), F(N) )  for a child C of N",
+        "read": "a child inherits its parent's backed-up value when that is larger",
+        "why": "When a subtree is abandoned, its F is replaced by the best (smallest) F that was cut off below it. RBFS can then return to a forgotten subtree knowing exactly how promising it was, and the max keeps F from falling below what is already known."
       }
     ],
     "why": "Linear space and optimal with admissible h. It may re-expand the same nodes many times when the best path keeps switching.",
     "traps": [
       "The limit passed down is the second-best F, not the parent's f.",
-      "Keep backed-up values; recomputing g + h throws the information away."
+      "Keep backed-up values; recomputing g + h throws the information away.",
+      "RBFS forgets subtrees, so it re-expands them: on 'RBFS switches branches...' A is expanded twice (A* expands each node once), and on ties it can switch back and forth often."
     ],
     "props": {
       "complete": "yes",
@@ -61,7 +63,8 @@ call RBFS(S, h(S), ∞)`,
   params: [],
   run(P) {
     const steps = [], path = [P.start], fm = Studio.fmt;
-    let expansions = 0;
+    let expansions = 0, reexpanded = 0;
+    const seen = new Set();
     const rows = [];
     const snap = (cur, cap, kids = []) => {
       const states = {}; path.forEach(p => (states[p] = "visited")); kids.forEach(k => (states[k.id] = "open")); states[cur] = "current";
@@ -74,8 +77,9 @@ call RBFS(S, h(S), ∞)`,
       if (N === P.goal) return [true, FN];
       const kids = P.adj[N].filter(([c]) => !path.includes(c)).map(([c, w]) => ({ id: c, g: g + w, F: Math.max(g + w + P.h[c], FN) }));
       expansions++;
-      rows.push([expansions, N, limit === Infinity ? "∞" : fm(limit), kids.map(k => `${k.id}:${fm(k.F)}`).join(" ") || "–"]);
-      snap(N, `Expand ${N} (limit ${limit === Infinity ? "∞" : fm(limit)}): children ${kids.map(k => `${k.id} F=${fm(k.F)}`).join(", ") || "none"}`, kids);
+      const again = seen.has(N); seen.add(N); if (again) reexpanded++;
+      rows.push([expansions, again ? N + " (again)" : N, limit === Infinity ? "∞" : fm(limit), kids.map(k => `${k.id}:${fm(k.F)}`).join(" ") || "–"]);
+      snap(N, `Expand ${N}${again ? " AGAIN (RBFS forgot its subtree when it backed up, so the work is repeated)" : ""} (limit ${limit === Infinity ? "∞" : fm(limit)}): children ${kids.map(k => `${k.id} F=${fm(k.F)}`).join(", ") || "none"}`, kids);
       if (!kids.length) return [false, Infinity];
       for (let guard = 0; guard < 500; guard++) {
         kids.sort((a, b) => a.F - b.F || (a.id < b.id ? -1 : 1));
@@ -94,9 +98,9 @@ call RBFS(S, h(S), ∞)`,
     const [ok] = rbfs(P.start, 0, P.h[P.start], Infinity);
     if (!ok) { steps.push({ caption: "No path to the goal", nodes: Studio.gs.nodes(P), edges: Studio.gs.edges(P) }); return { steps, result: { found: false, expanded: expansions } }; }
     const found = path.slice(), cost = Studio.gs.pathCost(P, found);
-    steps.push({ caption: `Goal ${P.goal} reached: path ${found.join(" – ")}, cost ${fm(cost)}, ${expansions} expansions`,
+    steps.push({ caption: `Goal ${P.goal} reached: path ${found.join(" – ")}, cost ${fm(cost)}, ${expansions} expansions${reexpanded ? ` (${reexpanded} of them repeat earlier work: the price of linear memory)` : ""}`,
       nodes: Studio.gs.nodes(P, Object.fromEntries(found.map(p => [p, p === P.goal ? "goal" : "path"]))), edges: Studio.gs.edges(P, found),
       table: { title: "expansions", columns: ["#", "node", "limit", "children F"], rows: rows.slice(-14) }, stats: [{ label: "path cost", value: fm(cost), state: "ok" }, { label: "expansions", value: expansions }] });
-    return { steps, result: { found: true, path: found, cost, expanded: expansions } };
+    return { steps, result: { found: true, path: found, cost, expanded: expansions, reexpanded } };
   },
 });

@@ -1,0 +1,11 @@
+{
+ "id": "align-similar",
+ "type": "alignment",
+ "name": "ACGTTGCAAT vs ACGTAGCAAT: one substitution",
+ "note": "Two nearly identical sequences, match 0, mismatch 1, gap 1: cost 1. Run Alignment (A*) and read the last caption: A* expands only 11 of the 121 lattice points along the diagonal, whereas dynamic programming always fills all 121.",
+ "a": "ACGTTGCAAT",
+ "b": "ACGTAGCAAT",
+ "match": 0,
+ "mismatch": 1,
+ "gap": 1
+}

@@ -6,6 +6,7 @@ Studio.register({
   week: 5,
   problem: "graph",
   order: 40,
+  defaultExample: "graph-dijkstra",
   summary: "OPEN is a priority queue on g(N), the cost so far. A cheaper path to a node on OPEN or CLOSED updates its parent. Optimal for non-negative costs.",
   pseudocode: `OPEN ← [(S, nil, 0)] ordered by g
 while OPEN not empty
@@ -56,7 +57,8 @@ while OPEN not empty
     "why": "Optimal for non-negative edge costs; it is Dijkstra's algorithm stopped at the goal. It explores in all directions because it has no idea where the goal is.",
     "traps": [
       "Apply the goal test when the goal is removed from OPEN, not when it is generated.",
-      "Remember to update g and the parent on cheaper paths."
+      "Remember to update g and the parent on cheaper paths: in 'Dijkstra demo' G is first reached at 9 (via C) and then improved to 8 (via D); keeping the first path would give a wrong answer.",
+      "UCS ignores the goal's direction: it expands every node cheaper than the optimum (compare the expansions of A* on the 'Weighted graph' example: 8 for UCS, 5 for A*)."
     ],
     "props": {
       "complete": "yes",

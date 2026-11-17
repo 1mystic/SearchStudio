@@ -7,6 +7,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 30,
+  defaultExample: "graph-grid",
   summary: "Expand the graph layer by layer like breadth-first search, but never generate a node with f = g + h above an upper bound U. Only the boundary (the last two layers) is kept in CLOSED, older layers are deleted. With admissible h the cost equals A*'s.",
   pseudocode: `U ← cost of a quick solution (greedy) or a given bound
 layer0 ← [S]
@@ -33,7 +34,7 @@ return the best goal found (or the quick solution)`,
       { f: "CLOSED = layers k and k−1", read: "only the boundary is stored", why: "Every neighbour of a layer-k node is in layer k−1, k or k+1 (in a graph of unit moves), so older layers can never be regenerated through duplicate detection." },
       { f: "discard C when g(C) + h(C) > U", read: "bound pruning", why: "It keeps the layers narrow and, with h ≤ h*, never discards the optimal path when U ≥ C*." },
     ],
-    why: "BFHS stores far fewer expanded nodes than A* on graphs whose layers are narrow compared with the whole explored region. It pays with expanding every node with f ≤ U, even ones A* would never reach.",
+    why: "BFHS stores far fewer expanded nodes than A* on graphs whose layers are narrow compared with the whole explored region: on the 4×5 grid its peak CLOSED is 8 against A*'s 19. It pays with expanding every node with f ≤ U, even ones A* would never reach.",
     traps: ["Costs are compared across layers, so a node can be reached in a later layer with a lower g; this tracer keeps the cheaper copy only when it is still in a retained layer.", "A bad (large) U weakens the pruning but never breaks the answer.", "In the original BFHS no parent pointers are kept, so only the cost is known; here parent links are kept just to print the path. Divide and Conquer BFHS shows how to recover it without them."],
     props: { complete: "yes if U ≥ C*", optimal: "yes with admissible h", time: "A*-like", space: "two layers + one" },
   },
@@ -78,6 +79,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 35,
+  defaultExample: "graph-grid",
   summary: "BFHS keeps only boundary layers, so it cannot read the path back. DC-BFHS remembers a relay node from the middle layer of the best path, then solves start→relay and relay→goal as two smaller BFHS problems, recursively. No parent pointers are stored at all.",
   pseudocode: `DC-BFHS(S, T, U):
     run BFHS from S to T with bound U, no parent pointers      # gives cost C and the number of layers L
@@ -99,7 +101,7 @@ Studio.register({
       { f: "C = g(R) + cost(R→T)", read: "an optimal path through R splits into two optimal halves", why: "Each half of an optimal path is itself optimal, so solving the halves and joining them gives an optimal whole." },
       { f: "memory ≈ boundary layers of the largest sub-search", read: "no pointers, no deep layers", why: "The sub-searches run one at a time, so their memory is not added up." },
     ],
-    why: "Shows how to get the path from a search that keeps almost nothing. The cost is a second pass per level of recursion.",
+    why: "Shows how to get the path from a search that keeps almost nothing: on the 4×5 grid the boundary CLOSED is at most 9 against A*'s 19. The cost is a second pass per level of recursion.",
     traps: ["The relay must be recorded in the same run that finds the best goal; a different tie-break could give a different path and relay.", "A sub-search uses h = 0, so it expands more nodes than the first run did.", "The relay layer ⌊L/2⌋ is by number of moves, not by cost; on weighted graphs the halves can have unequal cost."],
     props: { complete: "yes if U ≥ C*", optimal: "yes with admissible h", time: "≈ 2 × BFHS", space: "boundary layers" },
   },

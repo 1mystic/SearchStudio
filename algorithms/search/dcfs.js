@@ -7,6 +7,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 80,
+  defaultExample: "graph-grid",
   summary: "Frontier search drops CLOSED: each OPEN node remembers which neighbours already used an edge to it, so expanded nodes are never regenerated. A relay node halfway along each path lets the path be rebuilt by two smaller searches.",
   pseudocode: `DCFS(S, G):
     run frontier search from S to G           # OPEN only; each node keeps a 'used' set of neighbours
@@ -39,7 +40,7 @@ Studio.register({
         "why": "For grid-like spaces (such as sequence alignment) the frontier is much smaller than the expanded region."
       }
     ],
-    "why": "Trades extra time (the recursive searches) for a large memory saving. It is the basis of memory-efficient sequence alignment.",
+    "why": "On the 4×5 grid the frontier never holds more than a handful of nodes and no CLOSED list is stored, at the cost of 66 expansions in total against A*'s 20. Trades extra time (the recursive searches) for a large memory saving. It is the basis of memory-efficient sequence alignment.",
     "traps": [
       "Frontier search alone gives the cost, not the path: the relay recursion recovers it.",
       "The 'used' bookkeeping is what replaces the CLOSED check."

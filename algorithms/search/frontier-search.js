@@ -6,6 +6,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 70,
+  defaultExample: "graph-grid",
   summary: "A* with no CLOSED list at all. Each OPEN node remembers which of its moves lead back to nodes already expanded (used-operator bits), so the parents are never regenerated. Memory is just the frontier.",
   pseudocode: `OPEN ← [(S, g=0, used={})]                 # no CLOSED list
 while OPEN not empty
@@ -29,8 +30,8 @@ while OPEN not empty
       { f: "memory = |OPEN|", read: "there is no CLOSED list", why: "In grid-like graphs the frontier is a thin front, much smaller than everything expanded so far." },
       { f: "h consistent (h(N) ≤ k(N,M) + h(M))", read: "needed for correctness", why: "Then a node is expanded with its final g, so never needing to be reopened. Reversible moves (undirected graph) are also needed, so the used bit can be set." },
     ],
-    why: "A* minus its biggest list. It trades away the path: on its own it can only report the cost, and DCFS or DC-BFHS recover the path.",
-    traps: ["With an inconsistent heuristic a node may need reopening, which frontier search cannot do.", "Only for undirected graphs here: a directed edge has no 'reverse operator' to mark as used.", "To print the path this tracer carries the path along with each OPEN node. That is for the display only and is not counted in the memory figures."],
+    why: "A* minus its biggest list: on the 4×5 grid it holds at most 5 nodes in total where A* holds 20 (19 of them CLOSED). It trades away the path: on its own it can only report the cost, and DCFS or DC-BFHS recover the path.",
+    traps: ["With an inconsistent heuristic a node may need reopening, which frontier search cannot do: on 'Admissible but not monotone h: A* reopens C' it returns S–C–G = 6 although the optimum is 5 (A* reopens C and finds S–A–B–C–G).", "Only for undirected graphs here: a directed edge has no 'reverse operator' to mark as used.", "To print the path this tracer carries the path along with each OPEN node. That is for the display only and is not counted in the memory figures."],
     props: { complete: "yes", optimal: "yes with admissible, consistent h", time: "same as A*", space: "OPEN only" },
   },
   params: [],

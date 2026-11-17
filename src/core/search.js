@@ -93,7 +93,7 @@
             notes.push(`${c}: cheaper path via ${N.id} (g ${fmt(old.g)} → ${fmt(g)})`);
             const ti = tree.findIndex(([, v]) => v === c); if (ti >= 0) tree.splice(ti, 1); tree.push([N.id, c]);
             old.parent = N.id; old.g = g; old.depth = N.depth + 1; old.f = g + W * old.h;
-            if (inClosed) { CLOSED.splice(CLOSED.indexOf(inClosed), 1); OPEN.push(inClosed); notes[notes.length - 1] += ", reopened"; }
+            if (inClosed) { CLOSED.splice(CLOSED.indexOf(inClosed), 1); OPEN.push(inClosed); notes[notes.length - 1] += kind === "astar" ? ", so CLOSED node " + c + " is REOPENED (it was closed with a worse g: " + (W > 1 ? "w·h" : "h") + " is not monotone)" : ", reopened"; }
           }
         }
         if (kind === "dfs") OPEN = added.concat(OPEN); else OPEN = OPEN.concat(added);

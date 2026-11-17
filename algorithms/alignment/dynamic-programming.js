@@ -41,7 +41,9 @@ trace back from (m,n) choosing a move that produced each value`,
     "why": "Exact and O(m·n). The same lattice can be searched by A* with an admissible heuristic, or with frontier ideas to cut memory, which is how the course connects alignment to search.",
     "traps": [
       "Costs are minimised here; scoring versions maximise similarity instead.",
-      "Off-by-one: row i refers to letter aᵢ, i.e. a[i−1] in code."
+      "Off-by-one: row i refers to letter aᵢ, i.e. a[i−1] in code.",
+      "Several alignments can share the optimal cost; the traceback prefers the diagonal move on ties, so a different tie-break prints a different but equally good alignment.",
+      "The costs decide the shape: in 'ACGTC vs AGTC, gap 2, mismatch 3' the single gap that the length difference forces goes after the A, where it lets G, T and C match exactly (cost 2); anywhere else it would add mismatches of 3 each."
     ],
     "props": {
       "complete": "yes",
@@ -74,7 +76,7 @@ trace back from (m,n) choosing a move that produced each value`,
     const pathSet = new Set(path), edges = [];
     for (let k = 0; k + 1 < path.length; k++) edges.push({ u: path[k], v: path[k + 1], state: "path" });
     const nodes = Object.fromEntries(P.ids.map(id => { const [ii, jj] = id.split(",").map(Number); return [id, { state: pathSet.has(id) ? "path" : "closed", label: String(D[ii][jj]) }]; }));
-    steps.push({ caption: `Optimal cost ${D[m][n]}: ${A.join("")} / ${B.join("")}`, nodes, edges, table: tableAt(m, pathSet),
+    steps.push({ caption: `Traceback from (${m},${n}) follows the move that produced each value. Optimal cost ${D[m][n]}: ${A.join("")} / ${B.join("")} (${A.filter((x, q) => x !== "-" && B[q] !== "-" && x === B[q]).length} matches, ${A.filter((x, q) => x !== "-" && B[q] !== "-" && x !== B[q]).length} mismatches, ${A.filter((x, q) => x === "-" || B[q] === "-").length} gaps). The table needed all ${(m + 1) * (n + 1)} cells`, nodes, edges, table: tableAt(m, pathSet),
       lists: [{ label: "a", items: A.map(x => ({ text: x, state: "open" })), boxes: true }, { label: "b", items: B.map((x, k) => ({ text: x, state: x === A[k] ? "open" : x === "-" || A[k] === "-" ? "alt" : "bad" })), boxes: true }],
       stats: [{ label: "cost", value: D[m][n], state: "ok" }] });
     return { steps, result: { cost: D[m][n], alignment: [A.join(""), B.join("")] } };

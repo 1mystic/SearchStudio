@@ -6,6 +6,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 70,
+  defaultExample: "graph-rbfs-switch",
   summary: "Depth-first search that never expands a node with f = g + h above a bound. Start with bound f(S); after a failed pass, raise the bound to the smallest f that was cut off. Optimal with admissible h, memory linear in depth.",
   pseudocode: `bound ← f(S) = h(S)
 loop
@@ -56,7 +57,8 @@ DFS(N, g, bound):
     ],
     "why": "Optimal with admissible h and linear memory. It repeats work in every pass, which is cheap when f takes few distinct values and expensive when many nodes have different f.",
     "traps": [
-      "Count expansions across all passes.",
+      "Count expansions across all passes: on 'RBFS switches branches...' the bounds are 5, 6, 7 and the passes expand S, A (bound 5); S, A, B (bound 6); S, A, C (bound 7) and reach G: 8 expansions in total against A*'s 4 (the price of linear memory); the table lists every bound.",
+      "The next bound is the smallest f that was cut off, not bound + 1: costs of 1.5 or 2 would skip values if it were incremented.",
       "IDA* has no CLOSED list, so on graphs it may revisit nodes by different paths."
     ],
     "props": {
@@ -107,6 +109,11 @@ DFS(N, g, bound):
       }
       summary.push([F(bound), expanded, next === Infinity ? "∞" : F(next), "no path within bound"]);
       if (next === Infinity) break;
+      steps.push({ caption: `Round ${round} over, no goal within bound ${F(bound)} (${expanded} expansion${expanded === 1 ? "" : "s"}). The smallest f that was cut off is ${F(next)}, so the next bound is ${F(next)}; the next round restarts from ${P.start} and repeats the earlier work`,
+        nodes: Studio.gs.nodes(P, { [P.start]: "current" }), edges: Studio.gs.edges(P),
+        lists: [{ label: "BOUNDS SO FAR", items: summary.map(r => ({ text: `${r[0]} → ${r[2]}`, state: "open" })) }],
+        table: { title: "rounds", columns: ["bound", "expanded", "next bound", "result"], rows: summary, rowStates: summary.map((_, i) => (i === summary.length - 1 ? "cur" : "")) },
+        stats: [{ label: "next bound", value: F(next) }, { label: "total expanded", value: total }] });
       bound = next;
     }
     steps.push({ caption: "No path to the goal", nodes: Studio.gs.nodes(P), edges: Studio.gs.edges(P), table: { columns: ["bound", "expanded", "next bound", "result"], rows: summary } });

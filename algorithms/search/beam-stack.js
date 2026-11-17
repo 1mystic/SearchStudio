@@ -6,6 +6,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 40,
+  defaultExample: "graph-grid",
   summary: "Beam search with memory of what it threw away. Each layer keeps its w best nodes by f, and a beam stack records the range of f values [lo, hi) each layer has covered. After a layer is exhausted the search backtracks to the deepest layer with unexplored f values, so it is eventually complete and optimal.",
   pseudocode: `U ← cost of a quick solution (greedy) or a given bound
 layer 0 ← [S];  beam stack ← [ [lo=−∞, hi=∞) per layer ]
@@ -31,7 +32,7 @@ return the best goal found`,
       { f: "stored nodes ≤ w · (layers)", read: "each layer holds at most w nodes", why: "The beam width bounds the memory regardless of the graph." },
       { f: "layer k item = [lo_k, hi_k)", read: "f-values already covered up to hi_k", why: "Every dropped node has f ≥ hi_k, so once all slices are searched nothing with f ≤ U is missed; with admissible h the optimum is found." },
     ],
-    why: "A wide enough beam makes it behave like A*; w = 1 turns it into depth-first-like backtracking. Memory stays small either way, so it trades time for space.",
+    why: "On the 4×5 grid with w = 2 it stores at most 14 nodes where A* stores 20, at the price of 40 expansions against A*'s 19 (it backtracks 3 times). A wide enough beam makes it behave like A*; w = 1 turns it into depth-first-like backtracking. Memory stays small either way, so it trades time for space.",
     traps: ["With w = 1 it can revisit the same node many times.", "A bound U that is too low prunes the solution; the greedy bound is always safe.", "The cost equals UCS/A* only when h is admissible; with an inadmissible h it returns the best path it saw, which may not be optimal.", "Cycles are avoided here by never generating a node that is already on its own path."],
     props: { complete: "yes (with backtracking)", optimal: "yes with admissible h", time: "up to exponential", space: "O(w · depth)" },
   },

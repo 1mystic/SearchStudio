@@ -6,6 +6,7 @@ Studio.register({
   week: 5,
   problem: "graph",
   order: 42,
+  defaultExample: "graph-t",
   summary: "Tree search with OPEN ordered on g and no CLOSED list. The same state can appear many times in the search tree; the tracer counts the occurrences. The first goal picked is the cheapest path.",
   pseudocode: `OPEN ← [(S, nil, g=0)]                      # a search TREE: no CLOSED list
 repeat
@@ -31,6 +32,7 @@ repeat
     ],
     "why": "It finds the optimal path like UCS, but because it does not merge duplicates it does more work. Adding a CLOSED list (and updating g on cheaper paths) turns it into Dijkstra's algorithm. The occurrence counts show exactly what a CLOSED list saves.",
     "traps": [
+      "Duplicates: on 'Graph T' A appears twice, B twice and G three times, while Dijkstra on the same graph closes each node once; on the 4×5 grid the tree has hundreds of nodes for 20 states.",
       "The goal state may itself appear several times in the tree; only the first one picked ends the search.",
       "Do not stop when the goal is generated: stop when it is picked.",
       "A pick of a node is counted as a refinement even when it is the goal."

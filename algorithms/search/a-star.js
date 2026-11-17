@@ -6,6 +6,7 @@ Studio.register({
   week: 5,
   problem: "graph",
   order: 60,
+  defaultExample: "graph-weighted",
   summary: "OPEN is a priority queue on f(N) = g(N) + w·h(N). With w = 1 and an admissible h (h ≤ h*) the first goal picked is optimal. w > 1 is weighted A*: faster, not guaranteed optimal.",
   pseudocode: `OPEN ← [(S, nil, g=0)] ordered by f = g + w·h
 while OPEN not empty
@@ -34,7 +35,7 @@ while OPEN not empty
       ],
       [
         "update cheaper paths",
-        "Change parent and g; reopen CLOSED nodes if needed."
+        "If a cheaper g to a node on OPEN or CLOSED is found, change its parent and g; a CLOSED node goes back to OPEN (reopened). This can only happen when h is not monotone."
       ]
     ],
     "formulas": [
@@ -59,17 +60,18 @@ while OPEN not empty
         "why": "Faster, but the path can be up to w times the optimum."
       }
     ],
-    "why": "A* is optimal with an admissible h and is as efficient as any algorithm using the same h. Overestimating h (inadmissible) can make it return a worse path: try the 'inadmissible' example.",
+    "why": "A* is optimal with an admissible h and is as efficient as any algorithm using the same h. Compare the two examples 'Weighted graph for UCS and A*' (admissible h: optimal cost 12, fewer expansions than UCS) and 'Same graph, inadmissible h(B) = 12' (h overestimates, A* returns cost 13 instead of 12). If h is admissible but not monotone, a node may be closed before its cheapest path is known; A* then reopens it when the cheaper path appears: try 'Admissible but not monotone h: A* reopens C'.",
     "traps": [
-      "Admissible ≠ consistent: consistency implies admissibility, not the reverse.",
+      "Admissible ≠ consistent: consistency implies admissibility, not the reverse. Example 'Admissible but not monotone h' has h ≤ h* everywhere yet A* must reopen C.",
       "h = 0 makes A* behave like UCS.",
-      "With an inadmissible h the first goal found may not be optimal."
+      "With an inadmissible h the first goal picked may not be optimal (example 'Same graph, inadmissible h(B) = 12').",
+      "The goal test is on picking from OPEN, not on generating: the goal can sit on OPEN with a worse g while a cheaper route is still being found."
     ],
     "props": {
       "complete": "yes",
       "optimal": "yes with admissible h",
       "time": "exponential in general",
-      "space": "same"
+      "space": "exponential (OPEN and CLOSED)"
     }
   },
   params: [

@@ -1,0 +1,18 @@
+{
+ "id": "graph-rbfs-switch",
+ "type": "graph",
+ "name": "RBFS switches branches and re-expands A (IDA* bounds 5, 6, 7)",
+ "note": "Monotone, admissible h; optimal path S-A-C-G = 7. RBFS dives into A (F = 5), sees that C has F = 7 > the alternative B (F = 6), backs 7 up to A and switches to B; B's child D has F = 8 > 7, so 8 is backed up to B and the search returns to A, which is EXPANDED AGAIN (5 expansions, A twice; A* needs 4). IDA* on the same graph runs with bounds 5, 6, 7.",
+ "nodes": [
+  { "id": "S", "x": 0.5, "y": 2.0, "h": 5 },
+  { "id": "A", "x": 2.2, "y": 0.8, "h": 3 },
+  { "id": "B", "x": 2.2, "y": 3.2, "h": 3 },
+  { "id": "C", "x": 4.0, "y": 0.8, "h": 3 },
+  { "id": "D", "x": 4.0, "y": 3.2, "h": 4 },
+  { "id": "G", "x": 5.6, "y": 2.0, "h": 0 }
+ ],
+ "edges": [["S", "A", 2], ["S", "B", 3], ["A", "C", 2], ["B", "D", 1], ["C", "G", 3], ["D", "G", 5]],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}

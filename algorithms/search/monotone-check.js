@@ -6,6 +6,7 @@ Studio.register({
   week: 6,
   problem: "graph",
   order: 65,
+  defaultExample: "graph-reopen",
   summary: "Compute the true remaining cost h* by a backward Dijkstra from the goal, then test every node for admissibility (h ≤ h*) and every edge for the monotone condition h(m) ≤ k(m,n) + h(n).",
   pseudocode: `h* ← Dijkstra from the goal (true cost to the goal)
 for each node n: admissible at n  ⇔  h(n) ≤ h*(n)
@@ -48,7 +49,7 @@ monotone everywhere and h(goal) = 0  ⇒  admissible`,
     ],
     "why": "Knowing which property holds tells you whether A* is optimal (admissible) and whether it may need to reopen closed nodes (not monotone).",
     "traps": [
-      "Admissible does not imply monotone.",
+      "Admissible does not imply monotone: the 'Admissible but not monotone h' example passes the first table and fails on the edge B→C (3 > 1 + 0); A* then reopens C.",
       "Check both directions of an undirected edge."
     ],
     "props": {

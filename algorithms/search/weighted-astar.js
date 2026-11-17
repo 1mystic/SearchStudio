@@ -6,6 +6,7 @@ Studio.register({
   week: 5,
   problem: "graph",
   order: 61,
+  defaultExample: "graph-dijkstra",
   summary: "A* with f = g + w·h, w ≥ 1. Trusting h more makes the search greedier and usually faster. With an admissible h the path cost is at most w times the optimum C*.",
   pseudocode: `OPEN ← [(S, nil, g=0)] ordered by f = g + w·h
 while OPEN not empty
@@ -34,7 +35,8 @@ while OPEN not empty
     "traps": [
       "The bound needs an admissible h. With an inadmissible h there is no guarantee at all (try the inadmissible example).",
       "w = 1 gives plain A*; w < 1 is not weighted A* (it drifts toward UCS and loses the bound meaning).",
-      "A larger w does not always expand fewer nodes on every graph; it usually does."
+      "A larger w does not always expand fewer nodes on every graph; it usually does.",
+      "The trade in numbers: on the 'Dijkstra demo' graph w = 2 returns S–C–G at cost 9 (optimum 8, bound 2 × 8 = 16) after 3 expansions instead of A*'s 5; on the 4×5 grid w = 2 expands 8 nodes instead of 20 and still finds cost 7. Set w = 1 to get A* back."
     ],
     "props": { "complete": "yes", "optimal": "no: within w · C* with admissible h", "time": "often much less than A*", "space": "same as A*" }
   },
