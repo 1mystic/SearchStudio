@@ -6,6 +6,7 @@ Studio.register({
   week: 3,
   problem: "planning",
   order: 5,
+  defaultExample: "plan-hill-terrain",
   summary: "Steepest-ascent hill climbing on blocks-world states. The simple heuristic h1 (+1 per block on the right thing, −1 otherwise) gets stuck at a local maximum; h2 (credit for a whole correct tower) reaches the goal.",
   pseudocode: `N ← start
 loop

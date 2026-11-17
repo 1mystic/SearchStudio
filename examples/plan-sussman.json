@@ -2,7 +2,7 @@
  "id": "plan-sussman",
  "type": "planning",
  "name": "Sussman anomaly",
- "note": "C is on A; goal: A on B on C. Achieving the goals one at a time undoes earlier work.",
+ "note": "C is on A; goal: A on B on C. Achieving the goals one at a time undoes earlier work. Run Goal Stack Planning (10 steps: it clobbers on(B,C) while achieving on(A,B) and has to redo it), Means-ends analysis (fails: it cycles) and Partial Order Planning / Graphplan (6 steps, interleaving the subgoals).",
  "blocks": [
   "A",
   "B",

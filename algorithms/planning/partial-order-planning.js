@@ -6,6 +6,7 @@ Studio.register({
   week: 8,
   problem: "planning",
   order: 40,
+  defaultExample: "plan-sussman",
   summary: "Search in the space of partial plans. Start with steps Start (effects = initial state) and Finish (preconditions = goal). Repeatedly pick an open precondition, support it with an existing or a new step via a causal link, and resolve threats by promotion or demotion. Backtrack when stuck.",
   pseudocode: `plan ← {Start, Finish}, Start < Finish, agenda ← goal preconditions of Finish
 while agenda not empty
@@ -57,7 +58,8 @@ return any linearisation of the steps`,
     "why": "Finds the optimal 6-step plan for the Sussman anomaly by interleaving subgoals; the search can be expensive.",
     "traps": [
       "Check threats for new links and for new steps.",
-      "Never order a step before Start or after Finish."
+      "Never order a step before Start or after Finish.",
+      "The plan-space search is exponential: this studio declines problems with more than 4 blocks. Try example plan-sussman: 6 steps, no goal clobbering, because the subgoal orderings are chosen only when threats force them."
     ],
     "props": {
       "complete": "yes (with systematic search)",
@@ -66,6 +68,7 @@ return any linearisation of the steps`,
       "space": "O(plan size) per partial plan"
     }
   },
+  check: P => (P.blocks.length > 4 ? `Partial Order Planning is limited to 4 blocks (its iterative-deepening plan-space search grows too fast); this problem has ${P.blocks.length}` : null),
   params: [{ key: "limit", label: "Stop after plans explored (per bound)", type: "int", default: 20000 }],
   run(P, { limit }) {
     const BW = Studio.blocks, steps = [];

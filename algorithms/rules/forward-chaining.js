@@ -6,6 +6,7 @@ Studio.register({
   week: 10,
   problem: "rules",
   order: 10,
+  defaultExample: "rules-conflict",
   summary: "Repeat the recognise–act cycle: match every rule against working memory to build the conflict set, choose one instantiation by a conflict-resolution strategy, fire it (add or remove facts), until no new instantiation remains.",
   pseudocode: `repeat
     MATCH:   conflict set ← every (rule, bindings) whose conditions hold in WM and that has not fired
@@ -44,7 +45,8 @@ Studio.register({
     "why": "Data-driven reasoning, natural for monitoring and configuration. Naive matching repeats work each cycle; Rete removes that cost.",
     "traps": [
       "A variable must bind to the same value in every condition of a rule.",
-      "Conflict resolution changes the order, not the final set of derived facts (for rules that only add)."
+      "Conflict resolution changes the order, not the final set of derived facts (for rules that only add). Try example rules-conflict with the three strategies: the first firing is R1 ann, R1 bob or R2 ann.",
+      "With remove actions or NOT conditions the strategy can change the final facts, because firing one rule can destroy the match of another."
     ],
     "props": {
       "complete": "derives every consequence (add-only rules)",
@@ -58,7 +60,7 @@ Studio.register({
     const L = Studio.rulesLib, steps = [];
     let WM = P.facts0.map((f, i) => ({ f, t: i + 1 }));
     let clock = WM.length;
-    const fired = new Set();
+    const fired = new Set(), firing = [];
     const has = f => WM.find(w => w.f.join(" ") === f.join(" "));
     const instantiate = r => {
       let out = [{ b: {}, used: [] }];
@@ -76,19 +78,20 @@ Studio.register({
     const wmList = (fresh = []) => [{ label: "WM", items: WM.map(w => ({ text: `${w.t}:${L.show(w.f)}`, state: fresh.includes(w.t) ? "open" : "plain" })) }];
     for (let cycle = 1; cycle <= 60; cycle++) {
       const cs = P.rulesP.flatMap(instantiate).filter(i => !fired.has(i.key));
-      if (!cs.length) { steps.push({ caption: `Cycle ${cycle}: the conflict set is empty — stop. Working memory has ${WM.length} facts.`, lists: wmList(), stats: [{ label: "facts", value: WM.length, state: "ok" }] }); break; }
+      if (!cs.length) { steps.push({ caption: `Cycle ${cycle}: the conflict set is empty — stop. Working memory has ${WM.length} facts. Firing order under the ${strategy} strategy: ${firing.join(" → ") || "nothing fired"}. A different strategy reorders the firings; for rules that only add facts it cannot change the final set of facts.`, lists: wmList(), stats: [{ label: "facts", value: WM.length, state: "ok" }] }); break; }
       const ranked = cs.slice().sort((a, b) => strategy === "recency" ? Math.max(...b.used, 0) - Math.max(...a.used, 0) || a.r.order - b.r.order
         : strategy === "specificity" ? b.r.conds.length - a.r.conds.length || a.r.order - b.r.order : a.r.order - b.r.order || Math.max(...b.used, 0) - Math.max(...a.used, 0));
       const pick = ranked[0];
       const table = { title: `conflict set (${strategy})`, columns: ["instantiation", "uses facts", "chosen"], rows: ranked.map(i => [show(i), i.used.join(","), i === pick ? "fire" : ""]), rowStates: ranked.map(i => (i === pick ? "cur" : "")) };
       steps.push({ caption: `Cycle ${cycle} — match: ${cs.length} instantiation${cs.length > 1 ? "s" : ""}; resolve: ${show(pick)}`, lists: wmList(), table, stats: [{ label: "cycle", value: cycle }, { label: "facts", value: WM.length }] });
       fired.add(pick.key);
+      firing.push(show(pick));
       const fresh = [], changes = [];
       pick.r.acts.forEach(a => { const f = L.subst(a.pat, pick.b);
         if (a.op === "add") { if (!has(f)) { WM.push({ f, t: ++clock }); fresh.push(clock); changes.push("+" + L.show(f)); } }
         else { const k = has(f); if (k) { WM = WM.filter(w => w !== k); changes.push("−" + L.show(f)); } } });
       steps.push({ caption: `Cycle ${cycle} — execute ${pick.r.name}: ${changes.join(", ") || "no change (facts already present)"}`, lists: wmList(fresh), table, stats: [{ label: "cycle", value: cycle }, { label: "facts", value: WM.length }] });
     }
-    return { steps, result: { facts: WM.map(w => L.show(w.f)), cycles: fired.size } };
+    return { steps, result: { facts: WM.map(w => L.show(w.f)), cycles: fired.size, order: firing } };
   },
 });

@@ -2,7 +2,7 @@
  "id": "game-three-ply",
  "type": "game",
  "name": "Two-ply tree (3 × 3)",
- "note": "The classic textbook tree: MAX moves, then MIN. Minimax value 3; alpha-beta prunes two leaves.",
+ "note": "The classic textbook tree: MAX moves, then MIN. Minimax value 3; alpha-beta prunes two leaves (7 of 9 evaluated). Change Child order: best first evaluates only 5 leaves, worst first prunes nothing (9). SSS* evaluates 7.",
  "root": "MAX",
  "tree": [
   [

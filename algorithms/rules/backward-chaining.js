@@ -6,6 +6,7 @@ Studio.register({
   week: 9,
   problem: "rules",
   order: 20,
+  defaultExample: "rules-backtrack",
   summary: "Goal-directed reasoning over a rule base: to prove a goal, either find it among the facts or find a rule whose THEN part matches it and prove every IF condition of that rule as a sub-goal (AND). Different rules for the same goal are alternatives (OR). The search is drawn as an AND–OR goal tree.",
   pseudocode: `Prove(goal, bindings):
     for each fact f that unifies with goal: succeed (f is a solved leaf)
@@ -45,7 +46,7 @@ Studio.register({
     ],
     "why": "Every goal it proves is also derived by forward chaining (both are sound), but it only does the work needed for the query. An ancestor check is needed because rule bases can be recursive.",
     "traps": [
-      "The first matching fact or rule is not always the right one: bindings may make a later condition fail, and then it must backtrack.",
+      "The first matching fact or rule is not always the right one: bindings may make a later condition fail, and then it must backtrack. Try example rules-backtrack: rule F1 fails on (heavy tweety), the grey branch is undone, and F2 proves the goal.",
       "Rule variables are renamed apart for each use, so ?x in two different uses are different variables.",
       "Without the ancestor check a recursive rule (ancestor defined through ancestor) can loop forever.",
       "This stepper proves the first answer found; a query with variables may have several answers."

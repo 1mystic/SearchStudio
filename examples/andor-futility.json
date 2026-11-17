@@ -1,0 +1,22 @@
+{
+ "id": "andor-futility",
+ "type": "andor",
+ "name": "AND–OR graph with a dead end (futility)",
+ "note": "A has two connectors: B (looks cheapest, 1 + h 1 = 2) or AND{C,D} (2 + 1 + 1 = 4). AO* marks B and expands it: B has no connectors, so it is a dead end with cost FUTILITY, and A is revised to use AND{C,D}. C and D then expand to solved leaves: A is solved with cost 4 and the solution graph is A, C, D, K1, K2 (B is abandoned).",
+ "start": "A",
+ "edgeCost": 1,
+ "nodes": [
+  { "id": "A", "h": 2, "x": 2.5, "y": 0 },
+  { "id": "B", "h": 1, "x": 0.5, "y": 1 },
+  { "id": "C", "h": 1, "x": 2, "y": 1 },
+  { "id": "D", "h": 1, "x": 3.5, "y": 1 },
+  { "id": "K1", "h": 0, "solved": true, "x": 2, "y": 2 },
+  { "id": "K2", "h": 0, "solved": true, "x": 3.5, "y": 2 }
+ ],
+ "connectors": [
+  { "from": "A", "to": ["B"] },
+  { "from": "A", "to": ["C", "D"] },
+  { "from": "C", "to": ["K1"] },
+  { "from": "D", "to": ["K2"] }
+ ]
+}

@@ -6,6 +6,7 @@ Studio.register({
   week: 8,
   problem: "planning",
   order: 30,
+  defaultExample: "plan-sussman",
   summary: "Keep a stack of goals and actions. Pop satisfied goals; replace an unsatisfied goal by an action that achieves it plus that action's preconditions; when an action reaches the top its preconditions hold, so apply it. Goals are solved one at a time, which is why the Sussman anomaly makes it undo its own work.",
   pseudocode: `push the conjunct goal, then each goal in it
 while the stack is not empty
@@ -50,7 +51,8 @@ while the stack is not empty
     "why": "Fast and easy to trace, but not optimal and sensitive to goal order: on the Sussman anomaly it needs 10 steps where 6 suffice.",
     "traps": [
       "Push preconditions so that the one to achieve first is on top.",
-      "Always re-check the conjunct goal after its parts are popped."
+      "Always re-check the conjunct goal after its parts are popped.",
+      "Goal clobbering: achieving one goal can undo another (the Sussman anomaly). Run example plan-sussman: 10 steps instead of 6; the captions say 'Goal clobbering' when it happens."
     ],
     "props": {
       "complete": "no",
@@ -63,7 +65,7 @@ while the stack is not empty
   run(P, { goalOrder }) {
     const BW = Studio.blocks, steps = [];
     let S = new Set(P.init);
-    const plan = [];
+    const plan = []; let clobbered = 0;
     const goals = goalOrder === "reversed" ? P.goal.slice().reverse() : P.goal.slice();
     const stack = [{ kind: "conj", goals: goals.slice() }];
     goals.slice().reverse().forEach(g => stack.push({ kind: "goal", g }));
@@ -94,7 +96,7 @@ while the stack is not empty
       } else if (x.kind === "conj") {
         const miss = x.goals.filter(g => !S.has(g));
         if (!miss.length) { stack.pop(); snap(`All of ${x.goals.join(" ∧ ")} hold: pop the conjunct`); }
-        else { miss.slice().reverse().forEach(g => stack.push({ kind: "goal", g })); snap(`Conjunct ${x.goals.join(" ∧ ")} broken (${miss.join(", ")} undone by later actions): push them again`); }
+        else { miss.slice().reverse().forEach(g => stack.push({ kind: "goal", g })); clobbered++; snap(`Goal clobbering: the conjunct ${x.goals.join(" ∧ ")} was achieved goal by goal, but later actions undid ${miss.join(", ")}. A linear planner cannot interleave subgoals, so it pushes ${miss.length > 1 ? "them" : "it"} again and redoes the work`); }
       } else {
         stack.pop();
         if (!BW.applicable(x.op, S)) { snap(`${x.op.name} is not applicable: preconditions were undone; Goal Stack Planning fails`); return { steps, result: { plan: null } }; }
@@ -103,7 +105,7 @@ while the stack is not empty
       }
     }
     const ok = [...P.goalSet].every(g => S.has(g));
-    snap(ok ? `Done: ${plan.length}-step plan ${plan.join(", ")}` : "Stopped without achieving the goal");
-    return { steps, result: { plan: ok ? plan : null } };
+    snap(ok ? `Done: ${plan.length}-step plan ${plan.join(", ")}.${clobbered ? ` Goal clobbering happened ${clobbered} time${clobbered > 1 ? "s" : ""}: the goals interact, so the plan is longer than necessary (Partial Order Planning or Graphplan find a shorter one).` : " No goal was clobbered, so the goals could be solved independently."}` : "Stopped without achieving the goal");
+    return { steps, result: { plan: ok ? plan : null, clobbered } };
   },
 });

@@ -2,7 +2,7 @@
  "id": "game-four-ply",
  "type": "game",
  "name": "Four-ply binary tree",
- "note": "Sixteen leaves: compare how many alpha-beta and SSS* evaluate.",
+ "note": "Sixteen leaves, value 8. Alpha-beta evaluates 10 leaves as given, 7 with best-first ordering and 15 with worst-first ordering; SSS* evaluates only 8.",
  "root": "MAX",
  "tree": [
   [

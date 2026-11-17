@@ -6,6 +6,7 @@ Studio.register({
   week: 8,
   problem: "planning",
   order: 40,
+  defaultExample: "plan-graphplan-nogoods",
   summary: "Build a planning graph of alternating proposition and action layers with no-op actions and mutex (mutual exclusion) pairs; once the goals appear together without being mutex, search backwards through the graph for a plan, memoising failed goal sets.",
   pseudocode: `P0 ← initial state;  i ← 0
 loop
@@ -44,7 +45,8 @@ EXTRACT(G, i):  if i = 0 return [ ]
       "Goals appearing without mutex is necessary, not sufficient: extraction can still fail and the graph must be extended.",
       "A no-op is an action: it can be mutex with real actions (for example a no-op that keeps AE true is mutex with any action that deletes AE).",
       "Layers count parallel steps; in the one-arm blocks world nearly every pair of actions is mutex, so layers and plan steps coincide.",
-      "The termination test (graph levelled off and the nogood table stopped growing) proves that no plan exists; here it is checked after every failed extraction."
+      "Nogoods are goal sets proved unachievable at a layer: a repeat visit is cut immediately instead of searched again. Try example plan-graphplan-nogoods: the goals are non-mutex at P4 but extraction fails at P4 and P5 and succeeds at P6, reusing nogoods.",
+      "The termination test (graph levelled off and the nogood table at the layer where it levelled stopped growing) proves that no plan exists; it is checked after every failed extraction."
     ],
     "props": { "complete": "yes (finds a plan whenever one exists)", "optimal": "fewest layers", "time": "graph: polynomial; extraction: exponential in the worst case", "space": "polynomial in propositions × layers" }
   },
@@ -148,7 +150,7 @@ EXTRACT(G, i):  if i = 0 return [ ]
       return r;
     };
 
-    let n = 0, plan = null, layers = null, leveled = false, prevNo = -1, firstOK = null, failure = null;
+    let n = 0, plan = null, layers = null, leveled = false, lvl = 0, prevNo = -1, firstOK = null, failure = null;
     for (;;) {
       const g = goalsOK(n);
       if (g.ok) {
@@ -157,10 +159,10 @@ EXTRACT(G, i):  if i = 0 return [ ]
         const r = n === 0 ? [] : extract(goals, n);
         if (r) { layers = r; break; }
         steps.push({ caption: `Extraction from P${n} failed (every way of choosing actions led to a nogood), so the graph is extended by one more layer.`, blocks: draw0, stats: [{ label: "nogoods", value: nogood.reduce((s, x) => s + x.size, 0), state: "bad" }] });
-        if (leveled) { const sz = nogood[n].size; if (sz === prevNo) { failure = "the graph has levelled off and the nogood table stopped growing: no plan exists"; break; } prevNo = sz; }
+        if (leveled) { const sz = nogood[lvl].size; if (sz === prevNo) { failure = "the graph has levelled off and the nogood table stopped growing: no plan exists"; break; } prevNo = sz; }
       } else steps.push({ caption: `Goals are not yet usable in P${n}: ${g.why}. Extend the graph.`, blocks: draw0, stats: [{ label: "layer", value: n }] });
       if (n >= maxLevels) { failure = `the layer limit (${maxLevels}) was reached`; break; }
-      if (expand(n)) leveled = true;
+      if (expand(n) && !leveled) { leveled = true; lvl = n; }
       n++;
     }
     if (!layers) {

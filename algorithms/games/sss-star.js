@@ -7,6 +7,7 @@ Studio.register({
   problem: "game",
   check: P => (P.hasChance ? "This algorithm is limited to trees without chance nodes (MAX/MIN only): with chance nodes its answer would be wrong. Use Expectiminimax." : ""),
   order: 30,
+  defaultExample: "game-four-ply",
   summary: "A best-first algorithm for game trees. OPEN holds triples (node, LIVE or SOLVED, merit h). It refines the most promising strategy first and never evaluates a leaf that Alpha-Beta would prune; it can skip leaves Alpha-Beta evaluates.",
   pseudocode: `OPEN ← [(root, LIVE, +∞)]
 loop
@@ -56,6 +57,7 @@ loop
     "why": "Dominates alpha-beta in leaves evaluated, at the cost of an OPEN list that can grow large.",
     "traps": [
       "Ties in merit are broken by leftmost position.",
+      "SSS* never evaluates more leaves than alpha-beta with the same left-to-right order (game-four-ply: 8 against 10) but keeps a large OPEN list.",
       "When a MAX parent is solved, remove all its other descendants from OPEN."
     ],
     "props": {

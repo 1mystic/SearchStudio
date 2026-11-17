@@ -7,6 +7,7 @@ Studio.register({
   problem: "game",
   check: P => (P.hasChance ? "This algorithm is limited to trees without chance nodes (MAX/MIN only): with chance nodes its answer would be wrong. Use Expectiminimax." : ""),
   order: 20,
+  defaultExample: "game-three-ply",
   summary: "Carry a window (α, β): α is the best value MAX can already guarantee, β the best MIN can guarantee. When α ≥ β at a node, the remaining children cannot matter and are pruned.",
   pseudocode: `AlphaBeta(N, α, β):
     if N is a leaf: return e(N)
@@ -54,6 +55,7 @@ call AlphaBeta(root, −∞, +∞)`,
     "why": "Always returns the minimax value. How much it prunes depends on move ordering: try the 'best first' and 'worst first' settings.",
     "traps": [
       "Pruned subtrees are never evaluated: count leaves carefully.",
+      "How much is pruned depends on the move ordering, never the value: on example game-four-ply the Child order parameter gives 10 leaves (as given), 7 (best first) and 15 (worst first), all with value 8.",
       "The value returned at a pruned node is a bound, not an exact value; only the root's value is exact."
     ],
     "props": {
@@ -102,7 +104,7 @@ call AlphaBeta(root, −∞, +∞)`,
     snap(null, `AlphaBeta(${P.root}, −∞, +∞)`);
     const v = ab(P.root, -Infinity, Infinity);
     const pl = P.leaves.filter(l => pruned.has(l)).length;
-    snap(null, `Value ${v} (same as Minimax). ${leaves} of ${P.leaves.length} leaves evaluated, ${pl} pruned.`);
+    snap(null, `Value ${v} (same as Minimax). ${leaves} of ${P.leaves.length} leaves evaluated, ${pl} pruned with child order "${order || "given"}": the value never depends on the order, the amount of pruning does (best first prunes most, worst first may prune nothing).`);
     steps[steps.length - 1].stats.unshift({ label: "value", value: v, state: "ok" });
     return { steps, result: { value: v, leaves, pruned: pl } };
   },
