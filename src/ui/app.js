@@ -18,11 +18,14 @@
     [8, "Planning", "Domain independent planning: state-space planning, Goal Stack Planning, Partial Order Planning."],
     [9, "Problem decomposition", "Goal trees and AND–OR graphs; algorithm AO*."],
     [10, "Rule-based systems", "Pattern directed inference, the forward chaining engine and the Rete algorithm."],
-    [11, "Constraint processing", "Backtracking, arc consistency, combining search and reasoning, the Waltz algorithm, model based diagnosis."],
+    [11, "Constraint processing", "Backtracking, arc consistency, combining search and reasoning, SAT as a CSP, the Waltz algorithm, model based diagnosis."],
+    [12, "Lookahead, lookback and synthesis", "Forward checking and full or arc-consistency lookahead; conflict-directed backjumping; nogood recording; depth-first branch and bound; the closing discussion."],
   ];
   const FAMILY_ORDER = ["Graph search · uninformed", "Graph search · informed", "Graph search · optimal", "Graph search · space saving", "Sequence alignment",
     "TSP · exact", "TSP · constructive", "TSP · perturbation", "TSP · local search", "TSP · genetic", "TSP · swarm",
-    "Game playing", "Planning", "Problem decomposition", "Rule-based systems", "Constraint processing"];
+    "SAT · exact", "SAT · local search", "SAT · stochastic", "SAT · genetic",
+    "Game playing", "Planning", "Problem decomposition", "Rule-based systems", "Constraint processing",
+    "Constraint processing · lookahead", "Constraint processing · lookback", "SAT · constraint processing"];
   const famRank = f => { const i = FAMILY_ORDER.indexOf(f); return i < 0 ? 99 : i; };
   S.algorithms.sort((a, b) => (a.week || 99) - (b.week || 99) || famRank(a.family) - famRank(b.family) || a.order - b.order);
   const POPULAR = ["search-bfs", "search-astar", "tsp-nearest-neighbour", "tsp-savings", "tsp-sa", "tsp-ga", "game-alpha-beta", "plan-gsp", "andor-ao-star", "rules-rete", "csp-ac3", "csp-waltz"];

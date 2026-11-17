@@ -129,5 +129,15 @@ eq(run("align-dp", ex("align-gattaca")).cost, run("align-astar", ex("align-gatta
 eq(run("align-dp", ex("align-gattaca")).cost, 4, "GATTACA/GCATGCU edit distance 4");
 eq(run("align-dp", ex("align-short")).cost, run("align-astar", ex("align-short")).cost, "alignment: A* = DP cost (short)");
 
+// ---------- per-feature known-answer suites: tools/tests/*.mjs, each `export default ({ Studio, ok, eq, ex, run, checkRun }) => { ... }`
+{
+  const fs = await import("node:fs"), path = await import("node:path"), url = await import("node:url");
+  const dir = path.join(path.dirname(url.fileURLToPath(import.meta.url)), "tests");
+  if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir).filter(f => f.endsWith(".mjs")).sort()) {
+    try { const m = await import(url.pathToFileURL(path.join(dir, f)).href); await m.default({ Studio, ok, eq, ex, run, checkRun }); }
+    catch (e) { ok(false, `tests/${f}: threw ${e.stack || e.message}`); }
+  }
+}
+
 console.log(fail ? `\n${fail} FAILED, ${pass} passed` : `\nall ${pass} checks passed`);
 process.exit(fail ? 1 : 0);
