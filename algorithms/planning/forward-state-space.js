@@ -6,6 +6,7 @@ Studio.register({
   week: 8,
   problem: "planning",
   order: 10,
+  defaultExample: "plan-sussman",
   summary: "Search forward from the initial state: every applicable operator gives a successor state. Breadth-first search returns a shortest plan, but the branching factor is the number of applicable actions.",
   pseudocode: `OPEN ← [(init, plan = [ ])];  seen ← {init}
 while OPEN not empty

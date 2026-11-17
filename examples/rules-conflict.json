@@ -1,0 +1,14 @@
+{
+ "id": "rules-conflict",
+ "type": "rules",
+ "name": "Conflict resolution: three strategies, three firing orders",
+ "note": "Run Forward chaining three times, changing the conflict-resolution strategy. All three derive exactly the same facts, but the firing order differs. In the first cycle the conflict set holds R1 ann, R2 ann and R3 bob: rule order fires R1 ann (the first rule listed), recency fires R3 bob (it uses the newest fact), specificity fires R2 ann (two conditions beat one). Compare the conflict-set table in cycle 1 and the 'Firing order' in the last caption.",
+ "goal": "(advise rest ann)",
+ "facts": ["(has fever ann)", "(has cough ann)", "(has rash bob)"],
+ "rules": [
+  { "name": "R1", "if": ["(has fever ?p)"], "then": ["(suspect flu ?p)"] },
+  { "name": "R2", "if": ["(has fever ?p)", "(has cough ?p)"], "then": ["(suspect pneumonia ?p)"] },
+  { "name": "R3", "if": ["(has rash ?p)"], "then": ["(suspect measles ?p)"] },
+  { "name": "R4", "if": ["(suspect flu ?p)"], "then": ["(advise rest ?p)"] }
+ ]
+}

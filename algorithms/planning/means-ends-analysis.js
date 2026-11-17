@@ -6,6 +6,7 @@ Studio.register({
   week: 8,
   problem: "planning",
   order: 50,
+  defaultExample: "plan-sussman",
   summary: "Compare the current state with the goal, pick the most important difference, look up an operator that removes it in the difference table, and recursively make that operator's preconditions true first. No protection of earlier achievements, so interacting goals (Sussman) defeat it.",
   pseudocode: `MEA(state, goal):
     while goal ⊄ state
@@ -31,7 +32,7 @@ Studio.register({
     ],
     "why": "It is the first goal-directed planner: instead of blind search it only considers operators relevant to a difference. Its failure on interacting goals motivates goal protection, partial-order planning and Graphplan.",
     "traps": [
-      "MEA is not complete: it does not protect earlier achievements, so it can undo its own work and cycle (the Sussman anomaly).",
+      "MEA is not complete: it does not protect earlier achievements, so it can undo its own work and cycle (the Sussman anomaly). Run example plan-sussman to watch it fail and plan-reverse to watch it succeed.",
       "The result depends on the importance ordering and on the difference table; a different table can succeed where this one fails.",
       "A sub-goal may clobber a fact achieved earlier: after each operator, recompute all differences."
     ],

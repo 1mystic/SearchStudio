@@ -2,7 +2,7 @@
  "id": "andor-revision",
  "type": "andor",
  "name": "AND–OR graph with a change of mind",
- "note": "Unit cost per arc. AO* first prefers the AND arc C+D, then switches back to B when C turns out costly.",
+ "note": "Unit cost per arc. AO* first marks B (estimate 6), expands B and finds it costs 8, changes its mind to the AND arc C+D, expands C (cost 6), and switches back to B; expanding E finally solves it with cost 3. Watch the 'change of mind' captions.",
  "start": "A",
  "edgeCost": 1,
  "nodes": [

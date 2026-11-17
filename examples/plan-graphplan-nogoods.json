@@ -1,0 +1,9 @@
+{
+ "id": "plan-graphplan-nogoods",
+ "type": "planning",
+ "name": "Graphplan nogoods: four blocks on the table, build a tower",
+ "note": "Four blocks on the table; goal: the tower A on B on C on D. The goals are present and non-mutex already in P4, but no plan of 4 layers exists: extraction fails and records nogoods. It fails again at P5 (re-using earlier nogoods: watch for 'already in the nogood table') and succeeds at P6 with the 6-step plan. Watch the four mutex types in layers A0-A3 as well.",
+ "blocks": ["A", "B", "C", "D"],
+ "init": [["B"], ["A"], ["D"], ["C"]],
+ "goal": ["ontable(D)", "on(C,D)", "on(B,C)", "on(A,B)"]
+}

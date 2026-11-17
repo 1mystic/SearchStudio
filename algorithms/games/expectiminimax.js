@@ -6,6 +6,7 @@ Studio.register({
   week: 7,
   problem: "game",
   order: 40,
+  defaultExample: "game-chance-gamble",
   summary: "Supplementary (Russell & Norvig, games of chance). Minimax for games with dice or cards: MAX takes the largest child, MIN the smallest, and a chance node takes the expected value, the sum of probability × child value. With no chance nodes it is exactly Minimax.",
   pseudocode: `Expectiminimax(N):
     if N is a leaf: return e(N)
@@ -41,6 +42,7 @@ Studio.register({
     "traps": [
       "A chance node's value can be a fraction that is not any leaf's value.",
       "Probabilities on the edges of one chance node must sum to 1.",
+      "Treating chance nodes as MIN, MAX or a plain average gives a wrong value or a wrong move: the last caption on example game-chance-gamble lists them (4, 8 and 5 against the true 6.5).",
       "Minimax would be wrong here: it treats the roll as a choice. Pruning is also harder, because an average is only bounded if the leaf values are."
     ],
     "props": {
@@ -81,7 +83,12 @@ Studio.register({
     kids.forEach(c => { if (N[P.root].player === "MAX" ? val[c] > val[best] : val[c] < val[best]) best = c; });
     const nodes = {}; P.ids.forEach(id => (nodes[id] = { state: "closed", badge: N[id].children.length ? val[id] : undefined }));
     let x = P.root; while (x) { nodes[x].state = "path"; const n = N[x]; if (n.player === "CHANCE") break; let b = n.children[0]; n.children.forEach(c => { if (n.player === "MAX" ? val[c] > val[b] : val[c] < val[b]) b = c; }); x = b; }
-    steps.push({ caption: `Expectiminimax value ${v}: ${N[P.root].player} should move to ${best}. ${leaves} leaves evaluated${P.hasChance ? "" : " (no chance nodes, so this equals Minimax)"}.`, nodes, edges: [], table: steps[steps.length - 1].table, stats: [{ label: "value", value: v, state: "ok" }, { label: "leaves evaluated", value: leaves }] });
-    return { steps, result: { value: v, leaves, move: best } };
+    // what a plain minimax reader would get by mis-treating the chance nodes (to show the expectation matters)
+    const naive = mode => { const f = id => { const n = N[id]; if (!n.children.length) return n.value; const vs = n.children.map(f); return n.player === "CHANCE" ? (mode === "min" ? Math.min(...vs) : mode === "max" ? Math.max(...vs) : vs.reduce((a, b) => a + b, 0) / vs.length) : n.player === "MAX" ? Math.max(...vs) : Math.min(...vs); };
+      const root = N[P.root], vs = root.children.map(f); const better = (a, b) => (root.player === "MAX" ? a > b : a < b); let bi = 0; vs.forEach((x, i) => { if (better(x, vs[bi])) bi = i; }); return { value: r(f(P.root)), move: root.children[bi] }; };
+    const nv = P.hasChance ? { asMin: naive("min"), asMax: naive("max"), asAverage: naive("avg") } : null;
+    const nvTxt = nv ? ` For comparison, a plain minimax that treats each chance node as an opponent gets ${nv.asMin.value} (move ${nv.asMin.move}), as a friend ${nv.asMax.value} (move ${nv.asMax.move}), as an unweighted average of its outcomes ${nv.asAverage.value} (move ${nv.asAverage.move}); only the probability-weighted expectation is the right value.` : "";
+    steps.push({ caption: `Expectiminimax value ${v}: ${N[P.root].player} should move to ${best}. ${leaves} leaves evaluated${P.hasChance ? "" : " (no chance nodes, so this equals Minimax)"}.${nvTxt}`, nodes, edges: [], table: steps[steps.length - 1].table, stats: [{ label: "value", value: v, state: "ok" }, { label: "leaves evaluated", value: leaves }] });
+    return { steps, result: { value: v, leaves, move: best, naive: nv } };
   },
 });

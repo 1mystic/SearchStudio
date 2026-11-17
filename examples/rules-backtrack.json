@@ -1,0 +1,13 @@
+{
+ "id": "rules-backtrack",
+ "type": "rules",
+ "name": "Backward chaining: a failed rule, then an alternative",
+ "note": "Query (can fly tweety). Rule F1 is tried first: it needs (has wings tweety), which is a fact, and then (heavy tweety), which nothing can prove, so the whole branch fails and is undone (grey nodes). The alternative rule F2 then needs (bird tweety) (proved through B1 from (has feathers tweety)) and (healthy tweety): proved. The green nodes show F2 and B1 only.",
+ "goal": "(can fly tweety)",
+ "facts": ["(has feathers tweety)", "(has wings tweety)", "(healthy tweety)"],
+ "rules": [
+  { "name": "F1", "if": ["(has wings ?x)", "(heavy ?x)"], "then": ["(can fly ?x)"] },
+  { "name": "F2", "if": ["(bird ?x)", "(healthy ?x)"], "then": ["(can fly ?x)"] },
+  { "name": "B1", "if": ["(has feathers ?x)"], "then": ["(bird ?x)"] }
+ ]
+}

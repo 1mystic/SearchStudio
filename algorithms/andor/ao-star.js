@@ -6,6 +6,7 @@ Studio.register({
   week: 9,
   problem: "andor",
   order: 10,
+  defaultExample: "andor-revision",
   summary: "Follow the marked (currently best) connectors from the start to an unexpanded node, expand it, then revise costs upwards: each node's cost is its cheapest connector, an AND connector costs the sum over its children. A node is solved when all children of its marked connector are solved.",
   pseudocode: `repeat until start is SOLVED (or its cost exceeds FUTILITY)
     trace marked connectors from start; pick an unexpanded node n on that partial solution
@@ -54,7 +55,8 @@ Studio.register({
     "why": "With admissible estimates AO* finds an optimal solution graph. The marked solution can change as estimates are corrected, which is visible in the trace.",
     "traps": [
       "An AND connector costs the sum, not the minimum, of its children.",
-      "Propagate revisions to all ancestors whose marked connector uses the node."
+      "Propagate revisions to all ancestors whose marked connector uses the node. Try example andor-revision: the marked connector of A changes twice.",
+      "A node with no connectors that is not solved is a dead end: its cost is FUTILITY, and every connector using it must be revised (example andor-futility: A abandons B for the AND connector C+D)."
     ],
     "props": {
       "complete": "yes",
@@ -71,6 +73,7 @@ Studio.register({
     const conCost = c => c.cost + c.to.reduce((s, t) => s + cost[t], 0);
     const best = () => { const sol = new Set(), edges = []; const w = x => { sol.add(x); const c = mark[x]; if (c) c.to.forEach(t => { edges.push({ u: x, v: t, state: "path", group: c.and ? "c" + c.k : undefined, directed: true }); if (!sol.has(t)) w(t); }); }; w(P.start); return { sol, edges }; };
     const rows = [];
+    const F = v => (v >= futility ? "FUTILITY (∞)" : Studio.fmt ? Studio.fmt(v) : v);
     const snap = (cur, cap) => {
       const { sol, edges } = best();
       const nodes = {}; P.ids.forEach(i => (nodes[i] = { state: !seen.has(i) ? "plain" : solved[i] ? "path" : expanded.has(i) ? "closed" : "open", badge: seen.has(i) ? (cost[i] >= futility ? "∞" : cost[i]) : undefined, sub: solved[i] ? "solved" : seen.has(i) ? "" : undefined }));
@@ -89,13 +92,16 @@ Studio.register({
       expanded.add(n);
       P.out[n].forEach(c => c.to.forEach(t => seen.add(t)));
       if (!P.out[n].length) cost[n] = futility;
-      snap(n, `Expand ${n}: ${P.out[n].length ? P.out[n].map(c => (c.and ? "AND{" + c.to.join(",") + "}" : c.to[0])).join(", ") : "no successors → cost FUTILITY"}`);
+      snap(n, `Expand ${n}: ${P.out[n].length ? P.out[n].map(c => (c.and ? "AND{" + c.to.join(",") + "}" : c.to[0])).join(", ") : "no successors: a dead end, so its cost becomes FUTILITY (∞) and every connector that uses it is revised"}`);
       const S = new Set([n]);
+      if (!P.out[n].length) parents(n).forEach(q => S.add(q)); // a dead end costs FUTILITY: its parents must be revised too
       for (let g = 0; g < 500 && S.size; g++) {
         const m = [...S].find(x => ![...S].some(y => y !== x && P.out[x].some(c => c.to.includes(y)))) || [...S][0];
         S.delete(m);
         if (!expanded.has(m)) continue;
+        if (!P.out[m].length) continue; // dead end: nothing to revise at m itself
         const before = [cost[m], solved[m]];
+        const prevMark = mark[m];
         if (P.out[m].length) {
           const opts = P.out[m].map(c => [conCost(c), c]).sort((a, b) => a[0] - b[0]);
           cost[m] = Math.min(futility, opts[0][0]); mark[m] = opts[0][1];
@@ -103,7 +109,7 @@ Studio.register({
           rows.push([rows.length + 1, m, opts.map(([v, c]) => (c.and ? `{${c.to.join("+")}}` : c.to[0]) + "=" + v).join(" "), cost[m], solved[m] ? "yes" : ""]);
         }
         if (before[0] !== cost[m] || before[1] !== solved[m]) parents(m).forEach(p => S.add(p));
-        snap(m, `Revise ${m}: cost ${before[0]} → ${cost[m]}${mark[m] ? `, best connector ${mark[m].and ? "AND{" + mark[m].to.join(",") + "}" : mark[m].to[0]}` : ""}${solved[m] && !before[1] ? ", now SOLVED" : ""}`);
+        snap(m, `Revise ${m}: cost ${F(before[0])} → ${F(cost[m])}${mark[m] ? `, best connector ${mark[m].and ? "AND{" + mark[m].to.join(",") + "}" : mark[m].to[0]}` : ""}${prevMark && mark[m] !== prevMark ? " — a change of mind: the old marked connector became more expensive than this one" : ""}${solved[m] && !before[1] ? ", now SOLVED" : ""}`);
       }
     }
     const { sol } = best();

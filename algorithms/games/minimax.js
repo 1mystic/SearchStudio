@@ -7,6 +7,7 @@ Studio.register({
   problem: "game",
   check: P => (P.hasChance ? "This algorithm is limited to trees without chance nodes (MAX/MIN only): with chance nodes its answer would be wrong. Use Expectiminimax." : ""),
   order: 10,
+  defaultExample: "game-three-ply",
   summary: "Evaluate the game tree depth-first from left to right: a MAX node takes the largest child value, a MIN node the smallest. The root's value is the outcome with best play from both sides.",
   pseudocode: `Minimax(N):
     if N is a leaf: return e(N)

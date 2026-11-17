@@ -1,0 +1,11 @@
+{
+ "id": "game-chance-gamble",
+ "type": "game",
+ "name": "Gamble or sure thing (supplementary, expectiminimax)",
+ "note": "Supplementary. MAX chooses the sure MIN node B (value 4) or a gamble: with probability 0.25 the coin leads to MIN node (2,10) (value 2), with probability 0.75 to MIN node (8,9) (value 8). Expectiminimax: 0.25*2 + 0.75*8 = 6.5, so MAX gambles. Wrong shortcuts in the last caption: treating the coin as an opponent gives 4 (picks the sure thing), as a friend 8, as an unweighted average 5. Only the probability-weighted expectation is right.",
+ "root": "MAX",
+ "tree": [
+  [4, 6],
+  { "chance": [[0.25, [2, 10]], [0.75, [8, 9]]] }
+ ]
+}

@@ -1,0 +1,12 @@
+{
+ "id": "rules-negation",
+ "type": "rules",
+ "name": "Negation: birds that are not penguins",
+ "note": "R1 (listed first) says a heavy bird is a penguin; R2 says a bird that is NOT a penguin flies. Run Rete: R2 tweety and R2 opus both enter the conflict set at first (no penguin fact exists yet), then R1 fires on opus, the new fact (penguin opus) reaches the NOT node and withdraws R2 opus from the conflict set before it can fire. Final facts: tweety flies, opus does not. Forward chaining gives the same facts.",
+ "goal": "(flies tweety)",
+ "facts": ["(bird tweety)", "(bird opus)", "(heavy opus)"],
+ "rules": [
+  { "name": "R1", "if": ["(bird ?x)", "(heavy ?x)"], "then": ["(penguin ?x)"] },
+  { "name": "R2", "if": ["(bird ?x)", "not (penguin ?x)"], "then": ["(flies ?x)"] }
+ ]
+}

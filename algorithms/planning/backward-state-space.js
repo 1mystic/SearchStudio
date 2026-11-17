@@ -6,6 +6,7 @@ Studio.register({
   week: 8,
   problem: "planning",
   order: 20,
+  defaultExample: "plan-sussman",
   summary: "Search backwards from the goal. An operator is relevant if it adds a goal and deletes none; regressing the goal set G through it gives (G − add) ∪ pre. Stop when the initial state satisfies the current goal set.",
   pseudocode: `OPEN ← [(goal, plan = [ ])]
 while OPEN not empty
