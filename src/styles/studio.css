@@ -489,3 +489,6 @@ svg.blocks .arm { fill: none; stroke: var(--muted); stroke-width: 3; }
   svg.g circle.n { r: 25px; } svg.g circle.ring2 { r: 31px; }
   svg.g text.nl { font-size: 24px; } svg.g text.w { font-size: 18px; stroke-width: 5px; } svg.g text.badge { font-size: 17px; } svg.g text.hlab { font-size: 14px; }
 }
+
+.ex-list { margin: 8px 0 24px; padding-left: 20px; }
+.ex-list li { margin: 4px 0; }

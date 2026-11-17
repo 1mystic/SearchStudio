@@ -64,6 +64,11 @@
     const all = S.examples.filter(e => e.type === algo.problem), ex = all.find(fits) || all[0];
     return ex ? ex.id : null;
   }
+  /* examples <-> algorithms: an example opens in the algorithms that name it as their default, else in the first one that accepts it */
+  const accepts = (a, e) => { if (!a.check) return true; try { return !a.check(S.prepare(e)); } catch (err) { return false; } };
+  const algosFor = e => { const all = S.algorithms.filter(a => a.problem === e.type), own = all.filter(a => a.defaultExample === e.id); return own.length ? own : all.filter(a => accepts(a, e)).slice(0, 1); };
+  const exampleLink = (e, a) => `#try-${a.id}/${e.id}`;
+  const examplesFor = a => S.examples.filter(e => e.type === a.problem && accepts(a, e));
   const describe = p => (p.note || (S.types[p.type] && S.types[p.type].describe ? S.types[p.type].describe(p) : ""));
   const ordered = () => S.algorithms.slice();
   const algoIndex = id => ordered().findIndex(a => a.id === id);
@@ -76,7 +81,8 @@
     const h = (location.hash || "#home").slice(1);
     let page = h, algoId = null;
     if (h.startsWith("algo-")) { page = "learn"; algoId = h.slice(5); }
-    if (h.startsWith("try-")) { page = "studio"; algoId = h.slice(4); }
+    let exId = null;
+    if (h.startsWith("try-")) { page = "studio"; [algoId, exId] = h.slice(4).split("/"); }
     if (h.startsWith("week-")) page = "course";
     if (!pages.some(p => p.dataset.page === page)) page = "home";
     pages.forEach(p => (p.hidden = p.dataset.page !== page));
@@ -88,7 +94,7 @@
     if (page === "library") renderLibrary();
     if (page === "course") renderCourse(h.startsWith("week-") ? Number(h.slice(5)) : null);
     if (page === "learn") renderLearn(algoId);
-    if (page === "studio") openStudio(algoId);
+    if (page === "studio") openStudio(algoId, exId);
     if (current !== h && !h.startsWith("week-")) window.scrollTo(0, 0);
     current = h;
     const a = algoId && S.get(algoId);
@@ -176,7 +182,7 @@
     if (!root.dataset.ready) {
       root.innerHTML = `<div class="page-head"><div><p class="eyebrow">Learn</p><h1>Algorithm library</h1><p class="lede">${S.algorithms.length} algorithms. Each has a beginner introduction, line-by-line pseudocode, formulas with reasons, and a studio run.</p></div>
         <div class="lib-tools"><input id="lib-search" class="search" type="search" placeholder="Filter by name, family or week" aria-label="Filter algorithms">
-        <div class="seg" role="tablist" aria-label="Group by"><button type="button" data-m="week" aria-selected="true">By week</button><button type="button" data-m="family" aria-selected="false">By family</button></div></div></div><div id="lib-list"></div>`;
+        <div class="seg" role="tablist" aria-label="Group by"><button type="button" data-m="week" aria-selected="true">By week</button><button type="button" data-m="family" aria-selected="false">By family</button><button type="button" data-m="examples" aria-selected="false">Examples</button></div></div></div><div id="lib-list"></div>`;
       root.dataset.ready = "1";
       $("#lib-search").addEventListener("input", e => { libFilter = e.target.value; drawLib(); });
       $$(".seg button", root).forEach(b => b.addEventListener("click", () => { libMode = b.dataset.m; $$(".seg button", root).forEach(x => x.setAttribute("aria-selected", x === b)); drawLib(); }));
@@ -190,8 +196,20 @@
       <h3><a href="#algo-${esc(a.id)}">${esc(a.name)}</a></h3><p>${esc(a.summary || "")}</p>
       <div class="row"><a class="btn small" href="#algo-${esc(a.id)}">Learn</a><a class="btn small primary" href="#try-${esc(a.id)}">Try it</a></div></article>`;
   };
+  const exampleCard = e => {
+    const T = S.types[e.type] || {}, own = algosFor(e), first = own[0], note = describe(e);
+    return `<article class="card"><div class="card-top"><span class="tag">${esc(typeLabel(e.type))}</span></div>
+      <h3>${esc(e.name)}</h3><p>${esc(note)}</p>
+      <div class="row">${first ? `<a class="btn small primary" href="${exampleLink(e, first)}">Open in studio</a>` : ""}${own.slice(1, 4).map(a => `<a class="btn small" href="${exampleLink(e, a)}">${esc(a.name)}</a>`).join("")}</div></article>`;
+  };
+  function drawExamples(q) {
+    const groups = new Map();
+    S.examples.filter(e => !q || (e.name + " " + typeLabel(e.type) + " " + describe(e)).toLowerCase().includes(q)).forEach(e => { const g = typeLabel(e.type); if (!groups.has(g)) groups.set(g, []); groups.get(g).push(e); });
+    $("#lib-list").innerHTML = [...groups].map(([g, list]) => `<h2 class="lib-fam">${esc(g)} examples <small>${list.length}</small></h2><div class="cards">${list.map(exampleCard).join("")}</div>`).join("") || `<p class="note">No example matches “${esc(libFilter)}”.</p>`;
+  }
   function drawLib() {
     const q = libFilter.trim().toLowerCase();
+    if (libMode === "examples") return drawExamples(q);
     let groups = new Map();
     ordered().filter(a => !q || (a.name + " " + a.family + " week " + a.week + " " + (a.summary || "")).toLowerCase().includes(q)).forEach(a => {
       const g = libMode === "week" ? `Week ${a.week} · ${weekTitle(a.week)}` : a.family;
@@ -246,6 +264,7 @@
             <div class="prop"><span>complete</span>${esc(props.complete || "–")}</div><div class="prop"><span>optimal</span>${esc(props.optimal || "–")}</div>
             <div class="prop"><span>time</span>${esc(props.time || a.complexity || "–")}</div><div class="prop"><span>space</span>${esc(props.space || "–")}</div></div>
           ${L.traps && L.traps.length ? `<h2><small>07</small>Traps</h2><ul class="traps">${L.traps.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+          ${(() => { const xs = examplesFor(a); return xs.length ? `<h2><small>★</small>Examples for this algorithm</h2><ul class="ex-list">${xs.map(e => `<li><a href="${exampleLink(e, a)}">${esc(e.name)}</a>${e.id === a.defaultExample ? ' <span class="tag ok">default</span>' : ""}</li>`).join("")}</ul>` : ""; })()}
           <div class="learn-end"><a class="btn primary" href="#try-${esc(a.id)}">Try it in the studio</a></div>
           ${pager("bottom")}
         </div>
@@ -256,10 +275,11 @@
   /* ------------------------------------------------------------ studio */
   const st = { algoId: null, problemId: null, params: {}, run: null, i: 0, timer: null, speed: 1.2 };
   let studioReady = false;
-  function openStudio(algoId) {
+  function openStudio(algoId, exId) {
     if (!studioReady) initStudio();
     const prefs = store.get();
     if (algoId && S.get(algoId)) { const a = S.get(algoId), cur = findProblem(st.problemId); if (st.algoId !== algoId) st.params = {}; st.algoId = algoId; if (!cur || cur.type !== a.problem) st.problemId = defaultProblemFor(a); }
+    const want = exId && findProblem(exId); if (want && S.get(st.algoId) && want.type === S.get(st.algoId).problem) st.problemId = exId;
     if (!st.algoId) st.algoId = prefs.algo && S.get(prefs.algo) ? prefs.algo : "tsp-nearest-neighbour";
     const A = S.get(st.algoId);
     if (!st.problemId || !findProblem(st.problemId) || findProblem(st.problemId).type !== A.problem) {
