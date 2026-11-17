@@ -551,3 +551,126 @@ svg.g .w, svg.g .badge, svg.g .hlab { font-family: var(--mono); }
 .card p, .export-grid .box p { font-size: 14px; }
 .chip { font-size: 13.5px; }
 .pg b { font-size: 14px; font-weight: 600; }
+
+/* =====================================================================
+   v2 / layout shell. Header spans the full width; reading pages keep a ~72ch column; the studio is an app shell.
+   >=1600  three panes: controls rail | stage (player pinned at the bottom) | trace panel; each pane scrolls on its own
+   1100-1599 two columns: controls rail | stage + trace below (trace stays one scroll away, player is sticky)
+   700-1099 controls become a compact 3-up bar above the stage, panels below
+   <700     one column, controls are an accordion after the stage, player pinned to the bottom edge
+   ===================================================================== */
+.top-in { max-width: none; height: var(--top-h); padding-block: 0; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.foot-in { max-width: none; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+main { max-width: 1280px; padding-block: 32px 72px; }
+main:has(.page[data-page="studio"]:not([hidden])) { max-width: none; padding: 0; }
+.learn { max-width: 1180px; }
+.learn-body { max-width: 78ch; }
+.learn-body .intro, .learn-body p { max-width: 72ch; }
+
+/* ---- studio: shared pieces */
+.studio { display: grid; gap: 16px; padding: 16px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); align-items: start; }
+.controls { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.box { background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r); padding: 0; }
+.box > summary { list-style: none; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 12px; color: var(--muted); user-select: none; border-radius: var(--r); }
+.box > summary::-webkit-details-marker { display: none; }
+.box > summary::after { content: ""; margin-left: auto; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-2px, -2px); transition: transform .15s; }
+.box[open] > summary::after { transform: rotate(-135deg) translate(-2px, -2px); }
+.box > summary:hover { color: var(--ink); }
+.box[open] > summary { border-bottom: 1px solid var(--rule); border-radius: var(--r) var(--r) 0 0; }
+.box > :not(summary) { margin-left: 12px; margin-right: 12px; }
+.box > summary + * { margin-top: 12px; }
+.box > :last-child { margin-bottom: 12px; }
+.export-grid .box { padding: 12px 14px; }
+.export-grid .box > * { margin-left: 0; margin-right: 0; }
+.export-grid .box h2 { margin-bottom: 4px; font-size: 14px; }
+.controls .box { padding: 0; }
+.picker { background: var(--panel-2); border-radius: var(--r-sm); }
+.stage-wrap { min-width: 0; }
+.stage-title { text-align: left; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; }
+.stage-title h1 { display: block; border: 0; padding: 0; font-size: 19px; font-weight: 650; letter-spacing: -.015em; }
+.stage-title p { font-style: normal; font-size: 13px; margin: 0; color: var(--muted); }
+.stage { border-radius: var(--r); padding: 16px 18px; }
+.st-cap { text-align: left; color: var(--ink); font-size: 15px; line-height: 1.55; margin: 4px 0 0; padding: 10px 14px; background: var(--panel-2); border: 1px solid var(--rule); border-left: 3px solid var(--yellow); border-radius: var(--r-sm); min-height: 0; }
+.stats { justify-content: flex-start; }
+.player { border-radius: var(--r); padding: 8px 12px; background: color-mix(in srgb, var(--panel) 96%, transparent); backdrop-filter: blur(8px); }
+.panel { min-width: 0; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
+.panel .tabs { margin: 0; padding: 0 8px; background: var(--panel-2); border-bottom: 1px solid var(--rule); }
+.panel .tabs button { padding: 11px 12px; }
+.panel .tabpanel { padding: 12px; min-height: 0; }
+.panel .trace-list { max-height: 420px; border: 0; border-radius: 0; margin: -4px -12px 0; }
+.panel .trace-list li { padding: 8px 12px; }
+.panel pre { border: 0; background: transparent; padding: 0; font-size: 12.5px; }
+.panel .export-grid { grid-template-columns: 1fr; }
+.panel .problem-note { margin-top: 12px; }
+
+/* ---- default (< 700): single column */
+.studio { grid-template-columns: minmax(0, 1fr); }
+.stage-wrap { display: contents; }
+.stage-title { order: 1; } .stage { order: 2; } .player { order: 3; } .controls { order: 4; } .panel { order: 5; }
+.player { position: sticky; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 10; box-shadow: 0 6px 24px rgba(0, 0, 0, .35); }
+.stage-title { margin-bottom: -8px; }
+.studio .stage { padding: 12px; min-height: 0; }
+.stage-inner, .stage-inner.has-chart, .stage-inner.wide { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "graph" "cap" "side" "chart" "lists"; }
+
+/* ---- tablet 700-1099: compact 3-up control bar above the stage */
+@media (min-width: 700px) {
+  .studio { padding-inline: max(20px, env(safe-area-inset-left, 0px)); }
+  .controls { order: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 12px; }
+  .stage-title { order: 1; } .stage { order: 2; } .player { order: 3; } .panel { order: 5; }
+  .studio .stage { padding: 16px 18px; }
+  .stage-inner { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: "graph side" "lists lists" "cap cap"; gap: 12px 22px; }
+  .stage-inner.has-chart { grid-template-areas: "graph side" "graph chart" "lists lists" "cap cap"; grid-template-rows: auto 1fr auto auto; }
+  .stage-inner.wide { grid-template-areas: "graph chart" "side side" "lists lists" "cap cap"; }
+  .stage-inner.nodraw { grid-template-columns: minmax(0, 1fr); grid-template-areas: "side" "lists" "cap"; }
+}
+
+/* ---- desktop 1100-1599: rail + stage, trace panel under the stage */
+@media (min-width: 1100px) {
+  .studio { grid-template-columns: 290px minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; column-gap: 20px; row-gap: 12px; }
+  .controls { grid-column: 1; grid-row: 1 / span 5; display: flex; flex-direction: column; position: sticky; top: calc(var(--top-h) + 16px); max-height: calc(100dvh - var(--top-h) - 32px); overflow-y: auto; padding-right: 2px; align-self: start; }
+  .stage-title { grid-column: 2; grid-row: 1; margin: 0; }
+  .stage { grid-column: 2; grid-row: 2; }
+  .player { grid-column: 2; grid-row: 3; bottom: 12px; }
+  .panel { grid-column: 2; grid-row: 4; align-self: start; }
+  .panel .trace-list { max-height: 360px; }
+}
+
+/* ---- wide 1600+: full-bleed three-pane app shell, every pane scrolls on its own */
+@media (min-width: 1600px) {
+  body:has(.page[data-page="studio"]:not([hidden])) { overflow: hidden; }
+  body:has(.page[data-page="studio"]:not([hidden])) .foot { display: none; }
+  .page[data-page="studio"]:not([hidden]) { height: calc(100dvh - var(--top-h)); }
+  .studio { height: 100%; padding: 0; gap: 0; grid-template-columns: 300px minmax(0, 1fr) clamp(380px, 22vw, 440px); grid-template-rows: 100%; align-items: stretch; }
+  .controls { grid-column: 1; grid-row: 1; position: static; max-height: none; height: 100%; padding: 14px 12px 20px 16px; border-right: 1px solid var(--rule); background: var(--bg); overflow-y: auto; }
+  .stage-wrap { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 14px 20px 14px; gap: 12px; }
+  .stage-title, .stage, .player { grid-column: auto; grid-row: auto; order: 0; }
+  .stage-title { margin: 0; flex: none; }
+  .stage { flex: 1; min-height: 0; overflow: auto; }
+  .player { flex: none; position: static; box-shadow: none; }
+  .panel { grid-column: 3; grid-row: 1; height: 100%; border: 0; border-left: 1px solid var(--rule); border-radius: 0; background: var(--bg); align-self: stretch; min-height: 0; }
+  .panel .tabs { background: var(--bg); padding: 6px 12px 0; }
+  .panel .tabpanel { flex: 1; overflow: auto; padding: 14px 16px; }
+  .panel #tab-trace:not([hidden]) { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+  .panel #tab-trace .trace-list { flex: 1; max-height: none; margin: 0; }
+  .panel #tab-trace .problem-note { margin: 0; padding: 10px 16px; border-top: 1px solid var(--rule); flex: none; }
+  .panel .trace-list li { padding: 9px 16px; }
+  svg.g { max-height: calc(100dvh - var(--top-h) - 300px); }
+}
+
+/* ---- small screens */
+@media (max-width: 699px) {
+  main { padding-block: 20px 56px; }
+  .controls .box:not([open]) > summary { padding-block: 12px; }
+}
+
+/* controls: children keep their inset without overflowing the box */
+.box > .picker { width: calc(100% - 24px); }
+.box > .row, .box > .subpanel, .box > form, .box > p { max-width: calc(100% - 24px); }
+@media (min-width: 1600px) {
+  .stage-inner { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+  .stage-inner.nodraw { grid-template-columns: minmax(0, 1fr); }
+}
+
+.controls { align-items: stretch; }
+@media (min-width: 700px) and (max-width: 1099px) { .controls { align-items: start; } }
+svg.g { margin-inline: auto; }

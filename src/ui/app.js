@@ -286,6 +286,8 @@
   function refresh() { fillPickers(); buildParams(); runNow(); }
   function initStudio() {
     studioReady = true;
+    /* phones: only Algorithm stays open, the rest is an accordion */
+    if (window.matchMedia("(max-width: 699px)").matches) $$(".controls details.box").forEach((d, i) => { if (i) d.open = false; });
     $("#pick-algo").addEventListener("click", () => pickAlgorithm(setAlgo, st.algoId));
     $("#pick-problem").addEventListener("click", () => {
       const a = S.get(st.algoId);
