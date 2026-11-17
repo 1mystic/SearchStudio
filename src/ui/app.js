@@ -75,6 +75,15 @@
   const SRC_BASE = "https://github.com/1mystic/SearchStudio/blob/main/";
   const fileOf = a => (S.files && S.files[a.id]) || `algorithms/${a.id}.js`;
 
+  /* ------------------------------------------------------------ scrollbars appear only over the element being hovered */
+  (function () {
+    let on = [];
+    const scrollers = el => { const out = []; for (let e = el; e && e.nodeType === 1; e = e.parentElement) { const cs = getComputedStyle(e); if ((/(auto|scroll)/.test(cs.overflowY) && e.scrollHeight > e.clientHeight) || (/(auto|scroll)/.test(cs.overflowX) && e.scrollWidth > e.clientWidth) || e === document.documentElement) out.push(e); } return out; };
+    const set = list => { on.forEach(e => list.includes(e) || e.classList.remove("sb-on")); list.forEach(e => e.classList.add("sb-on")); on = list; };
+    document.addEventListener("mouseover", e => set(scrollers(e.target)), { passive: true });
+    document.documentElement.addEventListener("mouseleave", () => set([]));
+  })();
+
   /* ------------------------------------------------------------ router */
   const pages = $$(".page");
   let current = "";
