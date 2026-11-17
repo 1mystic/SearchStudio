@@ -55,7 +55,6 @@ export function build(Studio, owner, SITE, PKG) {
 <meta property="og:type" content="article"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${og}">
 <meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
 <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
 <link rel="stylesheet" href="../src/styles/studio.css">
 <script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <script type="application/ld+json">${json(ldx)}</script>
@@ -71,7 +70,7 @@ export function build(Studio, owner, SITE, PKG) {
     const L = a.learn || {}, p = L.props || {}, url = `${SITE}learn/${a.id}.html`;
     const prev = A[i - 1], next = A[i + 1];
     const desc = (L.intro || a.summary || "").slice(0, 300);
-    const body = `<article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>${esc(owner[a.id] || "")}</div></div>
+    const body = `<article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><a class="fc-dir" href="../#week-${a.week}">Week ${a.week}</a><span class="fc-sep">·</span><span class="fc-dir">${esc(a.family)}</span><span class="fc-sep">›</span><span class="fc-file">${esc(a.name)}</span></div></div>
 <div class="learn-body" style="margin:0 auto">
 <div class="learn-head"><div><p class="eyebrow">Week ${a.week} · ${esc(a.family)}</p><h1>${esc(a.name)}</h1></div><a class="btn primary" href="../#try-${a.id}">Run it step by step</a></div>
 <p class="intro">${esc(L.intro || a.summary || "")}</p>
