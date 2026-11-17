@@ -1,0 +1,16 @@
+{
+ "id": "graph-t",
+ "type": "graph",
+ "name": "Graph T: duplicate states in branch & bound",
+ "note": "Branch & bound without CLOSED reaches S–A–B–G (cost 4) after 5 refinements; the search tree then holds S once, A twice, B twice and G three times. h is admissible.",
+ "nodes": [
+  { "id": "S", "x": 0.5, "y": 2.0, "h": 3 },
+  { "id": "A", "x": 2.2, "y": 0.8, "h": 2 },
+  { "id": "B", "x": 2.2, "y": 3.2, "h": 2 },
+  { "id": "G", "x": 4.0, "y": 2.0, "h": 0 }
+ ],
+ "edges": [["S", "A", 1], ["S", "B", 4], ["A", "B", 1], ["A", "G", 4], ["B", "G", 2]],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}

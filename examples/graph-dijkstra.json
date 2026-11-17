@@ -1,0 +1,18 @@
+{
+ "id": "graph-dijkstra",
+ "type": "graph",
+ "name": "Dijkstra demo: G is first reached at 9, then improved to 8",
+ "note": "Weighted graph for Dijkstra and branch & bound. Picks S, B, A, C, D, G (6 picks). C relaxes G to 9, then D relaxes it to 8: optimum S–B–D–G = 8. h is admissible.",
+ "nodes": [
+  { "id": "S", "x": 0.5, "y": 2.0, "h": 6 },
+  { "id": "A", "x": 2.0, "y": 0.6, "h": 6 },
+  { "id": "B", "x": 2.0, "y": 2.0, "h": 5 },
+  { "id": "C", "x": 2.0, "y": 3.4, "h": 3 },
+  { "id": "D", "x": 3.8, "y": 1.4, "h": 2 },
+  { "id": "G", "x": 5.2, "y": 2.4, "h": 0 }
+ ],
+ "edges": [["S", "A", 4], ["S", "B", 2], ["S", "C", 5], ["B", "D", 3], ["A", "D", 5], ["C", "G", 4], ["D", "G", 3]],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}
