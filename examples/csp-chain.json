@@ -2,7 +2,7 @@
  "id": "csp-chain",
  "type": "csp",
  "name": "Ordering chain X < Y < Z",
- "note": "Arc consistency alone pins every variable down.",
+ "note": "X < Y < Z over {1,2,3}. Run Arc consistency: X < Y < Z over three values forces X = 1, Y = 2, Z = 3. Every domain ends as a single value, so the problem is solved without any search. Compare Map colouring: Australia, where arc consistency deletes nothing.",
  "variables": [
   {
    "id": "X",

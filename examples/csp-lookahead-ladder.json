@@ -1,0 +1,76 @@
+{
+ "id": "csp-lookahead-ladder",
+ "type": "csp",
+ "name": "Look-ahead ladder: no solution, found at different depths",
+ "note": "The core is B, C, D: C < D with D in {1,2} gives C = 1, D = 2; then B ≠ C and B ≠ D leaves B nothing. A is irrelevant noise. Forward checking tries 17 values before it concludes there is no solution, partial look-ahead 6, full look-ahead 5, arc-consistency look-ahead (MAC) only 3. Compare the 'extra pruned' column: each stronger look-ahead removes values earlier.",
+ "variables": [
+  {
+   "id": "A",
+   "domain": [
+    1,
+    2,
+    3
+   ],
+   "x": 0,
+   "y": 1
+  },
+  {
+   "id": "B",
+   "domain": [
+    1,
+    2
+   ],
+   "x": 1.5,
+   "y": 0
+  },
+  {
+   "id": "C",
+   "domain": [
+    1,
+    2,
+    3
+   ],
+   "x": 1.5,
+   "y": 2
+  },
+  {
+   "id": "D",
+   "domain": [
+    1,
+    2
+   ],
+   "x": 3,
+   "y": 1
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "A",
+    "D"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "B",
+    "C"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "B",
+    "D"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "C",
+    "D"
+   ],
+   "rel": "lt"
+  }
+ ]
+}

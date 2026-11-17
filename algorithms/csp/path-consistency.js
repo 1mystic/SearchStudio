@@ -1,6 +1,7 @@
 /* Week 11: path consistency (3-consistency) on triangles of variables; PC-1 style sweeps. */
 Studio.register({
   id: "csp-path-consistency",
+  defaultExample: "csp-pc-triangle",
   name: "Path consistency (PC, i-consistency)",
   family: "Constraint processing",
   week: 11,
@@ -21,7 +22,7 @@ Studio.register({
     "steps": [["pick a triangle X, Z, Y", "Only two constraints are used at a time: R(X,Z) and R(Z,Y)."], ["compose R(X,Z) ∘ R(Z,Y)", "All pairs (a, b) for which some c fits both."], ["intersect with R(X,Y)", "Pairs without a witness are deleted."], ["repeat until nothing changes", "A deletion can destroy the witness of another pair."], ["empty relation", "No solution."]],
     "formulas": [{ "f": "R(X,Y) ← R(X,Y) ∩ { (a,b) : ∃ c ∈ D(Z), (a,c) ∈ R(X,Z) ∧ (c,b) ∈ R(Z,Y) }", "read": "keep a pair only if the third variable can be given a value that works with both", "why": "In any solution containing X = a, Y = b, the variable Z has some value c, and that value must satisfy both constraints, so pairs with no such c cannot be in a solution." }, { "f": "k-consistency: every consistent (k−1)-assignment extends to any k-th variable", "read": "k = 1 node, k = 2 arc, k = 3 path", "why": "Higher k reasons about bigger groups, at a higher cost; k = n gives a backtrack-free search." }],
     "why": "Two colours on a triangle: each value has a partner on every edge, so arc consistency removes nothing, yet three mutually different variables with two values cannot exist. Path consistency empties a relation and proves it.",
-    "traps": ["Path consistency prunes PAIRS (it changes constraints), not just values; domains shrink only afterwards, when arc consistency is run on the tightened relations (done in the last step).", "It can add constraints between variables that had none: unconstrained pairs start as 'all pairs allowed'.", "The i-consistency hierarchy (strong i-consistency for i = n gives backtrack-free search) is shown as background; only the 3-consistency algorithm is traced. The remark on strong k-consistency is **supplementary**."],
+    "traps": ["Try example 'Two colours on a triangle': run Arc consistency first (nothing is deleted), then this algorithm (a relation becomes empty). Path consistency is strictly stronger than arc consistency, and also costlier.", "Path consistency prunes PAIRS (it changes constraints), not just values; domains shrink only afterwards, when arc consistency is run on the tightened relations (done in the last step).", "It can add constraints between variables that had none: unconstrained pairs start as 'all pairs allowed'.", "The i-consistency hierarchy (strong i-consistency for i = n gives backtrack-free search) is shown as background; only the 3-consistency algorithm is traced. The remark on strong k-consistency is **supplementary**."],
     "props": { "complete": "no (filtering only)", "optimal": "n/a", "time": "O(n³·d³) per sweep", "space": "O(n²·d²)" },
   },
   params: [{ key: "maxsweeps", label: "Max sweeps", type: "int", default: 10, min: 1, max: 30 }],

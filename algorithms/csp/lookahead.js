@@ -41,15 +41,15 @@
   C.lookahead = { apply };
 
   const MODES = {
-    partial: { id: "csp-lookahead-partial", name: "Partial look-ahead", order: 50,
+    partial: { id: "csp-lookahead-partial", name: "Partial look-ahead", order: 50, def: "csp-lookahead-gw",
       what: "forward checking, then each future variable Xᵢ is also revised against the LATER future variables Xⱼ (j > i) in one pass",
       summary: "Forward checking plus one directed pass over the future variables: every future variable is revised against the future variables that come after it in the ordering. Cheaper than full look-ahead, catches fewer dead ends.",
       pass: "one pass, arcs (Xᵢ, Xⱼ) with i before j" },
-    full: { id: "csp-lookahead-full", name: "Full look-ahead", order: 51,
+    full: { id: "csp-lookahead-full", name: "Full look-ahead", order: 51, def: "csp-lookahead-gw",
       what: "forward checking, then every arc between two future variables is revised once, in both directions",
       summary: "Forward checking plus one pass of arc revision over every arc between future variables (both directions). Detects dead ends that forward checking cannot, e.g. a future variable squeezed empty by two other future variables.",
       pass: "one pass over all future arcs" },
-    mac: { id: "csp-lookahead-mac", name: "Arc-consistency look-ahead (MAC)", order: 52,
+    mac: { id: "csp-lookahead-mac", name: "Arc-consistency look-ahead (MAC)", order: 52, def: "csp-lookahead-ladder",
       what: "forward checking, then AC-3 on the future variables until nothing changes (maintaining arc consistency)",
       summary: "After each assignment, restore full arc consistency among the future variables with AC-3 (MAC: maintaining arc consistency). The strongest of the three look-aheads and the one with the smallest search tree.",
       pass: "AC-3 to a fixpoint" },
@@ -100,7 +100,7 @@
   for (const mode of Object.keys(MODES)) {
     const M = MODES[mode];
     S.register({
-      id: M.id, name: M.name, family: "Constraint processing · lookahead", week: 12, problem: "csp", order: M.order,
+      id: M.id, defaultExample: M.def, name: M.name, family: "Constraint processing · lookahead", week: 12, problem: "csp", order: M.order,
       summary: M.summary,
       pseudocode: `Lookahead(assignment, domains, i):          # mode = ${mode}
     if i > n: return assignment
@@ -118,7 +118,7 @@
         "steps": [["assign X = a", ""], ["forward checking", "Prune the future neighbours of X that clash with a."], ["extra look-ahead", `The part that goes beyond forward checking: ${M.pass}.`], ["empty domain → reject a", "The step table shows which deletions came from FC and which only from the look-ahead."]],
         "formulas": [{ "f": "D(Y) ← { b ∈ D(Y) : ∃ c ∈ D(Z), (b, c) allowed by C(Y,Z) }", "read": "delete values of a future variable Y that have no support in another future variable Z", "why": "A value without support can never be part of a solution extending the current assignment, so deleting it is safe." }],
         "why": "A future variable can be squeezed empty by two OTHER future variables. Forward checking cannot see that until one of them is assigned; look-ahead sees it now. Example: after G = W the neighbours of G lose W and become single-valued, which empties D(E); only the look-ahead variants notice (see the example 'G = W wipes out E').",
-        "traps": ["Partial look-ahead depends on the variable order: a variable that is last in the ordering is never revised against anything, so it may miss a wipe-out that full look-ahead finds.", "More pruning per node does not always mean less total time; each node costs more.", "Which pruning came from forward checking and which from the extra look-ahead is shown in separate columns. The split into 'partial / full / MAC' passes is the usual textbook presentation; the exact pass structure is **supplementary** to the lecture slides."],
+        "traps": ["The three variants prune in a strict order: forward checking < partial < full < MAC (each prunes at least what the previous one does). Example 'Look-ahead ladder' shows 17, 6, 5 and 3 values tried before the same conclusion (no solution).", "Partial look-ahead depends on the variable order: a variable that is last in the ordering is never revised against anything, so it may miss a wipe-out that full look-ahead finds.", "More pruning per node does not always mean less total time; each node costs more.", "Which pruning came from forward checking and which from the extra look-ahead is shown in separate columns. The split into 'partial / full / MAC' passes is the usual textbook presentation; the exact pass structure is **supplementary** to the lecture slides."],
         "props": { "complete": "yes", "optimal": "n/a", "time": "O(dⁿ) worst case, smaller tree than forward checking", "space": "O(n·d) for domain copies" },
       },
       params: [{ key: "mrv", label: "Variable order", type: "select", default: "given", options: [["given", "as listed"], ["mrv", "smallest domain first (MRV)"]] }],

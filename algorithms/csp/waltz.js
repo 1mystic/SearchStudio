@@ -1,6 +1,7 @@
 /* Waltz algorithm: constraint propagation over Huffman–Clowes junction labellings. */
 Studio.register({
   id: "csp-waltz",
+  defaultExample: "waltz-cube",
   name: "Waltz algorithm",
   family: "Constraint processing",
   week: 11,
@@ -52,7 +53,8 @@ labels agree: + with +, − with −, an arrow leaving J with the same arrow ent
     "why": "Constraint propagation instead of search: the cube drawing becomes unambiguous once the background is fixed. Without that, several interpretations survive.",
     "traps": [
       "Arrow labels are relative to direction: 'out' at one end is 'in' at the other.",
-      "Arc consistency can leave several labellings; a search step picks among them."
+      "Arc consistency can leave several labellings; a search step picks among them. Compare the two cube examples: with the background constraint every junction ends with one labelling; without it junction O keeps one but P to U keep 2 or 3 each (several 3-D readings of the same drawing survive).",
+      "Waltz filtering is only as good as the catalogue: it assumes trihedral vertices in general position, so drawings of other objects can be labelled wrongly or not at all."
     ],
     "props": {
       "complete": "filtering only",

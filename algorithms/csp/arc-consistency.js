@@ -1,6 +1,7 @@
 /* Arc consistency: Revise, AC-1 and AC-3. */
 Studio.register({
   id: "csp-ac3",
+  defaultExample: "csp-chain",
   name: "Arc consistency (AC-1, AC-3)",
   family: "Constraint processing",
   week: 11,
@@ -54,12 +55,13 @@ AC-1: repeat Revise on all arcs until a full pass changes nothing`,
     "why": "Cheap reasoning that shrinks domains; sometimes it solves the problem outright (the chain example), sometimes it only prunes (map colouring).",
     "traps": [
       "Arcs are directed: (X, Y) and (Y, X) are different.",
-      "Arc consistency does not guarantee a solution exists."
+      "Arc consistency does not guarantee a solution exists, nor that it finds one. Three outcomes to compare: 'Ordering chain' is solved by AC-3 alone (every domain becomes one value); 'Variable ordering' is pruned (D = 1, E = 2) but A, B, C stay ambiguous so search is needed; on the Australia map nothing is deleted at all. The 'Two colours on a triangle' example passes arc consistency yet has no solution: only path consistency sees it.",
+      "AC-1 and AC-3 delete exactly the same values; AC-3 only does less work (fewer revisions), which you can see in the revisions counter by switching the algorithm."
     ],
     "props": {
       "complete": "no (filtering only)",
       "optimal": "n/a",
-      "time": "O(e·d³)",
+      "time": "O(e·d³) for AC-3 (AC-1: O(n·e·d³))",
       "space": "O(e)"
     }
   },

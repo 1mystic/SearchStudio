@@ -1,6 +1,7 @@
 /* Model-based diagnosis: find conflicts by constraint propagation, then minimal diagnoses as minimal hitting sets. */
 Studio.register({
   id: "csp-diagnosis",
+  defaultExample: "circuit-polybox",
   name: "Model-based diagnosis",
   family: "Constraint processing",
   week: 11,
@@ -37,10 +38,12 @@ diagnoses ← minimal sets of components that intersect every conflict (minimal 
         "why": "If any conflict had no faulty member, the contradiction would remain."
       }
     ],
-    "why": "The polybox has conflicts {M1, M2, A1} and {M1, M3, A1, A2}, giving the diagnoses {M1}, {A1}, {M2, M3}, {M2, A2}.",
+    "why": "The polybox has conflicts {M1, M2, A1} and {M1, M3, A1, A2}, giving the diagnoses {M1}, {A1} (single faults, they sit in both conflicts) and {M2, M3}, {M2, A2} (double faults). Which diagnoses exist depends on the symptoms: in example 'both outputs wrong' the conflicts are {M1, M2, A1} and {M2, M3, A2} and the single fault {M2} explains both.",
     "traps": [
       "A conflict lists the components used to derive the contradiction, not just the one producing the wrong output.",
-      "Diagnoses are minimal: supersets also explain the symptoms but are less likely."
+      "Diagnoses are minimal: supersets also explain the symptoms but are less likely.",
+      "A component in only some of the conflicts cannot be a single fault: M2 is not enough on the Polybox example (it is not in the second conflict) but is enough on 'both outputs wrong'.",
+      "If the observations agree with the model there is no conflict and the only minimal diagnosis is the empty set: nothing is faulty."
     ],
     "props": {
       "complete": "yes (all minimal diagnoses)",
@@ -84,12 +87,16 @@ diagnoses ← minimal sets of components that intersect every conflict (minimal 
       if (r.clash) { conflicts.push(s); snap(`Conflict found: assuming only {${s.join(", ")}} work already contradicts the observations (${r.clash.w} = ${r.clash.got} vs ${r.clash.have})`, r.val, s.concat([r.clash.w]),
         { table: { title: "minimal conflicts", columns: ["#", "components"], rows: conflicts.map((c, i) => [i + 1, "{" + c.join(", ") + "}"]) } }); }
     }
-    // minimal hitting sets
+    // minimal hitting sets (with no conflict at all the empty set is the only minimal one: nothing is faulty)
     const diags = [];
-    for (const s of subsets) { if (diags.some(d => d.every(x => s.includes(x)))) continue; if (conflicts.every(c => c.some(x => s.includes(x)))) diags.push(s); }
+    if (!conflicts.length) diags.push([]);
+    else for (const s of subsets) { if (diags.some(d => d.every(x => s.includes(x)))) continue; if (conflicts.every(c => c.some(x => s.includes(x)))) diags.push(s); }
     const consistent = diags.filter(d => !propagate(new Set(ids.filter(x => !d.includes(x)))).clash);
-    snap(`Minimal diagnoses (each hits every conflict): ${diags.map(d => "{" + d.join(", ") + "}").join("  ")}`, null, diags.length ? diags[0] : [],
-      { table: { title: "result", columns: ["conflicts", "diagnoses"], rows: Array.from({ length: Math.max(conflicts.length, diags.length) }, (_, i) => [conflicts[i] ? "{" + conflicts[i].join(", ") + "}" : "", diags[i] ? "{" + diags[i].join(", ") + "}" + (consistent.includes(diags[i]) ? "" : " (inconsistent)") : ""]) },
+    const txt = d => (d.length ? "{" + d.join(", ") + "}" : "{ } (nothing is faulty)");
+    const bySize = k => diags.filter(d => d.length === k).length;
+    const sizes = [1, 2, 3].filter(k => bySize(k)).map(k => `${bySize(k)} ${k === 1 ? "single" : k === 2 ? "double" : "triple"}-fault`).join(", ");
+    snap(conflicts.length ? `Minimal diagnoses (each hits every conflict): ${diags.map(txt).join("  ")}. ${sizes}: a single faulty component that sits in every conflict explains the symptoms alone; otherwise at least two must be broken` : "No contradiction with the observations: the empty set is the only minimal diagnosis, nothing needs to be faulty", null, diags.length ? diags[0] : [],
+      { table: { title: "result", columns: ["conflicts", "diagnoses"], rows: Array.from({ length: Math.max(conflicts.length, diags.length) }, (_, i) => [conflicts[i] ? "{" + conflicts[i].join(", ") + "}" : "", diags[i] ? txt(diags[i]) + (consistent.includes(diags[i]) ? "" : " (inconsistent)") : ""]) },
         stats: [{ label: "conflicts", value: conflicts.length }, { label: "diagnoses", value: diags.length, state: "ok" }] });
     return { steps, result: { conflicts, diagnoses: diags } };
   },

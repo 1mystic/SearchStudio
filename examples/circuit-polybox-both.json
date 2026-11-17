@@ -1,0 +1,126 @@
+{
+ "id": "circuit-polybox-both",
+ "type": "circuit",
+ "name": "Polybox: both outputs wrong (F = 10, G = 10)",
+ "note": "Same circuit and inputs, expected F = 12 and G = 12, but both outputs are observed as 10. The conflicts are {M1, M2, A1} and {M2, M3, A2}. M2 appears in both, so the single fault {M2} explains everything (it feeds both adders: Y = 4 instead of 6). The remaining minimal diagnoses need two broken components: {M1, M3}, {M1, A2}, {A1, M3}, {A1, A2}. Compare with the Polybox example, where F alone is wrong.",
+ "inputs": {
+  "A": 3,
+  "B": 2,
+  "C": 2,
+  "D": 3,
+  "E": 3
+ },
+ "components": [
+  {
+   "id": "M1",
+   "op": "mul",
+   "in": [
+    "A",
+    "C"
+   ],
+   "out": "X"
+  },
+  {
+   "id": "M2",
+   "op": "mul",
+   "in": [
+    "B",
+    "D"
+   ],
+   "out": "Y"
+  },
+  {
+   "id": "M3",
+   "op": "mul",
+   "in": [
+    "C",
+    "E"
+   ],
+   "out": "Z"
+  },
+  {
+   "id": "A1",
+   "op": "add",
+   "in": [
+    "X",
+    "Y"
+   ],
+   "out": "F"
+  },
+  {
+   "id": "A2",
+   "op": "add",
+   "in": [
+    "Y",
+    "Z"
+   ],
+   "out": "G"
+  }
+ ],
+ "observed": {
+  "F": 10,
+  "G": 10
+ },
+ "layout": {
+  "A": [
+   0,
+   0
+  ],
+  "B": [
+   0,
+   1
+  ],
+  "C": [
+   0,
+   2
+  ],
+  "D": [
+   0,
+   3
+  ],
+  "E": [
+   0,
+   4
+  ],
+  "M1": [
+   1,
+   0.5
+  ],
+  "M2": [
+   1,
+   2
+  ],
+  "M3": [
+   1,
+   3.5
+  ],
+  "X": [
+   2,
+   0.5
+  ],
+  "Y": [
+   2,
+   2
+  ],
+  "Z": [
+   2,
+   3.5
+  ],
+  "A1": [
+   3,
+   1.2
+  ],
+  "A2": [
+   3,
+   2.8
+  ],
+  "F": [
+   4,
+   1.2
+  ],
+  "G": [
+   4,
+   2.8
+  ]
+ }
+}
