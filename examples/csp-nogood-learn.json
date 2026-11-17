@@ -1,0 +1,61 @@
+{
+ "id": "csp-nogood-learn",
+ "type": "csp",
+ "name": "Nogood recording: {A = r} rejects three later values",
+ "note": "Same shape as the backjumping example. The dead end at D (conflict set {A}) is stored as the nogood {A = r}. Back at C and B, the values C = z, B = y and B = z all contain that nogood and are rejected without search: 3 values pruned by nogoods.",
+ "variables": [
+  {
+   "id": "A",
+   "domain": [
+    "r",
+    "g"
+   ],
+   "x": 0,
+   "y": 0.6
+  },
+  {
+   "id": "B",
+   "domain": [
+    "x",
+    "y",
+    "z"
+   ],
+   "x": 1,
+   "y": 0
+  },
+  {
+   "id": "C",
+   "domain": [
+    "x",
+    "y",
+    "z"
+   ],
+   "x": 2,
+   "y": 0
+  },
+  {
+   "id": "D",
+   "domain": [
+    "r"
+   ],
+   "x": 3,
+   "y": 0.6
+  }
+ ],
+ "constraints": [
+  {
+   "scope": [
+    "A",
+    "D"
+   ],
+   "rel": "neq"
+  },
+  {
+   "scope": [
+    "B",
+    "C"
+   ],
+   "rel": "neq"
+  }
+ ]
+}
