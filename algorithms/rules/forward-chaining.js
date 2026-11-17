@@ -75,7 +75,7 @@ Studio.register({
       return out.map(o => ({ r, b: o.b, used: o.used, key: r.name + JSON.stringify(Object.entries(o.b).sort()) }));
     };
     const show = i => `${i.r.name} ${Object.entries(i.b).map(([k, v]) => k + "=" + v).join(" ")}`.trim();
-    const wmList = (fresh = []) => [{ label: "WM", items: WM.map(w => ({ text: `${w.t}:${L.show(w.f)}`, state: fresh.includes(w.t) ? "open" : "plain" })) }];
+    const wmList = (fresh = []) => [{ label: "WM (time tag: fact)", items: WM.map(w => ({ text: `${w.t}: ${L.show(w.f)}`, state: fresh.includes(w.t) ? "open" : "plain" })) }];
     for (let cycle = 1; cycle <= 60; cycle++) {
       const cs = P.rulesP.flatMap(instantiate).filter(i => !fired.has(i.key));
       if (!cs.length) { steps.push({ caption: `Cycle ${cycle}: the conflict set is empty — stop. Working memory has ${WM.length} facts. Firing order under the ${strategy} strategy: ${firing.join(" → ") || "nothing fired"}. A different strategy reorders the firings; for rules that only add facts it cannot change the final set of facts.`, lists: wmList(), stats: [{ label: "facts", value: WM.length, state: "ok" }] }); break; }
@@ -83,7 +83,7 @@ Studio.register({
         : strategy === "specificity" ? b.r.conds.length - a.r.conds.length || a.r.order - b.r.order : a.r.order - b.r.order || Math.max(...b.used, 0) - Math.max(...a.used, 0));
       const pick = ranked[0];
       const table = { title: `conflict set (${strategy})`, columns: ["instantiation", "uses facts", "chosen"], rows: ranked.map(i => [show(i), i.used.join(","), i === pick ? "fire" : ""]), rowStates: ranked.map(i => (i === pick ? "cur" : "")) };
-      steps.push({ caption: `Cycle ${cycle} — match: ${cs.length} instantiation${cs.length > 1 ? "s" : ""}; resolve: ${show(pick)}`, lists: wmList(), table, stats: [{ label: "cycle", value: cycle }, { label: "facts", value: WM.length }] });
+      steps.push({ caption: `Cycle ${cycle} — match: ${cs.length} instantiation${cs.length > 1 ? "s" : ""}; resolve: ${show(pick)}${strategy === "recency" ? ` — it uses fact tag${pick.used.length > 1 ? "s" : ""} ${pick.used.join(",") || "none"}; its newest tag ${Math.max(...pick.used, 0)} is the highest in the conflict set (OPS5 recency: the most recently added WME wins)` : ""}`, lists: wmList(), table, stats: [{ label: "cycle", value: cycle }, { label: "facts", value: WM.length }] });
       fired.add(pick.key);
       firing.push(show(pick));
       const fresh = [], changes = [];

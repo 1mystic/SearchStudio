@@ -2,7 +2,7 @@
  "id": "tsp-ga-premature",
  "type": "tsp",
  "name": "Nine cities (GA premature convergence)",
- "note": "Made for the genetic algorithm (optimum 255). Set Generations 30, Replace k = 3, keep Population 6, PMX and seed 15. With mutation probability 0 the whole population collapses into copies of one tour costing 329 (74 above the optimum): crossover can only reshuffle what is already there, so the search has converged prematurely. With mutation probability 0.9 the same run keeps finding new tours and reaches 255. Watch the distinct tours counter and the mean-cost line.",
+ "note": "Made for the genetic algorithm (optimum 255). Set Generations 30, Replace k = 3, keep Population 6, PMX and seed 15. With mutation probability 0 the whole population collapses into copies of one tour costing 329 (74 above the optimum): crossover can only reshuffle what is already there, so the search has converged prematurely. With mutation probability 0.9 the same run keeps finding new tours and reaches 255. Watch the distinct tours counter, the mean-cost line and the diversity chart on the step before the last: with mutation 0 the distinct-tours curve reaches 1 at generation 7.",
  "cities": [
   {
    "id": "A",

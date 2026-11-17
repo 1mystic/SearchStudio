@@ -1,0 +1,57 @@
+{
+ "id": "graph-dc-beam-narrow",
+ "type": "graph",
+ "name": "Narrow beam loses the cheap route (DC beam search)",
+ "note": "Run Divide and Conquer Beam Search. With w = 1 the beam keeps one node per layer and ends with a path of cost 6; with w = 2 (or more) it keeps the cheap route and returns the optimum, cost 4 (UCS agrees). Watch the CUT BY WIDTH list: nodes cut by the beam are gone for good, and the relay in the middle layer lets the path be rebuilt without parent pointers.",
+ "nodes": [
+  {
+   "id": "S",
+   "x": 0.5,
+   "y": 2.0,
+   "h": 3
+  },
+  {
+   "id": "A",
+   "x": 2.6,
+   "y": 0.8,
+   "h": 1
+  },
+  {
+   "id": "B",
+   "x": 2.6,
+   "y": 3.2,
+   "h": 2
+  },
+  {
+   "id": "G",
+   "x": 4.8,
+   "y": 2.0,
+   "h": 0
+  }
+ ],
+ "edges": [
+  [
+   "S",
+   "A",
+   1
+  ],
+  [
+   "A",
+   "G",
+   10
+  ],
+  [
+   "S",
+   "B",
+   2
+  ],
+  [
+   "B",
+   "G",
+   2
+  ]
+ ],
+ "start": "S",
+ "goal": "G",
+ "directed": false
+}
