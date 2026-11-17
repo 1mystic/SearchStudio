@@ -59,7 +59,9 @@
     if (algo.defaultExample && findProblem(algo.defaultExample)) return algo.defaultExample;
     if (algo.problem === "tsp") return "tsp-six-cities";
     if (algo.problem === "graph") return WEIGHTED.includes(algo.id) ? "graph-weighted" : "graph-g1";
-    const ex = S.examples.find(e => e.type === algo.problem);
+    // first example of the right type that the algorithm accepts (e.g. Minimax declines chance-node trees)
+    const fits = e => { if (!algo.check) return true; try { return !algo.check(S.prepare(e)); } catch (err) { return false; } };
+    const all = S.examples.filter(e => e.type === algo.problem), ex = all.find(fits) || all[0];
     return ex ? ex.id : null;
   }
   const describe = p => (p.note || (S.types[p.type] && S.types[p.type].describe ? S.types[p.type].describe(p) : ""));
