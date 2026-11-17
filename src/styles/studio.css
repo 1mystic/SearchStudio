@@ -735,3 +735,27 @@ body.resizing { cursor: col-resize; user-select: none; }
 .btn.ghost { background: transparent; border-color: var(--rule-2); color: var(--muted); }
 .btn.ghost:hover { color: var(--ink); border-color: var(--dim); background: var(--panel); }
 .btn.ghost svg { flex: none; }
+
+/* =====================================================================
+   polish: consistent interaction states across the site
+   ===================================================================== */
+.btn, .icon-btn, .chip-link, .chip, .picker, .card, .nav a, .pg, .fam, .entry, .mi, .seg button, .tabs button, .trace-list li, .tree li a, .inp, .search, select {
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease; }
+.btn:active, .icon-btn:active, .chip-link:active, .picker:active, .seg button:active { transform: translateY(1px); }
+button:disabled, .btn[aria-disabled="true"], .icon-btn:disabled { opacity: .42; cursor: not-allowed; transform: none; filter: none; }
+button:disabled:hover, .icon-btn:disabled:hover { border-color: var(--rule-2); }
+.inp:focus-visible, .search:focus-visible, textarea:focus-visible, input:focus-visible {
+  outline: none; border-color: var(--yellow); box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 22%, transparent); }
+.card:hover { border-color: var(--dim); box-shadow: 0 6px 18px -12px rgba(0, 0, 0, .45); }
+.card:focus-within { border-color: var(--dim); }
+.trace-list li:focus-visible { outline: 2px solid var(--yellow); outline-offset: -2px; }
+.tabs button:focus-visible, .seg button:focus-visible { outline-offset: -2px; }
+::selection { background: color-mix(in srgb, var(--yellow) 32%, transparent); }
+
+/* error and empty states: calm, readable, left-aligned */
+.err-box { display: flex; gap: 10px; align-items: flex-start; text-align: left; margin: 24px; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--red) 55%, var(--rule)); background: color-mix(in srgb, var(--red) 8%, transparent); color: var(--ink); border-radius: var(--r); line-height: 1.5; }
+.err-box::before { content: "!"; flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--red); color: var(--bg); font-weight: 700; font-size: 13px; margin-top: 1px; }
+.note:empty, .msg:empty { display: none; }
+
+/* wide screens: give the drawing the larger share of the stage */
+@media (min-width: 1600px) { .stage-inner { grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); } }

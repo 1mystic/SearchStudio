@@ -50,7 +50,7 @@ h2(N) = Σ over blocks: +k if its whole structure of k blocks (down to the table
     P.blocks.forEach(b => (want[b] = "table"));
     P.goal.forEach(g => { const m = g.match(/^on\((\w+),(\w+)\)$/); if (m) want[m[1]] = m[2]; });
     const sup = (i, s) => (i ? s[i - 1] : "table");
-    const marks = st => { const mark = {}; st.forEach(s => { let good = true; s.forEach((b, i) => { good = good && sup(i, s) === want[b]; mark[b] = good ? "goal" : ""; }); }); return mark; };
+    const marks = st => { const mark = {}; st.forEach(s => { let good = true; s.forEach((b, i) => { good = good && sup(i, s) === want[b]; mark[b] = good ? "ok" : ""; }); }); return mark; };
     const h1 = st => st.reduce((t, s) => t + s.reduce((u, b, i) => u + (sup(i, s) === want[b] ? 1 : -1), 0), 0);
     const h2 = st => st.reduce((t, s) => { let good = true; return t + s.reduce((u, b, i) => { good = good && sup(i, s) === want[b]; return u + (good ? i + 1 : -(i + 1)); }, 0); }, 0);
     const hn = heuristic === "h2" ? "h2" : "h1", H = hn === "h2" ? h2 : h1;
