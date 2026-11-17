@@ -1,0 +1,8 @@
+{
+ "id": "ttt-horizon",
+ "type": "tictactoe",
+ "name": "Horizon effect: X to move",
+ "note": "X (A1, B1) to move against O (A2, C1). Run with k = 1 and k = 2: both choose A3, which looks fine but loses by force (O plays C2 and threatens both B2 and C3). With k = 3 the search sees X's winning fork B2 (X then threatens B3 and C3 at once) and picks it; the full-depth comparison confirms B2 wins and A3 loses.",
+ "board": "XO.X..O..",
+ "toMove": "X"
+}

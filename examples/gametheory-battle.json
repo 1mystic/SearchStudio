@@ -1,0 +1,9 @@
+{
+ "id": "gametheory-battle",
+ "type": "matrixgame",
+ "name": "Battle of the Sexes (coordination)",
+ "note": "Nobody has a dominated strategy, so elimination removes nothing. Best responses give two pure equilibria, (Football, Football) and (Opera, Opera): each player prefers a different one, but both are Pareto-efficient. The difficulty is coordination, not dominance.",
+ "rows": ["Football", "Opera"],
+ "cols": ["Football", "Opera"],
+ "payoff": [[[2, 1], [0, 0]], [[0, 0], [1, 2]]]
+}

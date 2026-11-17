@@ -1,0 +1,9 @@
+{
+ "id": "life-block",
+ "type": "life",
+ "name": "Block (still life)",
+ "note": "A 2 x 2 square. Every live cell has exactly 3 live neighbours, so all survive, and no dead cell has exactly 3 live neighbours, so nothing is born. Nothing ever changes: a still life. Population stays 4.",
+ "width": 5,
+ "height": 5,
+ "alive": [[1, 1], [1, 2], [2, 1], [2, 2]]
+}

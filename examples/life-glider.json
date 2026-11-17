@@ -1,0 +1,9 @@
+{
+ "id": "life-glider",
+ "type": "life",
+ "name": "Glider (moves diagonally)",
+ "note": "Five cells that never stay put. Run 4 generations: the same shape reappears one row down and one column right, so the glider travels one cell diagonally every 4 generations (a spaceship). Population stays 5. Watch the births (yellow) at the leading edge and the deaths (red) at the back.",
+ "width": 7,
+ "height": 7,
+ "alive": [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
+}

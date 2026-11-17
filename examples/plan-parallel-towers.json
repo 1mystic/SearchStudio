@@ -1,0 +1,9 @@
+{
+ "id": "plan-parallel-towers",
+ "type": "planning",
+ "name": "Two independent towers to turn over",
+ "note": "Tower A,B and tower C,D must each be turned over. The two jobs share no blocks, so with 2 arms the schedule overlaps them: 8 actions in a makespan of 4. Try k = 1 (makespan 8) and k = 3 (still 4: each tower is a chain of two dependent moves).",
+ "blocks": ["A", "B", "C", "D"],
+ "init": [["A", "B"], ["C", "D"]],
+ "goal": ["on(A,B)", "ontable(B)", "on(C,D)", "ontable(D)"]
+}

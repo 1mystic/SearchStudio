@@ -1,0 +1,9 @@
+{
+ "id": "life-blinker",
+ "type": "life",
+ "name": "Blinker (period 2)",
+ "note": "Three cells in a row. Watch the two end cells die (only 1 live neighbour) while two new cells are born above and below the middle (exactly 3 neighbours each). After 2 generations the pattern is back where it started: an oscillator of period 2. Population stays 3.",
+ "width": 5,
+ "height": 5,
+ "alive": [[2, 1], [2, 2], [2, 3]]
+}

@@ -7,7 +7,7 @@ This guide covers how to bring your own problem into the studio, and the exact J
 1. [Three ways to bring a problem in](#three-ways-to-bring-a-problem-in)
 2. [Fields every problem shares](#fields-every-problem-shares)
 3. [Which problem type each algorithm uses](#which-problem-type-each-algorithm-uses)
-4. Schemas: [TSP](#1-tsp--type-tsp) · [Graph](#2-state-space-graph--type-graph) · [Game tree](#3-game-tree--type-game) · [AND–OR graph](#4-andor-graph--type-andor) · [Planning](#5-blocks-world-planning--type-planning) · [Rule base](#6-rule-base--type-rules) · [CSP](#7-constraint-problem--type-csp) · [Line drawing](#8-line-drawing--type-linedrawing) · [Circuit](#9-circuit-diagnosis--type-circuit) · [Alignment](#10-sequence-alignment--type-alignment) · [SAT](#11-propositional-satisfiability--type-sat) · [State space](#12-implicit-state-space--type-statespace)
+4. Schemas: [TSP](#1-tsp--type-tsp) · [Graph](#2-state-space-graph--type-graph) · [Game tree](#3-game-tree--type-game) · [AND–OR graph](#4-andor-graph--type-andor) · [Planning](#5-blocks-world-planning--type-planning) · [Rule base](#6-rule-base--type-rules) · [CSP](#7-constraint-problem--type-csp) · [Line drawing](#8-line-drawing--type-linedrawing) · [Circuit](#9-circuit-diagnosis--type-circuit) · [Alignment](#10-sequence-alignment--type-alignment) · [SAT](#11-propositional-satisfiability--type-sat) · [State space](#12-implicit-state-space--type-statespace) · [Game of Life](#13-game-of-life--type-life) · [Tic-tac-toe](#14-tic-tac-toe-position--type-tictactoe) · [Matrix game](#15-matrix-game--type-matrixgame)
 5. [Adding a problem to the built-in examples](#adding-a-problem-to-the-built-in-examples)
 6. [Common errors](#common-errors)
 
@@ -33,7 +33,7 @@ When you import a problem whose type doesn't fit the current algorithm, the stud
 
 ```jsonc
 {
-  "type": "tsp",            // REQUIRED. One of: tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment, sat, statespace
+  "type": "tsp",            // REQUIRED. One of: tsp, graph, game, andor, planning, rules, csp, linedrawing, circuit, alignment, sat, statespace, life, tictactoe, matrixgame
   "name": "My problem",     // optional: shown in the picker (default "Imported problem")
   "note": "One line.",      // optional: shown under the name
   "id": "my-problem"        // ignored on import (a new id is given); REQUIRED only for files in examples/
@@ -54,7 +54,7 @@ When you import a problem whose type doesn't fit the current algorithm, the stud
 | `graph` | BFS, DFS, DFID, Best First, Hill Climbing, Beam Search, UCS, A*, Admissibility & monotone check, IDA*, RBFS, DCFS |
 | `game` | Minimax, Alpha-Beta, SSS* |
 | `andor` | AO* |
-| `planning` | Forward and backward state-space planning, Goal Stack Planning, Partial Order Planning |
+| `planning` | Forward and backward state-space planning, Goal Stack Planning, Partial Order Planning, Multi-arm plan scheduling |
 | `rules` | Forward chaining, Rete |
 | `csp` | Backtracking, Forward checking, Arc consistency (AC-1, AC-3) |
 | `linedrawing` | Waltz algorithm |
@@ -62,6 +62,9 @@ When you import a problem whose type doesn't fit the current algorithm, the stud
 | `alignment` | Sequence alignment (DP), Sequence alignment (A*) |
 | `sat` | Brute force (truth table, ≤ 6 variables), Hill climbing (N1), Beam search, Variable Neighbourhood Descent, Best neighbour (fixed moves), Tabu search |
 | `statespace` | BFS, DFS, Simple search (no node pairs), Best First, A* — on water jugs, 8-puzzle and missionaries & cannibals |
+| `life` | Game of Life generation stepper |
+| `tictactoe` | k-ply tic-tac-toe (static evaluator, horizon effect) |
+| `matrixgame` | Dominant strategies and Nash equilibria (supplementary) |
 
 Settings such as the start city, tie-break rule, temperature or seed are **not** part of the problem. You set them in the studio's Settings card after importing.
 
@@ -697,6 +700,75 @@ The shortest plan for 3 + 3 with a boat of 2 is 11 crossings. For missionaries t
 
 ---
 
+## 13. Game of Life — `"type": "life"`
+
+**Used by:** Game of Life generation stepper (Week 4, emergent systems).
+
+| Field | Required | Type | Meaning |
+|---|:--:|---|---|
+| `width`, `height` | ✔ | whole numbers 3–16 | Grid size. |
+| `alive` | ✔ | array of `[row, column]` | Live cells at generation 0. Rows and columns count from 0 at the top left. |
+| `wrap` | | `true` / `false` | `true` makes the grid a torus (the edges join). Default `false`: cells beyond the edge are dead. |
+
+```json
+{ "type": "life", "name": "Blinker", "width": 5, "height": 5, "alive": [[2, 1], [2, 2], [2, 3]] }
+```
+
+Rule B3/S23: a dead cell with exactly 3 live neighbours is born; a live cell with 2 or 3 survives; every other live cell dies. The studio's generations setting says how many to run.
+
+**Text format (Edit box):** one text row per grid row, `.` dead and `#` alive, and an optional line `wrap`.
+
+```
+.....
+.###.
+.....
+```
+
+**Random problems:** a seeded random soup of a chosen size and density.
+
+---
+
+## 14. Tic-tac-toe position — `"type": "tictactoe"`
+
+**Used by:** k-ply tic-tac-toe (Week 7).
+
+| Field | Required | Type | Meaning |
+|---|:--:|---|---|
+| `board` | ✔ | 9 characters | Row by row, each `X`, `O` or `.` (empty). X has the same number of marks as O, or one more. |
+| `toMove` | ✔ | `"X"` or `"O"` | Whose turn it is. |
+
+```json
+{ "type": "tictactoe", "name": "X to move", "board": "XO.X..O..", "toMove": "X" }
+```
+
+Cells are named `A1 A2 A3 / B1 B2 B3 / C1 C2 C3` (row letter, column number); ties go to the alphabetically first cell. MAX is always X. The static evaluator is e(n) = (rows, columns and diagonals not containing an O) − (those not containing an X), and a won position is ±∞.
+
+**Text format (Edit box):** three rows of three characters, then a line `move X` (or `move O`).
+
+**Random problems:** a seeded random position after a chosen number of marks.
+
+---
+
+## 15. Matrix game — `"type": "matrixgame"`
+
+**Used by:** Dominant strategies and Nash equilibria (Week 7, supplementary).
+
+| Field | Required | Type | Meaning |
+|---|:--:|---|---|
+| `rows` | ✔ | 2–5 different names | Strategies of the row player. |
+| `cols` | ✔ | 2–5 different names | Strategies of the column player. |
+| `payoff` | ✔ | array of rows of `[a, b]` | `payoff[i][j]` = `[row player's payoff, column player's payoff]` when row `i` meets column `j`. Higher is better. |
+
+```json
+{ "type": "matrixgame", "name": "Prisoner's Dilemma",
+  "rows": ["Cooperate", "Defect"], "cols": ["Cooperate", "Defect"],
+  "payoff": [[[-1, -1], [-3, 0]], [[0, -3], [-2, -2]]] }
+```
+
+The algorithm removes strictly dominated strategies one at a time, marks best responses, reports the pure Nash equilibria and flags those that another outcome beats for both players (Pareto-inefficient). A mixed equilibrium is not computed.
+
+---
+
 ## Adding a problem to the built-in examples
 
 To ship a problem with the site for everyone, not just your browser:
@@ -712,7 +784,7 @@ To ship a problem with the site for everyone, not just your browser:
 | Message | Fix |
 |---|---|
 | `That is not a valid problem: Unexpected token …` | The JSON is malformed: look for a trailing comma, a `//` comment or a missing quote. |
-| `Unknown problem type "…"` | `type` must be one of the eleven names above, in lowercase. |
+| `Unknown problem type "…"` | `type` must be one of the fourteen names above, in lowercase. |
 | `Matrix must be n × n` | One row per city, one number per city in every row, in the same order as `cities`. |
 | `Edge X–Y uses an unknown node` | Every edge end must be listed in `nodes`, with the same case. |
 | `Start node is not in the graph` | `start` (and `goal`) must be node ids. |
