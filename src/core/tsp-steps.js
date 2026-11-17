@@ -4,7 +4,28 @@
   const Studio = root.Studio;
   const T = () => Studio.tsp;
 
+  /* Exact optimum by Held-Karp dynamic programming, only for n <= 10 (used to say whether a heuristic's tour is optimal); null above that. Cached per problem. */
+  const optCache = new WeakMap();
+  function optimumOf(P) {
+    if (P.n > 10) return null;
+    if (optCache.has(P)) return optCache.get(P);
+    const n = P.n, m = n - 1, full = (1 << m) - 1, d = (i, j) => P.M[i][j], INF = 1e15;
+    let res;
+    if (n < 3) res = P.cost(P.ids);
+    else {
+      const dp = Array.from({ length: full + 1 }, () => new Array(m).fill(INF));
+      for (let j = 0; j < m; j++) dp[1 << j][j] = d(0, j + 1);
+      for (let mask = 1; mask <= full; mask++) for (let j = 0; j < m; j++) {
+        if (!(mask & (1 << j)) || dp[mask][j] >= INF) continue;
+        for (let k = 0; k < m; k++) if (!(mask & (1 << k))) { const nm = mask | (1 << k), v = dp[mask][j] + d(j + 1, k + 1); if (v < dp[nm][k]) dp[nm][k] = v; }
+      }
+      res = INF; for (let j = 0; j < m; j++) res = Math.min(res, dp[full][j] + d(j + 1, 0));
+    }
+    optCache.set(P, res); return res;
+  }
+
   Studio.tspSteps = {
+    optimum: optimumOf,
     nodes(P, state = "plain", over = {}) { const n = {}; P.ids.forEach(c => (n[c] = { state })); return Object.assign(n, over); },
 
     /* edges of tour t, with removed / added edge names ("AC") highlighted */
@@ -38,7 +59,9 @@
           stats: [{ label: "current", value: P.cost(cur) }, { label: "best neighbour", value: b ? b.cost : "–", state: better ? "ok" : "bad" }],
         });
         if (!better) {
-          steps.push({ caption: `No neighbour is better than ${P.cost(cur)}: local optimum for ${label}`, nodes: this.nodes(P, "path"),
+          const opt = optimumOf(P), c = P.cost(cur);
+          const verdict = opt == null ? "" : c === opt ? `. This tour is also the global optimum (${opt}, checked exactly)` : `. It is only a LOCAL optimum: the global optimum is ${opt} (checked exactly), ${c - opt} lower, but no single ${label} move gets there`;
+          steps.push({ caption: `No neighbour is better than ${c}: local optimum for ${label}${verdict}`, nodes: this.nodes(P, "path"),
             edges: this.edges(P, cur, { state: "path" }), table: this.neighbourTable(P, nb, null), stats: [{ label: "local optimum", value: P.cost(cur), state: "ok" }] });
           return { steps, tour: cur, cost: P.cost(cur) };
         }

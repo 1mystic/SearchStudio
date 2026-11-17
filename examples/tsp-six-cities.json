@@ -2,7 +2,7 @@
  "id": "tsp-six-cities",
  "type": "tsp",
  "name": "Six cities (TSP Search Atlas)",
- "note": "The instance used throughout the deck. Optimum A,D,B,F,C,E = 224.",
+ "note": "The instance used throughout the deck. Optimum A,D,B,F,C,E = 224. What to watch: Nearest neighbour costs 264 from A (forced return B-A = 92, the longest edge) but 240 from C. Greedy refuses CE (premature cycle) and CF, BD, AD ... (a city would get degree 3) and ends at 238. Savings with base A reaches 224, with base E only 229 (AD refused because D is interior). 2-edge exchange from the Greedy tour stops at 229, a local optimum that is not global; Or-opt, and variable neighbourhood descent via its 3-edge phase, reach 224. Beam search from Greedy with 2-city exchange gives 229 for w = 1 and 2, 224 for w = 3. Branch and bound proves 224 and prunes 24 subtrees. Simulated annealing accepts worse moves early and escapes 229. Best neighbour for k moves cycles between 229 and 224.",
  "cities": [
   {
    "id": "A",

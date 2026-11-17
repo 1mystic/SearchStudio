@@ -36,7 +36,7 @@ return node`,
     ],
     "formulas": [
       {
-        "f": "LocalOpt(N₁) ⊉ LocalOpt(N₂)",
+        "f": "local optimum of N₁  ⇏  local optimum of N₂",
         "read": "being stuck in one neighbourhood does not mean being stuck in another",
         "why": "Different moves reach different tours; a denser neighbourhood contains moves the sparse one lacks."
       }
@@ -44,7 +44,8 @@ return node`,
     "why": "Sparse neighbourhoods are cheap and do most of the work; dense ones are used only near the end, where they escape the sparse operator's traps.",
     "traps": [
       "The course version runs each MoveGen once, in order; some variants restart from MoveGen(1) after any improvement.",
-      "A phase can make no progress at all: that is fine."
+      "A phase can make no progress at all: that is fine.",
+      "Six cities from the Greedy tour (default order): 2-edge 238→229, 2-city 229→229 (no progress), 3-edge 229→224, the optimum. 2-opt alone is stuck at 229."
     ],
     "props": {
       "complete": "no",

@@ -81,7 +81,8 @@ return bestSeen`,
       walk.push({ x: i, y: P.cost(cur), best: P.cost(best), proposal: r.cost, accepted: acc });
       push(`k = ${i}: ${r.move}, ΔE = ${dE}, P = ${p}, u = ${u} → ${verdict}${acc ? "" : `; stay at ${P.cost(cur)}`}`);
     }
-    push(`bestSeen ${best.join(",")} = ${P.cost(best)} after ${k} samples, ${accepted} accepted at T = ${T}`, { nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.tspSteps.edges(P, best, { state: "path" }) });
+    const opt = Studio.tspSteps.optimum(P);
+    push(`bestSeen ${best.join(",")} = ${P.cost(best)}${opt != null ? (P.cost(best) === opt ? ", the optimum" : `, ${P.cost(best) - opt} above the optimum ${opt}`) : ""} after ${k} samples, ${accepted} accepted at the fixed T = ${T}. The final tour costs ${P.cost(cur)}: with T fixed the walk neither freezes nor stops wandering, so keep the best tour seen`, { nodes: Studio.tspSteps.nodes(P, "path"), edges: Studio.tspSteps.edges(P, best, { state: "path" }) });
     return { steps, result: { tour: best, cost: P.cost(best), accepted, final: cur, finalCost: P.cost(cur) } };
   },
 });
