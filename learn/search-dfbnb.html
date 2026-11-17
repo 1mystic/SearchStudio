@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Depth-First Branch and Bound — step by step · Search Studio</title>
+<meta name="description" content="Depth-First Branch and Bound keeps the small memory of depth-first search but still finds the optimal path. It carries a bound U, the cost of the best complete path found so far, and cuts off any branch that already costs at least U.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-dfbnb.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Depth-First Branch and Bound — step by step · Search Studio"><meta property="og:description" content="Depth-First Branch and Bound keeps the small memory of depth-first search but still finds the optimal path. It carries a bound U, the cost of the best complete path found so far, and cuts off any branch that already costs at least U."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-dfbnb.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Depth-First Branch and Bound","description":"Depth-First Branch and Bound keeps the small memory of depth-first search but still finds the optimal path. It carries a bound U, the cost of the best complete path found so far, and cuts off any branch that already costs at least U.","url":"https://1mystic.github.io/SearchStudio/learn/search-dfbnb.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Depth-First Branch and Bound","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/dfbnb.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 12 · Graph search · optimal</p><h1>Depth-First Branch and Bound</h1></div><a class="btn primary" href="../#try-search-dfbnb">Run it step by step</a></div>
+<p class="intro">Depth-First Branch and Bound keeps the small memory of depth-first search but still finds the optimal path. It carries a bound U, the cost of the best complete path found so far, and cuts off any branch that already costs at least U.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Explore depth-first. The first path to the goal sets U = its cost. From then on, a path to node N is pruned when g(N) + h(N) ≥ U, because with an admissible h no completion of it can be cheaper than U. Whenever a cheaper goal path is found, U is lowered. When the search ends, the best path found is optimal. Only the current path is stored, so memory is linear in the depth. With the option 'g only' the heuristic is ignored (h = 0): then the pruning test is g(N) ≥ U.</p>
+<h2><small>02</small>Pseudocode</h2><pre>U ← ∞;  best ← none
+DFBnB(N, g, path):
+    if g + h(N) ≥ U: prune; return                 # cannot improve on the best solution
+    if GoalTest(N): U ← g;  best ← path;  return   # a better solution
+    for each child C of N not on the path, in increasing order of g' + h(C):
+        DFBnB(C, g + k(N,C), path + C)
+return best</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>U ← ∞</td><td>No solution known yet.</td></tr><tr><td>go depth-first, nearest children first</td><td>Ordering by g + h finds a good U early.</td></tr><tr><td>prune if g + h ≥ U</td><td>This path cannot beat the best solution.</td></tr><tr><td>goal reached with g &lt; U: U ← g</td><td>A cheaper solution; remember the path.</td></tr><tr><td>backtrack until every branch is searched or pruned</td><td>The last U is the optimum.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">prune N when g(N) + h(N) ≥ U</div><p class="read">its best possible total is no better than the bound</p><p class="why">With h ≤ h* the true cost of any path through N is at least g(N)+h(N), so continuing cannot help.</p></div><div class="formula"><div class="f">U ← min(U, g(goal))</div><p class="read">tighten the bound at each solution</p><p class="why">A smaller U prunes more of the remaining tree.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>It needs memory only for the current path, unlike A* whose OPEN list can grow exponentially, and it still returns an optimal path. Its weakness is that, on a graph, it may reach the same state again by many paths. A good first solution (found by ordering children well) makes it prune heavily.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes (finite graph)</div><div class="prop"><span>optimal</span>yes with admissible h</div><div class="prop"><span>time</span>exponential worst case</div><div class="prop"><span>space</span>O(b·d)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The first goal found is not the answer: keep searching with the bound.</li><li>With an inadmissible h the pruning can discard the optimal path; with h = 0 ('g only') it is always safe.</li><li>A bad child ordering finds a poor U late and prunes little. On the 'Weighted graph' U improves twice (first S–A–C–E–G = 13, then the optimum S–B–E–G = 12) and every later branch is cut by g + h ≥ U.</li><li>Prune with ≥ U: a path equal to U cannot improve the answer.</li><li>Unlike A*, the first solution is usually not optimal; the search only stops when every branch is pruned. Use 'g only' to see the bound work without a heuristic: more branches survive.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="csp-cbj.html"><span>← Previous</span><b>Conflict-directed backjumping</b></a><a class="pg next" href="csp-nogood.html"><span>Next →</span><b>Nogood recording</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

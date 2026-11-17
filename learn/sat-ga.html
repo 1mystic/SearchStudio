@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Genetic algorithm — step by step · Search Studio</title>
+<meta name="description" content="A genetic algorithm keeps a whole population of candidate assignments instead of a single one. Fitter strings (more clauses satisfied) are more likely to become parents; crossover mixes the bits of two parents and mutation occasionally flips a bit, which can create strings that neither parent could.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-ga.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Genetic algorithm — step by step · Search Studio"><meta property="og:description" content="A genetic algorithm keeps a whole population of candidate assignments instead of a single one. Fitter strings (more clauses satisfied) are more likely to become parents; crossover mixes the bits of two parents and mutation occasionally flips a bit, which can create strings that neither parent could."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-ga.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Genetic algorithm","description":"A genetic algorithm keeps a whole population of candidate assignments instead of a single one. Fitter strings (more clauses satisfied) are more likely to become parents; crossover mixes the bits of two parents and mutation occasionally flips a bit, which can create strings that neither parent could.","url":"https://1mystic.github.io/SearchStudio/learn/sat-ga.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Genetic algorithm","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/genetic-algorithm.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 4 · SAT · genetic</p><h1>Genetic algorithm</h1></div><a class="btn primary" href="../#try-sat-ga">Run it step by step</a></div>
+<p class="intro">A genetic algorithm keeps a whole population of candidate assignments instead of a single one. Fitter strings (more clauses satisfied) are more likely to become parents; crossover mixes the bits of two parents and mutation occasionally flips a bit, which can create strings that neither parent could.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Fitness of a string is h, the number of satisfied clauses. Selection probability is p = h / Σh (roulette wheel: the cumulative probabilities partition [0, 1) and a uniform u picks the interval it falls in). Pairs of selected parents are crossed at a random one-point cut, and each child is mutated with probability pm by flipping one random bit.</p>
+<h2><small>02</small>Pseudocode</h2><pre>Pop ← N bit strings (given, or random)
+repeat for g generations
+    fitness(x) ← h(x);   p(x) ← h(x) / Σ h
+    pool ← N strings drawn by roulette-wheel (spin u, take the first x with cumulative p ≥ u)
+    for each consecutive pair (a, b) of the pool
+        cut ← random point in 1..n−1;   children ← a[0..cut)+b[cut..), b[0..cut)+a[cut..)
+        with probability pm flip one random bit of each child
+    Pop ← the children
+return the best string ever seen</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>fitness(x) ← h(x)</td><td>The population table shows h and the selection probability of each member.</td></tr><tr><td>spin the wheel N times</td><td>Each spin draws u from the seeded generator and picks the member whose cumulative interval contains u: fit members can be picked several times, weak ones not at all.</td></tr><tr><td>one-point crossover</td><td>Pick a cut between two bits; each child takes the left part of one parent and the right part of the other.</td></tr><tr><td>mutation with probability pm</td><td>A random bit of the child is flipped. This is how new bit values can appear that the population does not contain.</td></tr><tr><td>Pop ← children</td><td>A complete replacement of the generation (no elitism); the best string ever seen is tracked separately.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">p(xᵢ) = h(xᵢ) / Σⱼ h(xⱼ)</div><p class="read">selection probability proportional to fitness</p><p class="why">The probabilities sum to 1, and a string with twice the fitness gets twice the share of the wheel.</p></div><div class="formula"><div class="f">cumulative cᵢ = p(x₁) + … + p(xᵢ)</div><p class="read">the wheel's boundaries</p><p class="why">u falls in the interval (cᵢ₋₁, cᵢ] of exactly one member, so the draw has the right probabilities.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Crossover recombines good partial assignments, mutation keeps diversity. On the course example a single generation can produce the solution 1101 when mutation flips the right bit of a child that is one flip away from it. The method is incomplete: with few generations or a tiny population it may never find a solution.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>N·g evaluations</div><div class="prop"><span>space</span>O(N·n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Crossover only recombines bit values already present in the population; only mutation creates new ones. Default population 1000,0110,0011,1100, 1 generation: with pm = 0.5 and seed 9 the solution 1101 is made by mutation (child 1100 mutated at d); with pm = 0 and seed 1 it is made by crossover alone (1100 × 0011 cut after c gives 1101). With the population 1000,0110,1100,0100, where every string has d = 0, pm = 0 can never produce 1101 however many generations you run, while pm = 0.5 usually finds it.</li><li>Fitness-proportional selection is weak when all h values are close: the probabilities are then almost equal.</li><li>If every h is 0 the wheel would divide by zero; the trace falls back to uniform probabilities.</li><li>A solution found in a child must be recorded when it appears: the next generation may lose it.</li><li>Results depend on the seed and on the initial population; the same inputs repeat the run exactly.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="sat-sa.html"><span>← Previous</span><b>Simulated annealing</b></a><a class="pg next" href="tsp-stochastic-hc.html"><span>Next →</span><b>Stochastic hill climbing</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

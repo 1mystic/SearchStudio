@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dijkstra's Algorithm — step by step · Search Studio</title>
+<meta name="description" content="Dijkstra's algorithm is Uniform Cost Search written as a table. Each node carries a best-known distance d. The WHITE node with the smallest d is made BLACK, and then its neighbours are checked to see whether going through it gives them a shorter distance.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-dijkstra.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Dijkstra's Algorithm — step by step · Search Studio"><meta property="og:description" content="Dijkstra's algorithm is Uniform Cost Search written as a table. Each node carries a best-known distance d. The WHITE node with the smallest d is made BLACK, and then its neighbours are checked to see whether going through it gives them a shorter distance."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-dijkstra.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Dijkstra's Algorithm","description":"Dijkstra's algorithm is Uniform Cost Search written as a table. Each node carries a best-known distance d. The WHITE node with the smallest d is made BLACK, and then its neighbours are checked to see whether going through it gives them a shorter distance.","url":"https://1mystic.github.io/SearchStudio/learn/search-dijkstra.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Dijkstra's Algorithm","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/dijkstra.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 5 · Graph search · optimal</p><h1>Dijkstra's Algorithm</h1></div><a class="btn primary" href="../#try-search-dijkstra">Run it step by step</a></div>
+<p class="intro">Dijkstra's algorithm is Uniform Cost Search written as a table. Each node carries a best-known distance d. The WHITE node with the smallest d is made BLACK, and then its neighbours are checked to see whether going through it gives them a shorter distance.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Colour every node WHITE and give it d = ∞, except the start with d = 0. Pick the WHITE node N with least d and colour it BLACK: its d is now the true shortest distance from the start. For each WHITE neighbour C of N with edge cost k, if d(N)+k &lt; d(C) then set d(C) = d(N)+k and parent(C) = N (a relaxation). Stop when the goal is coloured BLACK, then follow the parents back to the start.</p>
+<h2><small>02</small>Pseudocode</h2><pre>d(S) ← 0;  d(v) ← ∞ for the rest;  all nodes WHITE
+repeat
+    N ← WHITE node with least d(N)           # ties: alphabetical
+    colour N BLACK
+    if N = goal: return the path (follow parents)
+    for each WHITE neighbour C of N with edge cost k:
+        if d(N) + k &lt; d(C):                  # relaxation
+            d(C) ← d(N) + k;  parent(C) ← N
+until no WHITE node has d &lt; ∞              # goal unreachable</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>d(S) = 0, all nodes WHITE</td><td>Nothing is final yet.</td></tr><tr><td>pick the WHITE node with least d</td><td>Ties go alphabetically. A pick is counted each time a node turns BLACK.</td></tr><tr><td>colour it BLACK</td><td>Its distance can no longer improve, because every other WHITE node has d at least as large and costs are not negative.</td></tr><tr><td>relax its WHITE neighbours</td><td>Replace d(C) when going through N is shorter, and record N as the parent.</td></tr><tr><td>stop when the goal is BLACK</td><td>Read the path through the parents.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">d(N) + k(N,C) &lt; d(C)  ⇒  d(C) ← d(N) + k(N,C)</div><p class="read">relaxation</p><p class="why">A shorter way to C through the newly final node N has been found, so C's estimate improves.</p></div><div class="formula"><div class="f">pick argmin d over WHITE nodes</div><p class="read">closest unfinished node</p><p class="why">With non-negative costs no later path can reach it more cheaply, so it can be made BLACK.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>It gives the shortest path to every node it blackens, and to the goal once the goal is picked. It is the same search as UCS: OPEN is the set of WHITE nodes with finite d, CLOSED is the BLACK set. It has no sense of direction, so it spreads in all directions.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes (finite graph)</div><div class="prop"><span>optimal</span>yes (non-negative costs)</div><div class="prop"><span>time</span>O(V²) or O(E log V)</div><div class="prop"><span>space</span>O(V)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Only WHITE neighbours are relaxed: a BLACK node is already final.</li><li>Edge costs must not be negative; with negative edges a BLACK node could still improve.</li><li>d of a node can change several times before it turns BLACK (for example G falling from 9 to 8): only the BLACK value is final.</li><li>Count picks, not relaxations.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-ucs.html"><span>← Previous</span><b>Uniform Cost Search</b></a><a class="pg next" href="search-branch-and-bound.html"><span>Next →</span><b>Branch &amp; Bound (state space)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hill climbing (N1) — step by step · Search Studio</title>
+<meta name="description" content="Local search treats the assignments as states and a flip of one variable as a move. The heuristic h counts satisfied clauses, so a solution is a state with h = m. Hill climbing walks uphill on h and never accepts a step that does not strictly improve it.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-hill-climbing.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Hill climbing (N1) — step by step · Search Studio"><meta property="og:description" content="Local search treats the assignments as states and a flip of one variable as a move. The heuristic h counts satisfied clauses, so a solution is a state with h = m. Hill climbing walks uphill on h and never accepts a step that does not strictly improve it."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-hill-climbing.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Hill climbing (N1)","description":"Local search treats the assignments as states and a flip of one variable as a move. The heuristic h counts satisfied clauses, so a solution is a state with h = m. Hill climbing walks uphill on h and never accepts a step that does not strictly improve it.","url":"https://1mystic.github.io/SearchStudio/learn/sat-hill-climbing.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Hill climbing (N1)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/hill-climbing.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · SAT · local search</p><h1>Hill climbing (N1)</h1></div><a class="btn primary" href="../#try-sat-hill-climbing">Run it step by step</a></div>
+<p class="intro">Local search treats the assignments as states and a flip of one variable as a move. The heuristic h counts satisfied clauses, so a solution is a state with h = m. Hill climbing walks uphill on h and never accepts a step that does not strictly improve it.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>The neighbourhood N1 of a bit string is the n strings that differ from it in exactly one bit. Pick the neighbour with the highest h (ties go to the lowest bit, i.e. the alphabetically first variable). Move only if its h is strictly greater than the current h; otherwise stop.</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start
+loop
+    if h(N) = m: return N                      # solved
+    nbrs ← all strings obtained by flipping one bit of N     # N1
+    B ← the neighbour with the largest h (ties: lowest bit)
+    if h(B) &gt; h(N): N ← B
+    else: return N                             # local maximum or plateau</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← start</td><td>A bit string, one bit per variable.</td></tr><tr><td>if h(N) = m: return N</td><td>Goal test: all clauses are satisfied.</td></tr><tr><td>nbrs ← flip one bit of N</td><td>The N1 neighbourhood has exactly n members.</td></tr><tr><td>B ← best neighbour</td><td>Ties broken by the lowest bit index: flipping a is tried before b, and so on.</td></tr><tr><td>if h(B) &gt; h(N): N ← B else stop</td><td>Strict improvement. A neighbour with equal h is a sideways move that hill climbing refuses, so it stops on a plateau.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">|N1| = C(n,1) = n</div><p class="read">n neighbours per state</p><p class="why">Each iteration costs n evaluations of h.</p></div><div class="formula"><div class="f">move iff h(B) &gt; h(N)</div><p class="read">strictly better only</p><p class="why">This rule is what makes the method stop on plateaus; tabu search and simulated annealing relax it.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>It is cheap and often gets close, but a state whose neighbours are all no better is a trap even when h &lt; m. On the course example it climbs 0000 (h 4) → 1000 (h 5) and stops, although 1101 (h 6) is a solution two flips away.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>O(n · m) per move</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Stopping with h &lt; m does not mean the formula is unsatisfiable, only that this start is stuck.</li><li>Equal h is not an improvement: a plateau stops strict hill climbing.</li><li>Ties between equally good neighbours go to the lowest bit; a different rule can give a different path.</li><li>Two different traps: on a plateau some neighbour has equal h, at a strict local maximum every neighbour is worse. The captions say which one. Course example sat-four-var stops on a plateau (1000: three neighbours with h 5); the example 'Local-maximum trap' (sat-local-trap) stops at 0100, where all four neighbours have h 6.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-nearest-neighbour.html"><span>← Previous</span><b>Nearest Neighbour</b></a><a class="pg next" href="tsp-greedy.html"><span>Next →</span><b>Greedy heuristic</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

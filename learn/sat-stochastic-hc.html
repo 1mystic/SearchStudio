@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stochastic hill climbing (fixed T) — step by step · Search Studio</title>
+<meta name="description" content="Stochastic hill climbing keeps the idea of preferring uphill moves but replaces the hard rule 'only if better' by a probability. A better neighbour is accepted with probability above one half, a worse one with probability below one half, and the temperature T decides how sharp that preference is. T ">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-stochastic-hc.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Stochastic hill climbing (fixed T) — step by step · Search Studio"><meta property="og:description" content="Stochastic hill climbing keeps the idea of preferring uphill moves but replaces the hard rule 'only if better' by a probability. A better neighbour is accepted with probability above one half, a worse one with probability below one half, and the temperature T decides how sharp that preference is. T "><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-stochastic-hc.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Stochastic hill climbing (fixed T)","description":"Stochastic hill climbing keeps the idea of preferring uphill moves but replaces the hard rule 'only if better' by a probability. A better neighbour is accepted with probability above one half, a worse one with probability below one half, and the temperature T decides how sharp that preference is. T ","url":"https://1mystic.github.io/SearchStudio/learn/sat-stochastic-hc.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Stochastic hill climbing (fixed T)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/stochastic-hill-climbing.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 4 · SAT · stochastic</p><h1>Stochastic hill climbing (fixed T)</h1></div><a class="btn primary" href="../#try-sat-stochastic-hc">Run it step by step</a></div>
+<p class="intro">Stochastic hill climbing keeps the idea of preferring uphill moves but replaces the hard rule 'only if better' by a probability. A better neighbour is accepted with probability above one half, a worse one with probability below one half, and the temperature T decides how sharp that preference is. T stays fixed; simulated annealing is the version that lowers it.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Choose a random neighbour X of N. Let ΔE = h(X) − h(N); for SAT we maximise h, so ΔE &gt; 0 is an improvement. Accept X with probability P = 1/(1 + e^(−ΔE/T)); draw u uniformly in [0, 1) and move if u &lt; P.</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start;  bestSeen ← N
+repeat k times
+    X ← random neighbour of N (flip a random bit)
+    ΔE ← h(X) − h(N)                  # positive = improvement (we maximise h)
+    P ← 1 / (1 + e^(−ΔE / T))
+    if random u &lt; P: N ← X
+    if h(N) &gt; h(bestSeen): bestSeen ← N
+return bestSeen</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>X ← random neighbour of N</td><td>Flip one randomly chosen bit (seeded generator).</td></tr><tr><td>ΔE ← h(X) − h(N)</td><td>Positive ΔE means more clauses satisfied. Note the sign: the TSP version uses cost(N) − cost(X) because it minimises.</td></tr><tr><td>P ← 1 / (1 + e^(−ΔE/T))</td><td>The course's sigmoid acceptance rule.</td></tr><tr><td>if u &lt; P: N ← X</td><td>u is the random number shown in the trace.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">P = 1 / (1 + e^(−ΔE/T))</div><p class="read">a sigmoid in ΔE/T</p><p class="why">ΔE = 0 gives exactly ½; ΔE &gt; 0 gives more than ½ and ΔE &lt; 0 less than ½, approaching 1 and 0 as |ΔE|/T grows.</p></div><div class="formula"><div class="f">T → 0: hill climbing;   T → ∞: random walk</div><p class="read">the two extremes</p><p class="why">Small T makes the sigmoid a step at ΔE = 0 (only improving moves); large T flattens it to ½ (a coin flip, i.e. random walk).</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>A worse neighbour can still be accepted, so the search can walk down off a local maximum such as 1000 (h 5) towards 1101 (h 6). Because T never falls, it keeps wandering even after it has found a good string, which is why we report bestSeen.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>k samples</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>With the sigmoid rule even an improving move can be rejected (P &lt; 1 at finite T).</li><li>ΔE is h(new) − h(current) here: do not copy the TSP sign.</li><li>Fixed T is a compromise: too hot is a random walk (try T = 100), too cold is hill climbing (try T = 0.05). Annealing varies it.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="sat-ihc.html"><span>← Previous</span><b>Iterated hill climbing</b></a><a class="pg next" href="sat-sa.html"><span>Next →</span><b>Simulated annealing</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

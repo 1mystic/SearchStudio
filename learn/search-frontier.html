@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Frontier Search — step by step · Search Studio</title>
+<meta name="description" content="In A* the CLOSED list does two jobs: it stops the search regenerating nodes it has already expanded, and it lets us rebuild the path. Frontier search replaces the first job with a few bits on each OPEN node, and drops CLOSED entirely. This is in the course's discussion of memory-saving search (front">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-frontier.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Frontier Search — step by step · Search Studio"><meta property="og:description" content="In A* the CLOSED list does two jobs: it stops the search regenerating nodes it has already expanded, and it lets us rebuild the path. Frontier search replaces the first job with a few bits on each OPEN node, and drops CLOSED entirely. This is in the course's discussion of memory-saving search (front"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-frontier.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Frontier Search","description":"In A* the CLOSED list does two jobs: it stops the search regenerating nodes it has already expanded, and it lets us rebuild the path. Frontier search replaces the first job with a few bits on each OPEN node, and drops CLOSED entirely. This is in the course's discussion of memory-saving search (front","url":"https://1mystic.github.io/SearchStudio/learn/search-frontier.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Frontier Search","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/frontier-search.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 6 · Graph search · space saving</p><h1>Frontier Search</h1></div><a class="btn primary" href="../#try-search-frontier">Run it step by step</a></div>
+<p class="intro">In A* the CLOSED list does two jobs: it stops the search regenerating nodes it has already expanded, and it lets us rebuild the path. Frontier search replaces the first job with a few bits on each OPEN node, and drops CLOSED entirely. This is in the course's discussion of memory-saving search (frontier search and its divide and conquer version); the used-operator bits are shown here in their simplest form, so treat the exact bookkeeping as **supplementary**.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Each OPEN node stores the set of neighbours that have already been expanded and generated it (its used operators). When N is expanded it never generates a child in used(N). Children already on OPEN merge: the new parent is added to their used set and the cheaper g is kept. After expansion N is discarded. Because no expanded node is stored, the search returns the cost; the path needs a relay recursion (see Divide and Conquer Frontier Search).</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, g=0, used={})]                 # no CLOSED list
+while OPEN not empty
+    N ← node with least f;  remove it
+    if GoalTest(N): return its cost
+    for each child C of N with g' = g(N) + k(N,C), if C is not in used(N):
+        if C is on OPEN: used(C) ← used(C) ∪ {N};  if g' is lower, update g(C)
+        else add (C, g', used = {N}) to OPEN
+    (N itself is forgotten)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← least f; goal test</td><td>Same as A*.</td></tr><tr><td>skip children in used(N)</td><td>Those are expanded nodes; this replaces the CLOSED check.</td></tr><tr><td>child on OPEN: add N to its used set</td><td>So that the child will not regenerate N later.</td></tr><tr><td>forget N</td><td>Only the frontier remains in memory.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">memory = |OPEN|</div><p class="read">there is no CLOSED list</p><p class="why">In grid-like graphs the frontier is a thin front, much smaller than everything expanded so far.</p></div><div class="formula"><div class="f">h consistent (h(N) ≤ k(N,M) + h(M))</div><p class="read">needed for correctness</p><p class="why">Then a node is expanded with its final g, so never needing to be reopened. Reversible moves (undirected graph) are also needed, so the used bit can be set.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>A* minus its biggest list: on the 4×5 grid it holds at most 5 nodes in total where A* holds 20 (19 of them CLOSED). It trades away the path: on its own it can only report the cost, and DCFS or DC-BFHS recover the path.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes with admissible, consistent h</div><div class="prop"><span>time</span>same as A*</div><div class="prop"><span>space</span>OPEN only</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>With an inconsistent heuristic a node may need reopening, which frontier search cannot do: on 'Admissible but not monotone h: A* reopens C' it returns S–C–G = 6 although the optimum is 5 (A* reopens C and finds S–A–B–C–G).</li><li>Only for undirected graphs here: a directed edge has no 'reverse operator' to mark as used.</li><li>To print the path this tracer carries the path along with each OPEN node. That is for the display only and is not counted in the memory figures.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-monotone-check.html"><span>← Previous</span><b>Admissibility &amp; monotone check</b></a><a class="pg next" href="search-ida-star.html"><span>Next →</span><b>IDA*</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

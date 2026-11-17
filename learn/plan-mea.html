@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Means-ends analysis — step by step · Search Studio</title>
+<meta name="description" content="Means-ends analysis (the idea behind Newell and Simon's General Problem Solver) works from differences. Compare the current state with the goal, choose the most important difference, and find an operator that reduces it. If the operator cannot be applied yet, its preconditions become a new sub-goal,">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/plan-mea.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Means-ends analysis — step by step · Search Studio"><meta property="og:description" content="Means-ends analysis (the idea behind Newell and Simon's General Problem Solver) works from differences. Compare the current state with the goal, choose the most important difference, and find an operator that reduces it. If the operator cannot be applied yet, its preconditions become a new sub-goal,"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/plan-mea.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Means-ends analysis","description":"Means-ends analysis (the idea behind Newell and Simon's General Problem Solver) works from differences. Compare the current state with the goal, choose the most important difference, and find an operator that reduces it. If the operator cannot be applied yet, its preconditions become a new sub-goal,","url":"https://1mystic.github.io/SearchStudio/learn/plan-mea.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Means-ends analysis","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/planning/means-ends-analysis.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 8 · Planning</p><h1>Means-ends analysis</h1></div><a class="btn primary" href="../#try-plan-mea">Run it step by step</a></div>
+<p class="intro">Means-ends analysis (the idea behind Newell and Simon's General Problem Solver) works from differences. Compare the current state with the goal, choose the most important difference, and find an operator that reduces it. If the operator cannot be applied yet, its preconditions become a new sub-goal, solved by the same procedure. The difference table says which operator removes which kind of difference.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Difference table for the blocks world: on(x,y) is removed by stack(x,y); ontable(x) by putdown(x); clear(x) by unstack(z,x) for the block z on x; holding(x) by pickup(x) (x on the table) or unstack(x,y); AE by putdown of the held block. Importance: positional differences first, lower blocks of the goal tower before higher ones (a tower is built from the bottom), then clear, then AE, then holding. Sub-goals are solved in the same importance order. Because MEA never protects facts it has already achieved, a later sub-goal can undo an earlier one: on the Sussman anomaly it keeps destroying and re-making the same facts and the loop check stops it.</p>
+<h2><small>02</small>Pseudocode</h2><pre>MEA(state, goal):
+    while goal ⊄ state
+        d ← the most important difference (goal fact not in state)
+        O ← operator that adds d            // from the difference table
+        MEA(state, pre(O))                  // sub-goal: make O applicable
+        if O is not applicable: fail
+        state ← apply(O, state)
+    return</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>list the differences between state and goal</td><td>Goal facts that do not hold.</td></tr><tr><td>choose the most important difference</td><td>Build the goal tower from its bottom upwards.</td></tr><tr><td>look up an operator in the difference table</td><td>Operators whose add list contains the difference.</td></tr><tr><td>make its preconditions true (recursion)</td><td>Sub-goaling: the unmet preconditions are a smaller goal.</td></tr><tr><td>apply the operator and repeat</td><td>Re-compute the differences: earlier ones may have come back.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">difference = goal − state</div><p class="read">goal facts not currently true</p><p class="why">These are exactly what remains to be achieved.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>It is the first goal-directed planner: instead of blind search it only considers operators relevant to a difference. Its failure on interacting goals motivates goal protection, partial-order planning and Graphplan.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>depends on the differences</div><div class="prop"><span>space</span>depth of sub-goaling</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>MEA is not complete: it does not protect earlier achievements, so it can undo its own work and cycle (the Sussman anomaly). Run example plan-sussman to watch it fail and plan-reverse to watch it succeed.</li><li>The result depends on the importance ordering and on the difference table; a different table can succeed where this one fails.</li><li>A sub-goal may clobber a fact achieved earlier: after each operator, recompute all differences.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="plan-pop.html"><span>← Previous</span><b>Partial Order Planning</b></a><a class="pg next" href="andor-ao-star.html"><span>Next →</span><b>AO*</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

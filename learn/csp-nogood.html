@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nogood recording — step by step · Search Studio</title>
+<meta name="description" content="Backtracking can discover the same dead end again and again under different irrelevant assignments. Nogood recording is a look-back method that remembers a dead end in a general form so it is never rediscovered.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/csp-nogood.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Nogood recording — step by step · Search Studio"><meta property="og:description" content="Backtracking can discover the same dead end again and again under different irrelevant assignments. Nogood recording is a look-back method that remembers a dead end in a general form so it is never rediscovered."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/csp-nogood.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Nogood recording","description":"Backtracking can discover the same dead end again and again under different irrelevant assignments. Nogood recording is a look-back method that remembers a dead end in a general form so it is never rediscovered.","url":"https://1mystic.github.io/SearchStudio/learn/csp-nogood.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Nogood recording","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/csp/nogood-recording.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 12 · Constraint processing · lookback</p><h1>Nogood recording</h1></div><a class="btn primary" href="../#try-csp-nogood">Run it step by step</a></div>
+<p class="intro">Backtracking can discover the same dead end again and again under different irrelevant assignments. Nogood recording is a look-back method that remembers a dead end in a general form so it is never rediscovered.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>A nogood is a partial assignment that cannot be extended to a solution. When Xᵢ has no value left, the values of the variables in its conflict set form a nogood. Later, any assignment that contains a stored nogood is rejected immediately.</p>
+<h2><small>02</small>Pseudocode</h2><pre>Nogood-BT(i):
+    conf(Xᵢ) ← { }
+    for each value a in D(Xᵢ)
+        if some stored nogood ⊆ assignment + {Xᵢ = a}: add its other variables to conf(Xᵢ); skip a   # pruned by a nogood
+        else if a clashes with an assigned Xⱼ: add Xⱼ to conf(Xᵢ); skip a
+        else assign Xᵢ = a; if Nogood-BT(i + 1) succeeds: return success
+             else add the failed child's conflict set − {Xᵢ} to conf(Xᵢ)
+    store nogood { Xⱼ = value(Xⱼ) : Xⱼ ∈ conf(Xᵢ) }         # unless a smaller stored nogood already covers it
+    return failure                                            # chronological: go back to Xᵢ₋₁</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>try a value of Xᵢ</td><td></td></tr><tr><td>contains a stored nogood?</td><td>Reject at once and note which nogood did it.</td></tr><tr><td>clash with an earlier Xⱼ?</td><td>Record Xⱼ in the conflict set.</td></tr><tr><td>no value left</td><td>Build the nogood from the conflict set and store it.</td></tr><tr><td>backtrack</td><td>Chronologically here; combine with backjumping for both effects.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">nogood = { Xⱼ = vⱼ : Xⱼ ∈ conf(Xᵢ) }</div><p class="read">the culprits and their current values</p><p class="why">The values in conf(Xᵢ) alone already exclude every value of Xᵢ, so any assignment containing them is hopeless, whatever else it says.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Small nogoods prune big parts of the tree. In the example 'Nogood recording' the single nogood {A=r} found at D rejects three later values (C=z, B=y, B=z) without any search.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>n/a</div><div class="prop"><span>time</span>O(dⁿ) worst case, ≤ backtracking</div><div class="prop"><span>space</span>O(number of nogoods)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Try example 'Nogood recording': the dead end at D is stored as {A=r} and later rejects C=z, B=y and B=z without search (10 nodes against 24 for plain backtracking). Nogood recording is chronological, so it still goes back one level at a time; CBJ jumps but forgets, nogoods remember but do not jump.</li><li>A nogood only prunes assignments that contain ALL of its variable-value pairs.</li><li>Storing every nogood costs memory; real systems bound the size or the number of nogoods.</li><li>Nogoods whose variables are already covered by a smaller stored nogood are not stored again. This subsumption test is **supplementary**.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-dfbnb.html"><span>← Previous</span><b>Depth-First Branch and Bound</b></a><span class="pg empty"></span></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

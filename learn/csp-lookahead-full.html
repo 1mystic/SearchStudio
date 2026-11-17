@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Full look-ahead — step by step · Search Studio</title>
+<meta name="description" content="Look-ahead methods reason about the future variables after every assignment, so that dead ends are found one or more levels earlier. Forward checking only compares the variable just assigned with its future neighbours; the look-ahead methods also compare the future variables with each other.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/csp-lookahead-full.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Full look-ahead — step by step · Search Studio"><meta property="og:description" content="Look-ahead methods reason about the future variables after every assignment, so that dead ends are found one or more levels earlier. Forward checking only compares the variable just assigned with its future neighbours; the look-ahead methods also compare the future variables with each other."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/csp-lookahead-full.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Full look-ahead","description":"Look-ahead methods reason about the future variables after every assignment, so that dead ends are found one or more levels earlier. Forward checking only compares the variable just assigned with its future neighbours; the look-ahead methods also compare the future variables with each other.","url":"https://1mystic.github.io/SearchStudio/learn/csp-lookahead-full.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Full look-ahead","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/csp/lookahead.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 12 · Constraint processing · lookahead</p><h1>Full look-ahead</h1></div><a class="btn primary" href="../#try-csp-lookahead-full">Run it step by step</a></div>
+<p class="intro">Look-ahead methods reason about the future variables after every assignment, so that dead ends are found one or more levels earlier. Forward checking only compares the variable just assigned with its future neighbours; the look-ahead methods also compare the future variables with each other.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>After assigning Xᵢ = a: (1) forward checking, then (2) forward checking, then every arc between two future variables is revised once, in both directions. If any future domain becomes empty, reject a at once. This is the &quot;Full look-ahead&quot; variant: one pass over all future arcs.</p>
+<h2><small>02</small>Pseudocode</h2><pre>Lookahead(assignment, domains, i):          # mode = full
+    if i &gt; n: return assignment
+    for each value a in D(Xᵢ)
+        D' ← copy of domains;  D'(Xᵢ) ← {a}
+        forward check: prune D'(Y) of every unassigned neighbour Y against Xᵢ = a
+        extra look-ahead (one pass over all future arcs):
+            revise the future variables against each other
+        if no D'(Y) is empty: result ← Lookahead(assignment + {Xᵢ = a}, D', i + 1); if result: return it
+    return failure</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>assign X = a</td><td></td></tr><tr><td>forward checking</td><td>Prune the future neighbours of X that clash with a.</td></tr><tr><td>extra look-ahead</td><td>The part that goes beyond forward checking: one pass over all future arcs.</td></tr><tr><td>empty domain → reject a</td><td>The step table shows which deletions came from FC and which only from the look-ahead.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">D(Y) ← { b ∈ D(Y) : ∃ c ∈ D(Z), (b, c) allowed by C(Y,Z) }</div><p class="read">delete values of a future variable Y that have no support in another future variable Z</p><p class="why">A value without support can never be part of a solution extending the current assignment, so deleting it is safe.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>A future variable can be squeezed empty by two OTHER future variables. Forward checking cannot see that until one of them is assigned; look-ahead sees it now. Example: after G = W the neighbours of G lose W and become single-valued, which empties D(E); only the look-ahead variants notice (see the example 'G = W wipes out E').</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>n/a</div><div class="prop"><span>time</span>O(dⁿ) worst case, smaller tree than forward checking</div><div class="prop"><span>space</span>O(n·d) for domain copies</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The three variants prune in a strict order: forward checking &lt; partial &lt; full &lt; MAC (each prunes at least what the previous one does). Example 'Look-ahead ladder' shows 17, 6, 5 and 3 values tried before the same conclusion (no solution).</li><li>Partial look-ahead depends on the variable order: a variable that is last in the ordering is never revised against anything, so it may miss a wipe-out that full look-ahead finds.</li><li>More pruning per node does not always mean less total time; each node costs more.</li><li>Which pruning came from forward checking and which from the extra look-ahead is shown in separate columns. The split into 'partial / full / MAC' passes is the usual textbook presentation; the exact pass structure is **supplementary** to the lecture slides.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="csp-lookahead-partial.html"><span>← Previous</span><b>Partial look-ahead</b></a><a class="pg next" href="csp-lookahead-mac.html"><span>Next →</span><b>Arc-consistency look-ahead (MAC)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Simple search (no node pairs) — step by step · Search Studio</title>
+<meta name="description" content="The first search procedures in the course keep only states on OPEN. They answer 'is a goal reachable?' but not 'how do I get there?'. This tracer runs that version on a state space so you can see the answer arrive without a path.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/statespace-simple.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Simple search (no node pairs) — step by step · Search Studio"><meta property="og:description" content="The first search procedures in the course keep only states on OPEN. They answer 'is a goal reachable?' but not 'how do I get there?'. This tracer runs that version on a state space so you can see the answer arrive without a path."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/statespace-simple.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Simple search (no node pairs)","description":"The first search procedures in the course keep only states on OPEN. They answer 'is a goal reachable?' but not 'how do I get there?'. This tracer runs that version on a state space so you can see the answer arrive without a path.","url":"https://1mystic.github.io/SearchStudio/learn/statespace-simple.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Simple search (no node pairs)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/statespace/simple-search.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 2 · Graph search · uninformed</p><h1>Simple search (no node pairs)</h1></div><a class="btn primary" href="../#try-statespace-simple">Run it step by step</a></div>
+<p class="intro">The first search procedures in the course keep only states on OPEN. They answer 'is a goal reachable?' but not 'how do I get there?'. This tracer runs that version on a state space so you can see the answer arrive without a path.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>OPEN is a list of states, CLOSED a list of states. Each loop picks the head of OPEN, tests it, moves it to CLOSED and adds its unseen children. Nothing records which state generated which, so when the goal is picked there is no chain of parents to follow. Replacing each state by a node pair (state, parent, depth) fixes that.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [S];  CLOSED ← [ ]
+while OPEN not empty
+    N ← head(OPEN);  remove it
+    if GoalTest(N): return &quot;goal reached&quot;        # but by which moves?
+    CLOSED ← N : CLOSED
+    children ← MoveGen(N) minus states on OPEN or CLOSED
+    OPEN ← OPEN ++ children  (queue)  or  children ++ OPEN  (stack)
+return failure</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← head(OPEN)</td><td>A queue gives BFS order, a stack gives DFS order.</td></tr><tr><td>if GoalTest(N): return</td><td>Reached, but only the fact is known.</td></tr><tr><td>CLOSED ← N : CLOSED</td><td>Remember N is expanded.</td></tr><tr><td>children ← MoveGen(N) minus seen</td><td>Without CLOSED, cycles can loop forever.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">path recovery needs one pointer per state</div><p class="read">parent(N)</p><p class="why">The path is the chain goal, parent(goal), parent(parent(goal)), … back to the start; with no pointers there is no chain.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>This is the motivation for node pairs: one extra field per entry turns 'a goal exists' into 'here is a solution'.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes (finite space, with CLOSED)</div><div class="prop"><span>optimal</span>n/a: no path is returned</div><div class="prop"><span>time</span>as BFS / DFS</div><div class="prop"><span>space</span>as BFS / DFS</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Reaching the goal is not the same as having the solution. For puzzles the moves are the answer: run this on space-water-jug and the last step says the path is lost, while BFS on the same problem prints the 7 pourings.</li><li>Switching OPEN between queue and stack changes how many states are expanded (15 for the queue, 9 for the stack on space-water-jug) but never recovers the path.</li><li>Without CLOSED (not offered here) the procedure may never stop on a cyclic state space.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="statespace-dfs.html"><span>← Previous</span><b>DFS on a state space</b></a><a class="pg next" href="plan-hill-climbing.html"><span>Next →</span><b>Hill climbing in the blocks world (h1 vs h2)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

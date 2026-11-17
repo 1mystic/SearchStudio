@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Best First on a state space — step by step · Search Studio</title>
+<meta name="description" content="Best First Search trusts the heuristic completely. In the 8-puzzle, h counts tiles out of place or their Manhattan distance to the goal squares; the board that looks nearest to the goal is expanded first.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/statespace-best-first.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Best First on a state space — step by step · Search Studio"><meta property="og:description" content="Best First Search trusts the heuristic completely. In the 8-puzzle, h counts tiles out of place or their Manhattan distance to the goal squares; the board that looks nearest to the goal is expanded first."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/statespace-best-first.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Best First on a state space","description":"Best First Search trusts the heuristic completely. In the 8-puzzle, h counts tiles out of place or their Manhattan distance to the goal squares; the board that looks nearest to the goal is expanded first.","url":"https://1mystic.github.io/SearchStudio/learn/statespace-best-first.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Best First on a state space","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/statespace/best-first.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · Graph search · informed</p><h1>Best First on a state space</h1></div><a class="btn primary" href="../#try-statespace-best-first">Run it step by step</a></div>
+<p class="intro">Best First Search trusts the heuristic completely. In the 8-puzzle, h counts tiles out of place or their Manhattan distance to the goal squares; the board that looks nearest to the goal is expanded first.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>OPEN holds node pairs (state, parent, h) ordered by h. The goal test is on picking from OPEN, ties break alphabetically (by state), and a state already on OPEN or CLOSED is not added again. Unlike A*, the cost already paid is ignored.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, h(S))];  CLOSED ← [ ]
+while OPEN not empty
+    N ← the pair with the least h;  remove it      # ties: alphabetical
+    if GoalTest(N): return the path
+    CLOSED ← N : CLOSED
+    children ← MoveGen(N) minus states on OPEN or CLOSED
+    OPEN ← OPEN ++ children, sorted by h</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← least-h pair on OPEN</td><td>Greedy: only the estimate counts.</td></tr><tr><td>if GoalTest(N): return path</td><td>Tested on picking.</td></tr><tr><td>children ← MoveGen(N) minus seen</td><td></td></tr><tr><td>sort OPEN by h</td><td>Ties alphabetical.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">tiles out of place: h₁ = number of tiles not on their goal square</div><p class="read">blank not counted</p><p class="why">Each such tile needs at least one move.</p></div><div class="formula"><div class="f">Manhattan: h₂ = Σ |row − goal row| + |col − goal col|</div><p class="read">sum of tile distances</p><p class="why">A tile moves one square per move, so it needs at least its Manhattan distance; h₂ ≥ h₁.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Both heuristics are admissible for the 8-puzzle, but Best First ignores g, so it may take a long way round. Compare the length of its solution with A*'s on the same board.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes on a finite space with CLOSED</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>exponential worst case</div><div class="prop"><span>space</span>exponential worst case</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Best First is not optimal even with an admissible h: on example space-8-puzzle-12 it returns a 44-move solution with tiles out of place (the shortest has 12). With Manhattan distance it happens to find 12 moves there, which is luck, not a guarantee.</li><li>A heuristic that is 0 everywhere turns the order into ties, i.e. alphabetical order of states.</li><li>For water jugs there is no useful h (it is 0); for missionaries and cannibals the studio uses the full-boat crossing bound.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-sa.html"><span>← Previous</span><b>Simulated annealing</b></a><a class="pg next" href="sat-ihc.html"><span>Next →</span><b>Iterated hill climbing</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

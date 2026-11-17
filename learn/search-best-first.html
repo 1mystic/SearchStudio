@@ -32,9 +32,9 @@ while OPEN not empty
 <h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">pick argmin h on OPEN</div><p class="read">most promising-looking node first</p><p class="why">Fast when h is accurate, but it ignores g, so the path found can be expensive.</p></div>
 <h2><small>05</small>Why it works, and when it does not</h2><p>Often reaches the goal quickly, but is not optimal and can be misled by a poor heuristic.</p>
 <h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>finite graphs</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>O(b^m) worst case</div><div class="prop"><span>space</span>O(b^m)</div></div>
-<h2><small>07</small>Traps</h2><ul class="traps"><li>Best First ignores g; A* adds it.</li><li>Ties in h decide the path: state your tie-breaking.</li></ul>
-<nav class="pager bottom"><a class="pg prev" href="tsp-two-city-exchange.html"><span>← Previous</span><b>2-city exchange</b></a><a class="pg next" href="tsp-two-edge-exchange.html"><span>Next →</span><b>2-edge exchange (2-opt)</b></a></nav>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Best First ignores g, so it is not optimal even when h is admissible: on graph-greedy-detour it takes S–A–G (cost 11) and never looks at the cost-4 route S–B–G; on graph-weighted it returns cost 13 where UCS finds 12. A* adds g.</li><li>Ties in h decide the path: state your tie-breaking.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-two-city-exchange.html"><span>← Previous</span><b>2-city exchange</b></a><a class="pg next" href="sat-best-neighbour.html"><span>Next →</span><b>Best neighbour, fixed moves</b></a></nav>
 </div></article></main>
-<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
 </body>
 </html>

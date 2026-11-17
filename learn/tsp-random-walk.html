@@ -31,9 +31,9 @@ return bestSeen</pre>
 <h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">P(next = X) = 1 / |N(current)|</div><p class="read">every neighbour is equally likely</p><p class="why">No bias toward better tours, so the walk drifts toward wherever most tours are: mostly bad ones.</p></div>
 <h2><small>05</small>Why it works, and when it does not</h2><p>Pure exploration can in principle reach anything, but without guidance it rarely finds good tours in reasonable time.</p>
 <h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>k samples</div><div class="prop"><span>space</span>O(n)</div></div>
-<h2><small>07</small>Traps</h2><ul class="traps"><li>Simulated annealing at very high temperature behaves almost like this (a coin flip per move).</li></ul>
-<nav class="pager bottom"><a class="pg prev" href="tsp-ihc.html"><span>← Previous</span><b>Iterated hill climbing</b></a><a class="pg next" href="tsp-sa.html"><span>Next →</span><b>Simulated annealing</b></a></nav>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Simulated annealing at very high temperature behaves almost like this (a coin flip per move).</li><li>Do not expect it to settle: on Six cities started from the Greedy tour (238) the cost jumps up and down by tens of units from step to step with no downward trend (more steps give a range of roughly 220 to 380), and the last step reports that range. Only the remembered bestSeen is useful.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-best-neighbour-moves.html"><span>← Previous</span><b>Best neighbour, k moves</b></a><a class="pg next" href="tsp-sa.html"><span>Next →</span><b>Simulated annealing</b></a></nav>
 </div></article></main>
-<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
 </body>
 </html>

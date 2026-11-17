@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Best neighbour, fixed moves — step by step · Search Studio</title>
+<meta name="description" content="Hill climbing quits when no neighbour is better. A simple escape is to keep moving anyway: take the best neighbour even if it is worse or equal, for a fixed number of moves, and remember the best string seen. The trouble is that the best neighbour of a state is often the state we just left.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-best-neighbour.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Best neighbour, fixed moves — step by step · Search Studio"><meta property="og:description" content="Hill climbing quits when no neighbour is better. A simple escape is to keep moving anyway: take the best neighbour even if it is worse or equal, for a fixed number of moves, and remember the best string seen. The trouble is that the best neighbour of a state is often the state we just left."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-best-neighbour.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Best neighbour, fixed moves","description":"Hill climbing quits when no neighbour is better. A simple escape is to keep moving anyway: take the best neighbour even if it is worse or equal, for a fixed number of moves, and remember the best string seen. The trouble is that the best neighbour of a state is often the state we just left.","url":"https://1mystic.github.io/SearchStudio/learn/sat-best-neighbour.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Best neighbour, fixed moves","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/best-neighbour.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · SAT · local search</p><h1>Best neighbour, fixed moves</h1></div><a class="btn primary" href="../#try-sat-best-neighbour">Run it step by step</a></div>
+<p class="intro">Hill climbing quits when no neighbour is better. A simple escape is to keep moving anyway: take the best neighbour even if it is worse or equal, for a fixed number of moves, and remember the best string seen. The trouble is that the best neighbour of a state is often the state we just left.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>At each of the k moves, evaluate the N1 neighbours of the current string, move to the one with the highest h (ties to the lowest bit) regardless of whether h improves, and update the best string seen. Return the best string seen.</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start;  bestSeen ← N
+repeat for a fixed number of moves
+    B ← the N1 neighbour with the largest h (ties: lowest bit)
+    N ← B                                   # even if h(B) ≤ h(N)
+    if h(N) &gt; h(bestSeen): bestSeen ← N
+return bestSeen</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>B ← best N1 neighbour</td><td>The same choice as hill climbing.</td></tr><tr><td>N ← B even if not better</td><td>This is what lets the walk leave a local maximum.</td></tr><tr><td>update bestSeen</td><td>The walk may go down, so the final string is not necessarily the best.</td></tr><tr><td>stop after the fixed number of moves</td><td>Or earlier when a solution is reached, if asked.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">N′ = argmax over N1(N) of h</div><p class="read">the best neighbour, uphill or not</p><p class="why">Flipping a variable back and forth keeps being the best choice, so the walk can cycle: x → y → x → y …</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>It shows why memory is needed. From the solution 1101 on the course example the best neighbour is 0101 (h 5) and from there the best neighbour is 1101 again: a cycle of length 2. Tabu search forbids the move back for a few iterations to break such cycles. The cycle also appears while still unsolved: on 'Local-maximum trap' (sat-local-trap) the walk goes 0000 → 0100 (h 7) → 1100 (h 6, downhill) → 0100 → 1100 … and never reaches the solutions 0011 or 0111, because 0100 is always the best neighbour of 1100.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>moves × n × m</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The last string is not the answer; the best string seen is.</li><li>A revisited string means a cycle: from then on the walk repeats forever.</li><li>With a solution reached the walk would normally stop; turn the stop off to watch the cycling.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-best-first.html"><span>← Previous</span><b>Best First Search</b></a><a class="pg next" href="tsp-two-edge-exchange.html"><span>Next →</span><b>2-edge exchange (2-opt)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Variable Neighbourhood Descent (N1 → N1–n) — step by step · Search Studio</title>
+<meta name="description" content="A local maximum depends on the neighbourhood: a state can have no better one-flip neighbour and still have a better string two flips away. VND uses that. It searches the small, cheap neighbourhood first and only widens it when it is stuck.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-vnd.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Variable Neighbourhood Descent (N1 → N1–n) — step by step · Search Studio"><meta property="og:description" content="A local maximum depends on the neighbourhood: a state can have no better one-flip neighbour and still have a better string two flips away. VND uses that. It searches the small, cheap neighbourhood first and only widens it when it is stuck."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-vnd.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Variable Neighbourhood Descent (N1 → N1–n)","description":"A local maximum depends on the neighbourhood: a state can have no better one-flip neighbour and still have a better string two flips away. VND uses that. It searches the small, cheap neighbourhood first and only widens it when it is stuck.","url":"https://1mystic.github.io/SearchStudio/learn/sat-vnd.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Variable Neighbourhood Descent (N1 → N1–n)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/vnd.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · SAT · local search</p><h1>Variable Neighbourhood Descent (N1 → N1–n)</h1></div><a class="btn primary" href="../#try-sat-vnd">Run it step by step</a></div>
+<p class="intro">A local maximum depends on the neighbourhood: a state can have no better one-flip neighbour and still have a better string two flips away. VND uses that. It searches the small, cheap neighbourhood first and only widens it when it is stuck.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Let Nk be the strings that differ from the current one in exactly k bits, so |Nk| = C(n,k), and let N1–k = N1 ∪ … ∪ Nk. Start with k = 1. Move to the best member of N1–k if it is strictly better, and reset k to 1. Otherwise increase k. When k passes n, the state is a local maximum of every neighbourhood, hence a global maximum of h (N1–n is the whole space).</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start;  k ← 1
+while k ≤ n and h(N) &lt; m
+    nbrs ← all strings that differ from N in at most k bits     # N1–k
+    B ← the neighbour with the largest h (ties: fewest flips, then lowest bit)
+    if h(B) &gt; h(N): N ← B;  k ← 1
+    else: k ← k + 1
+return N</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← start;  k ← 1</td><td>Begin with the smallest neighbourhood.</td></tr><tr><td>nbrs ← N1–k of N</td><td>Sizes are C(n,1), C(n,1)+C(n,2), …; the last one covers all 2ⁿ − 1 other strings.</td></tr><tr><td>B ← best neighbour</td><td>Ties: fewer flips first, then lowest bit.</td></tr><tr><td>if h(B) &gt; h(N): N ← B, k ← 1</td><td>Success: return to the cheap neighbourhood.</td></tr><tr><td>else k ← k + 1</td><td>Failure: pay for a bigger neighbourhood.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">|Nk| = C(n,k)</div><p class="read">choose which k of the n bits to flip</p><p class="why">This is why the neighbourhoods grow so fast: for n = 4 the sizes are 4, 6, 4, 1.</p></div><div class="formula"><div class="f">|N1–k| = C(n,1) + … + C(n,k)</div><p class="read">cumulative size</p><p class="why">|N1–n| = 2ⁿ − 1, so the last phase is brute force: VND ends exactly at a global maximum, at brute-force cost in the worst case.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>On the course example, hill climbing stops at 1000 (h 5), but flipping the pair b, d reaches 1101 (h 6), a solution. VND finds it by widening to N1–2 at 1000. Most of the time the cheap neighbourhood does the work and the expensive ones are only paid for when needed. The same escape works at a strict local maximum: on 'Local-maximum trap' (sat-local-trap) N1 fails at 0100 (all four neighbours have h 6) and N1–2 flips c and d to reach the solution 0111. The first step lists the sizes C(n,k): 4, 6, 4, 1 for four variables, 6, 15, 20, 15, 6, 1 for the six-variable sat-random-3sat; set the largest neighbourhood to 1 to see plain hill climbing fail.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes if run up to N1–n (it then covers the space)</div><div class="prop"><span>optimal</span>yes with N1–n</div><div class="prop"><span>time</span>up to O(2ⁿ · m)</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>After an improvement return to N1, not to the neighbourhood that found it.</li><li>N1–2 contains the one-flip neighbours as well as the pairs: 4 + 6 = 10 strings for n = 4, not 6.</li><li>If the whole sequence fails the result is a true global maximum of h, but a global maximum with h &lt; m means the formula is unsatisfiable.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-savings.html"><span>← Previous</span><b>Savings heuristic</b></a><a class="pg next" href="tsp-two-city-exchange.html"><span>Next →</span><b>2-city exchange</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

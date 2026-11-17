@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Stochastic hill climbing — step by step · Search Studio</title>
+<meta name="description" content="Ordinary hill climbing only ever accepts improvements and so gets stuck at the first local optimum. Stochastic hill climbing keeps the 'look at one random neighbour' step but accepts it with a probability that depends on how much better or worse it is, so it can sometimes walk downhill and escape.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/tsp-stochastic-hc.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Stochastic hill climbing — step by step · Search Studio"><meta property="og:description" content="Ordinary hill climbing only ever accepts improvements and so gets stuck at the first local optimum. Stochastic hill climbing keeps the 'look at one random neighbour' step but accepts it with a probability that depends on how much better or worse it is, so it can sometimes walk downhill and escape."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/tsp-stochastic-hc.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Stochastic hill climbing","description":"Ordinary hill climbing only ever accepts improvements and so gets stuck at the first local optimum. Stochastic hill climbing keeps the 'look at one random neighbour' step but accepts it with a probability that depends on how much better or worse it is, so it can sometimes walk downhill and escape.","url":"https://1mystic.github.io/SearchStudio/learn/tsp-stochastic-hc.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Stochastic hill climbing","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/tsp/stochastic-hill-climbing.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 4 · TSP · local search</p><h1>Stochastic hill climbing</h1></div><a class="btn primary" href="../#try-tsp-stochastic-hc">Run it step by step</a></div>
+<p class="intro">Ordinary hill climbing only ever accepts improvements and so gets stuck at the first local optimum. Stochastic hill climbing keeps the 'look at one random neighbour' step but accepts it with a probability that depends on how much better or worse it is, so it can sometimes walk downhill and escape.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>At a fixed temperature T, move from N to a random neighbour X with probability P = 1/(1 + e^(−ΔE/T)), where ΔE = cost(N) − cost(X) (positive means X is shorter). Unlike simulated annealing, T never changes.</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start;  bestSeen ← N
+repeat k times
+    X ← random neighbour of N
+    ΔE ← cost(N) − cost(X)            # positive = improvement
+    P ← 1 / (1 + e^(−ΔE / T))         # T is fixed
+    if random u &lt; P: N ← X
+    if N better than bestSeen: bestSeen ← N
+return bestSeen</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>X ← random neighbour of N</td><td>One random neighbour is examined, not the whole neighbourhood.</td></tr><tr><td>ΔE ← cost(N) − cost(X)</td><td>Positive ΔE is an improvement because the TSP minimises cost.</td></tr><tr><td>P ← 1 / (1 + e^(−ΔE/T))</td><td>The sigmoid: ΔE = 0 gives exactly ½; larger |ΔE| pushes P towards 1 or 0.</td></tr><tr><td>if u &lt; P: N ← X</td><td>u is a uniform random number in [0,1), drawn from the seeded generator.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">P = 1 / (1 + e^(−ΔE/T))</div><p class="read">sigmoid of ΔE/T</p><p class="why">ΔE &gt; 0 gives P &gt; ½, ΔE &lt; 0 gives P &lt; ½, ΔE = 0 gives P = ½ whatever T is.</p></div><div class="formula"><div class="f">T large: P → ½;   T small: P → 1 (ΔE&gt;0) or 0 (ΔE&lt;0)</div><p class="read">hot is a coin flip, cold is hill climbing</p><p class="why">T scales ΔE: dividing by a big T squashes all differences; a small T amplifies them.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>A fixed T is a fixed compromise: too hot and the search wanders at random, too cold and it behaves like plain hill climbing and stalls in a local optimum. Annealing resolves this by lowering T over time.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>k samples</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>ΔE is cost(current) − cost(next): improvement positive, the opposite of some textbooks.</li><li>Even an improving move is only accepted with probability P &lt; 1 at finite T, so keep the best tour seen.</li><li>The same seed gives the same run; change the seed, not the code, to see a different one.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="sat-ga.html"><span>← Previous</span><b>Genetic algorithm</b></a><a class="pg next" href="tsp-ga.html"><span>Next →</span><b>Genetic algorithm</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

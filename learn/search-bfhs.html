@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Breadth First Heuristic Search (BFHS) — step by step · Search Studio</title>
+<meta name="description" content="A* remembers every node it has expanded. Breadth First Heuristic Search borrows breadth-first search's layering: it knows that a node can only be regenerated from a neighbouring layer, so older layers can be thrown away. An upper bound U on f keeps the layers narrow. **Supplementary:** BFHS is from ">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-bfhs.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Breadth First Heuristic Search (BFHS) — step by step · Search Studio"><meta property="og:description" content="A* remembers every node it has expanded. Breadth First Heuristic Search borrows breadth-first search's layering: it knows that a node can only be regenerated from a neighbouring layer, so older layers can be thrown away. An upper bound U on f keeps the layers narrow. **Supplementary:** BFHS is from "><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-bfhs.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Breadth First Heuristic Search (BFHS)","description":"A* remembers every node it has expanded. Breadth First Heuristic Search borrows breadth-first search's layering: it knows that a node can only be regenerated from a neighbouring layer, so older layers can be thrown away. An upper bound U on f keeps the layers narrow. **Supplementary:** BFHS is from ","url":"https://1mystic.github.io/SearchStudio/learn/search-bfhs.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Breadth First Heuristic Search (BFHS)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/bfhs.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 6 · Graph search · space saving</p><h1>Breadth First Heuristic Search (BFHS)</h1></div><a class="btn primary" href="../#try-search-bfhs">Run it step by step</a></div>
+<p class="intro">A* remembers every node it has expanded. Breadth First Heuristic Search borrows breadth-first search's layering: it knows that a node can only be regenerated from a neighbouring layer, so older layers can be thrown away. An upper bound U on f keeps the layers narrow. **Supplementary:** BFHS is from Zhou and Hansen's work on memory-bounded graph search; it is beyond the lecture slides.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Layer k holds the nodes reached with k moves. Expand layer k completely to build layer k+1. A child is discarded if f = g + h &gt; U. Duplicate detection looks only at the current layer, the previous layer and the layer being built, which is enough on undirected graphs and means all earlier layers can be deleted. When a goal is picked with g &lt; U, U shrinks to g. The search ends when a layer is empty.</p>
+<h2><small>02</small>Pseudocode</h2><pre>U ← cost of a quick solution (greedy) or a given bound
+layer0 ← [S]
+while the current layer is not empty
+    for each node N in the layer (least f first)
+        if GoalTest(N) and g(N) &lt; U: remember N, U ← g(N)
+        else for each child C:  if g(C) + h(C) &gt; U: discard
+                                 elif C is already in the current, previous or next layer with g ≤ g(C): skip
+                                 else put C in the next layer
+    delete the layer before the previous one          # keep only the boundary
+    move to the next layer
+return the best goal found (or the quick solution)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>U ← greedy cost</td><td>A real solution gives a valid bound.</td></tr><tr><td>expand the whole layer</td><td>Unlike A*, nodes are not picked one at a time across layers.</td></tr><tr><td>if f(C) &gt; U: discard</td><td>With admissible h such a node cannot be on a cheaper path.</td></tr><tr><td>delete the layer before the previous one</td><td>The boundary of two layers is enough for duplicate detection.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">CLOSED = layers k and k−1</div><p class="read">only the boundary is stored</p><p class="why">Every neighbour of a layer-k node is in layer k−1, k or k+1 (in a graph of unit moves), so older layers can never be regenerated through duplicate detection.</p></div><div class="formula"><div class="f">discard C when g(C) + h(C) &gt; U</div><p class="read">bound pruning</p><p class="why">It keeps the layers narrow and, with h ≤ h*, never discards the optimal path when U ≥ C*.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>BFHS stores far fewer expanded nodes than A* on graphs whose layers are narrow compared with the whole explored region: on the 4×5 grid its peak CLOSED is 8 against A*'s 19. It pays with expanding every node with f ≤ U, even ones A* would never reach.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes if U ≥ C*</div><div class="prop"><span>optimal</span>yes with admissible h</div><div class="prop"><span>time</span>A*-like</div><div class="prop"><span>space</span>two layers + one</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Costs are compared across layers, so a node can be reached in a later layer with a lower g; this tracer keeps the cheaper copy only when it is still in a retained layer.</li><li>A bad (large) U weakens the pruning but never breaks the answer.</li><li>In the original BFHS no parent pointers are kept, so only the cost is known; here parent links are kept just to print the path. Divide and Conquer BFHS shows how to recover it without them.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="align-astar.html"><span>← Previous</span><b>Sequence alignment (A*)</b></a><a class="pg next" href="search-dc-bfhs.html"><span>Next →</span><b>Divide and Conquer BFHS (DC-BFHS)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

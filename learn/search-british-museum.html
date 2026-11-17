@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>British Museum (brute force on paths) — step by step · Search Studio</title>
+<meta name="description" content="The British Museum method looks at every possible path, one by one, and keeps the cheapest. It needs no cleverness and no heuristic, and its answer is the optimum. Its cost is the number of paths, which explodes as the graph grows.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-british-museum.html">
+<meta property="og:type" content="article"><meta property="og:title" content="British Museum (brute force on paths) — step by step · Search Studio"><meta property="og:description" content="The British Museum method looks at every possible path, one by one, and keeps the cheapest. It needs no cleverness and no heuristic, and its answer is the optimum. Its cost is the number of paths, which explodes as the graph grows."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-british-museum.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"British Museum (brute force on paths)","description":"The British Museum method looks at every possible path, one by one, and keeps the cheapest. It needs no cleverness and no heuristic, and its answer is the optimum. Its cost is the number of paths, which explodes as the graph grows.","url":"https://1mystic.github.io/SearchStudio/learn/search-british-museum.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"British Museum (brute force on paths)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/british-museum.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 5 · Graph search · optimal</p><h1>British Museum (brute force on paths)</h1></div><a class="btn primary" href="../#try-search-british-museum">Run it step by step</a></div>
+<p class="intro">The British Museum method looks at every possible path, one by one, and keeps the cheapest. It needs no cleverness and no heuristic, and its answer is the optimum. Its cost is the number of paths, which explodes as the graph grows.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Enumerate all simple paths (no repeated node) from S to the goal by depth-first exploration, in alphabetical order of neighbours. Each time a path reaches the goal, compare its cost with the best so far and keep the cheaper (the earlier one is kept on a tie). The answer has the same cost as Uniform Cost Search. The tracer shows each complete path found; after the first 40 it only reports improvements, and it counts everything.</p>
+<h2><small>02</small>Pseudocode</h2><pre>best ← none;  cost* ← ∞
+DFS over simple paths from S (a node may not repeat on the current path):
+    if the path ends at the goal:
+        if cost(path) &lt; cost*: best ← path;  cost* ← cost(path)
+        (do not extend a path past the goal)
+return best</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>extend the path one neighbour at a time</td><td>A node already on the path is skipped, so every path is simple.</td></tr><tr><td>when the goal is reached, record the path</td><td>Do not extend past the goal.</td></tr><tr><td>keep the cheapest so far</td><td>Strictly cheaper replaces; ties keep the first.</td></tr><tr><td>backtrack and continue</td><td>Until every path has been tried.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">cost(path) = Σ k(edge)</div><p class="read">sum of edge costs</p><p class="why">Paths are compared by total cost.</p></div><div class="formula"><div class="f">answer = min over all simple S→goal paths</div><p class="read">exhaustive minimum</p><p class="why">Nothing is skipped, so the minimum is the true optimum.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>It shows how much work the intelligent methods avoid. Uniform Cost Search finds the same cost while looking at a tiny fraction of the paths.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes</div><div class="prop"><span>time</span>exponential (number of simple paths)</div><div class="prop"><span>space</span>O(path length)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The number of simple paths can be exponential in the number of nodes.</li><li>It must not reuse a node on the same path, otherwise cycles give infinitely many paths.</li><li>Finding the first path is not enough: all paths must be tried.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-branch-and-bound.html"><span>← Previous</span><b>Branch &amp; Bound (state space)</b></a><a class="pg next" href="search-astar.html"><span>Next →</span><b>A*</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Smart Memory Graph Search (SMGS) — step by step · Search Studio</title>
+<meta name="description" content="A* keeps every expanded node in CLOSED for two reasons: to avoid regenerating it, and to read the path back. A node whose neighbours have all been expanded can no longer be regenerated, so the first reason is gone. The second still holds for nodes on the way to the frontier. SMGS deletes the rest. T">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-smgs.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Smart Memory Graph Search (SMGS) — step by step · Search Studio"><meta property="og:description" content="A* keeps every expanded node in CLOSED for two reasons: to avoid regenerating it, and to read the path back. A node whose neighbours have all been expanded can no longer be regenerated, so the first reason is gone. The second still holds for nodes on the way to the frontier. SMGS deletes the rest. T"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-smgs.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Smart Memory Graph Search (SMGS)","description":"A* keeps every expanded node in CLOSED for two reasons: to avoid regenerating it, and to read the path back. A node whose neighbours have all been expanded can no longer be regenerated, so the first reason is gone. The second still holds for nodes on the way to the frontier. SMGS deletes the rest. T","url":"https://1mystic.github.io/SearchStudio/learn/search-smgs.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Smart Memory Graph Search (SMGS)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/smgs.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 6 · Graph search · space saving</p><h1>Smart Memory Graph Search (SMGS)</h1></div><a class="btn primary" href="../#try-search-smgs">Run it step by step</a></div>
+<p class="intro">A* keeps every expanded node in CLOSED for two reasons: to avoid regenerating it, and to read the path back. A node whose neighbours have all been expanded can no longer be regenerated, so the first reason is gone. The second still holds for nodes on the way to the frontier. SMGS deletes the rest. The name and the idea of a boundary and relay nodes follow the lecture material on space-saving search; the exact deletion rule below is this site's reading of it, so treat the details as **supplementary**.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Run A*. After each expansion classify every CLOSED node. Boundary: at least one neighbour has not been expanded yet, so it may still be regenerated. Interior: all neighbours are expanded. A relay node is an interior node that is an ancestor, through parent pointers, of an OPEN or boundary node. Delete interior nodes that are not relays. The path to the goal is read from the nodes that remain.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, 0)];  CLOSED ← empty
+while OPEN not empty
+    N ← node with least f;  remove it
+    if GoalTest(N): return the path (follow parents through the kept nodes)
+    move N to CLOSED;  generate children as in A*
+    for each X in CLOSED:
+        if every neighbour of X has been expanded:  X is interior
+    live ← OPEN ∪ {CLOSED nodes that are not interior}      # the boundary
+    relay ← interior nodes that are ancestors of a live node
+    delete every interior node that is not a relay</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← least f; goal test; expand</td><td>Exactly A*.</td></tr><tr><td>boundary: some neighbour not expanded</td><td>Must stay, it could be regenerated.</td></tr><tr><td>interior: all neighbours expanded</td><td>Can never be regenerated: candidate for deletion.</td></tr><tr><td>relay: interior but an ancestor of a live node</td><td>Kept so every live node's parent chain stays intact.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">|CLOSED| ≤ |boundary| + |relay|</div><p class="read">only the edge of the expanded region plus the needed ancestors</p><p class="why">Everything else is deleted, so on wide graphs CLOSED is a thin shell instead of a solid blob.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Saves CLOSED memory at no cost in nodes expanded (on the 4×5 grid it deletes 9 nodes and the peak CLOSED falls from 19 to 17; the saving grows with the size of the graph). The relay rule is conservative: it keeps whole parent chains. Divide and conquer methods (DCFS, DC-BFHS) cut even those.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes with admissible h</div><div class="prop"><span>time</span>same as A*</div><div class="prop"><span>space</span>boundary + relay nodes</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>If an h is inconsistent a node can be reopened with a better g; its deleted neighbours are simply regenerated as new nodes.</li><li>Savings depend on the graph: on a tree or a path nearly every node stays a boundary or relay node.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-beam-stack.html"><span>← Previous</span><b>Beam Stack Search</b></a><a class="pg next" href="search-monotone-check.html"><span>Next →</span><b>Admissibility &amp; monotone check</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tabu search — step by step · Search Studio</title>
+<meta name="description" content="Best-neighbour walking cycles because the best move is often the one that undoes the last. Tabu search adds a short-term memory: a variable that has just been flipped may not be flipped again for a few iterations, which forces the walk onward, even through worse or equal states.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-tabu.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Tabu search — step by step · Search Studio"><meta property="og:description" content="Best-neighbour walking cycles because the best move is often the one that undoes the last. Tabu search adds a short-term memory: a variable that has just been flipped may not be flipped again for a few iterations, which forces the walk onward, even through worse or equal states."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-tabu.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Tabu search","description":"Best-neighbour walking cycles because the best move is often the one that undoes the last. Tabu search adds a short-term memory: a variable that has just been flipped may not be flipped again for a few iterations, which forces the walk onward, even through worse or equal states.","url":"https://1mystic.github.io/SearchStudio/learn/sat-tabu.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Tabu search","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/tabu-search.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · SAT · local search</p><h1>Tabu search</h1></div><a class="btn primary" href="../#try-sat-tabu">Run it step by step</a></div>
+<p class="intro">Best-neighbour walking cycles because the best move is often the one that undoes the last. Tabu search adds a short-term memory: a variable that has just been flipped may not be flipped again for a few iterations, which forces the walk onward, even through worse or equal states.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>At every iteration choose the best flip that is not tabu and take it even if h gets worse. The flipped variable becomes tabu for the tenure tt iterations. A tabu flip is still allowed when it gives an h larger than the best seen (the aspiration criterion). Optionally a long-term frequency memory subtracts λ times the number of past flips of a variable from its score, steering the search towards variables rarely flipped.</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start;  bestSeen ← N
+for t = 1, 2, …
+    if h(N) = m: stop
+    rank the one-bit flips i by  score(i) = h(flip(N,i)) − λ · freq(i)    (ties: lowest bit)
+    take the first flip that is not tabu,
+         or is tabu but gives h &gt; h(bestSeen)             # aspiration
+    N ← flip(N,i);  tabu(i) ← t + tt;  freq(i) ← freq(i) + 1
+    if h(N) &gt; h(bestSeen): bestSeen ← N
+return bestSeen</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← start; bestSeen ← N</td><td></td></tr><tr><td>rank the flips by score</td><td>Score is h of the neighbour; with λ &gt; 0 subtract λ × (how often that variable has been flipped). Ties: lowest bit.</td></tr><tr><td>first flip that is not tabu, or tabu with h &gt; bestSeen</td><td>This is the aspiration criterion: forbidding a move that would set a new record only blocks progress.</td></tr><tr><td>N ← the flip; tabu(i) ← t + tt</td><td>Variable i cannot be flipped again at iterations t+1 … t+tt.</td></tr><tr><td>update bestSeen; return it at the end</td><td>The walk may leave a good string, so keep the best one.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">tabu(i) at iteration t ⇔ t ≤ tabuUntil(i),  tabuUntil(i) = t₀ + tt</div><p class="read">flipped at t₀, forbidden for the next tt iterations</p><p class="why">Too short a tenure lets the walk cycle; too long blocks good moves. On the course example tt = 2 is enough to get out.</p></div><div class="formula"><div class="f">allow a tabu flip if h(new) &gt; h(bestSeen)</div><p class="read">aspiration criterion</p><p class="why">Tabu exists to stop cycling, never to block a new record.</p></div><div class="formula"><div class="f">score(i) = h(flip(N,i)) − λ · freq(i)</div><p class="read">frequency penalty (**supplementary**: the weight λ is a common implementation choice, not fixed by the course)</p><p class="why">Long-term memory of how often each variable has been flipped diversifies the search; λ = 0 switches it off.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>From 0000 on the course example: flip a (→ 1000, h 5); a is now tabu, and the best remaining flips tie at h 5, so b (the lowest bit) gives 1100, a sideways move; from 1100, a and b are tabu, and flipping d gives 1101, h 6, the unique solution. Hill climbing could never take the sideways move, and best-neighbour walking would have gone back to 0000. The tenure matters. On 'Local-maximum trap' (sat-local-trap) tenure 1 only forbids the immediate undo and the walk goes round 0000 → 0100 → 1100 → 1000 → 0000 and never finds a solution; tenure 2 breaks the loop and reaches 0111 in 5 flips. With tenure 4 and aspiration off every flip becomes tabu at 1111 and the search stops; with aspiration on, the tabu flip of a is allowed because 0111 (h 8) beats the best h seen (7).</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>iterations × n × m</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The tabu element is the variable (the move), not the whole string.</li><li>Tabu takes the best allowed move even when h decreases; only bestSeen is monotone.</li><li>Apply aspiration before rejecting a tabu flip.</li><li>With tenure 2 a variable flipped at iteration 1 is still tabu at iterations 2 and 3 and free again at 4.</li><li>Too short a tenure cycles (tenure 1 on sat-local-trap), too long a tenure freezes the search (tenure 4 with aspiration off stops when every flip is tabu). Aspiration is what rescues a record-breaking move from a long tenure.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-beam.html"><span>← Previous</span><b>Beam Search</b></a><a class="pg next" href="tsp-three-edge-exchange.html"><span>Next →</span><b>3-edge exchange</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

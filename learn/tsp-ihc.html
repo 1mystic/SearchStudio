@@ -32,9 +32,9 @@ return best</pre>
 <h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">P(success) ≈ 1 − (1 − p)^r</div><p class="read">with r restarts, each landing in the optimum's basin with probability p</p><p class="why">More restarts make it more likely that at least one starts in the right basin.</p></div>
 <h2><small>05</small>Why it works, and when it does not</h2><p>Simple and effective when local optima are many but hill climbing is cheap. It wastes effort if most random starts lead to the same poor basin.</p>
 <h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>r × hill climb</div><div class="prop"><span>space</span>O(n)</div></div>
-<h2><small>07</small>Traps</h2><ul class="traps"><li>Each restart is independent: nothing is learned between restarts.</li><li>Random starts are usually much worse than constructive tours.</li></ul>
-<nav class="pager bottom"><a class="pg prev" href="tsp-tabu.html"><span>← Previous</span><b>Tabu search</b></a><a class="pg next" href="tsp-random-walk.html"><span>Next →</span><b>Random walk</b></a></nav>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Each restart is independent: nothing is learned between restarts.</li><li>Random starts are usually much worse than constructive tours.</li><li>Different starts end in different local optima: on Six cities with 5 restarts the optima are 229, 224, 224, 229, 224, so one climb can be stuck at 229 while another finds 224.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-tabu.html"><span>← Previous</span><b>Tabu search</b></a><a class="pg next" href="tsp-best-neighbour-moves.html"><span>Next →</span><b>Best neighbour, k moves</b></a></nav>
 </div></article></main>
-<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>46 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
 </body>
 </html>

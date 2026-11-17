@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Branch &amp; bound (exact) — step by step · Search Studio</title>
+<meta name="description" content="Brute force looks at every tour. Branch and bound looks at families of tours: a node stands for 'every tour that contains these edges and avoids those edges', and a cheap lower bound says how good any tour in the family could possibly be. If even the optimistic bound cannot beat the best tour alread">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/tsp-branch-and-bound.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Branch &amp; bound (exact) — step by step · Search Studio"><meta property="og:description" content="Brute force looks at every tour. Branch and bound looks at families of tours: a node stands for 'every tour that contains these edges and avoids those edges', and a cheap lower bound says how good any tour in the family could possibly be. If even the optimistic bound cannot beat the best tour alread"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/tsp-branch-and-bound.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Branch & bound (exact)","description":"Brute force looks at every tour. Branch and bound looks at families of tours: a node stands for 'every tour that contains these edges and avoids those edges', and a cheap lower bound says how good any tour in the family could possibly be. If even the optimistic bound cannot beat the best tour alread","url":"https://1mystic.github.io/SearchStudio/learn/tsp-branch-and-bound.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Branch & bound (exact)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/tsp/branch-and-bound.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 5 · TSP · exact</p><h1>Branch &amp; bound (exact)</h1></div><a class="btn primary" href="../#try-tsp-branch-and-bound">Run it step by step</a></div>
+<p class="intro">Brute force looks at every tour. Branch and bound looks at families of tours: a node stands for 'every tour that contains these edges and avoids those edges', and a cheap lower bound says how good any tour in the family could possibly be. If even the optimistic bound cannot beat the best tour already found, the whole family is discarded unseen.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>A node is a pair (included edges, excluded edges). Its lower bound is ½ Σ over cities of the cost of the two cheapest admissible edges at that city: every tour uses exactly two edges at each city, and each edge is counted from both ends, hence the half. Branching picks an undecided edge e and creates two children: include e and exclude e. A node is a complete tour when every city has two included edges.</p>
+<h2><small>02</small>Pseudocode</h2><pre>best ← ∞ (or the cost of a known tour);  OPEN ← [root: no edge decided]
+while OPEN is not empty
+    N ← pick a node from OPEN                       # DFS: newest;  best-first: lowest bound
+    LB(N) ← ½ · Σ over cities of the two cheapest admissible edges
+             (included edges first; excluded edges, edges at a city that already has 2 included
+              edges, and edges closing a short cycle are not admissible)
+    if LB(N) ≥ best: prune N
+    else if every city has 2 included edges: best ← cost (a complete tour)
+    else  e ← cheapest undecided edge in the bound
+          children: N + include e,  N + exclude e   (drop infeasible ones)
+return best</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← pick from OPEN</td><td>Depth-first takes the newest node (include child first); best-first takes the node with the lowest bound.</td></tr><tr><td>LB(N) ← ½ Σ two cheapest admissible edges</td><td>Included edges at a city come first, then the cheapest admissible others. Excluded edges, edges at a city that already has two included edges, and edges that would close a sub-cycle are skipped.</td></tr><tr><td>if LB(N) ≥ best: prune</td><td>Every tour under N costs at least LB(N); if that is not below the best tour found, N cannot improve on it.</td></tr><tr><td>every city has 2 included edges</td><td>The included edges form one Hamiltonian cycle: a complete tour whose cost equals the bound.</td></tr><tr><td>children: include e / exclude e</td><td>Together they cover all the tours of N; a child that forces a city to degree 3, closes a short cycle, or leaves a city with fewer than two admissible edges is infeasible.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">LB = ½ Σ_c (e₁(c) + e₂(c))</div><p class="read">half the sum over cities of the two cheapest admissible edges at c</p><p class="why">Any tour has two edges at each city and each edge touches two cities, so its cost is half the sum of those per-city costs; choosing the cheapest two at every city can only lower that sum.</p></div><div class="formula"><div class="f">prune if LB ≥ best</div><p class="read">the optimistic cost is not below the incumbent</p><p class="why">No tour in this family can be strictly better than the best tour already found.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>The bound costs O(n²) per node but can remove huge subtrees. It is tight when the cheap edges at each city fit together into one tour, and weak when they do not, which is why the order in which edges are decided and a good first tour matter.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes</div><div class="prop"><span>time</span>O(n!) worst case</div><div class="prop"><span>space</span>O(n) per node, DFS</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The bound is half the sum, not the sum.</li><li>An included edge counts for both of its cities; a city with two included edges contributes exactly those two.</li><li>An edge at a city that already has two included edges is not admissible for its other end either.</li><li>A bound can be a fraction (x.5); compare it with integer tour costs without rounding.</li><li>Pruning depends on the best tour found so far. On Six cities depth-first picks 68 nodes, finds five successively better tours (238, 237, 233, 229, 224) and prunes 24 subtrees; best-first picks 49 nodes and finds only the optimum; depth-first with Initial best 229 picks 55. The Initial best must be above the optimum: below it no tour is found.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-aco.html"><span>← Previous</span><b>Ant colony optimisation</b></a><a class="pg next" href="search-ucs.html"><span>Next →</span><b>Uniform Cost Search</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hill climbing in the blocks world (h1 vs h2) — step by step · Search Studio</title>
+<meta name="description" content="Here a state is a set of stacks and a move takes the top block of one stack and puts it on the table or on top of another stack. The heuristic is only as good as the information it holds: h1 looks at each block's immediate support, h2 looks at the entire structure beneath it. Same search, same moves">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/plan-hill-climbing.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Hill climbing in the blocks world (h1 vs h2) — step by step · Search Studio"><meta property="og:description" content="Here a state is a set of stacks and a move takes the top block of one stack and puts it on the table or on top of another stack. The heuristic is only as good as the information it holds: h1 looks at each block's immediate support, h2 looks at the entire structure beneath it. Same search, same moves"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/plan-hill-climbing.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Hill climbing in the blocks world (h1 vs h2)","description":"Here a state is a set of stacks and a move takes the top block of one stack and puts it on the table or on top of another stack. The heuristic is only as good as the information it holds: h1 looks at each block's immediate support, h2 looks at the entire structure beneath it. Same search, same moves","url":"https://1mystic.github.io/SearchStudio/learn/plan-hill-climbing.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Hill climbing in the blocks world (h1 vs h2)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/planning/blocks-hill-climbing.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · Planning</p><h1>Hill climbing in the blocks world (h1 vs h2)</h1></div><a class="btn primary" href="../#try-plan-hill-climbing">Run it step by step</a></div>
+<p class="intro">Here a state is a set of stacks and a move takes the top block of one stack and puts it on the table or on top of another stack. The heuristic is only as good as the information it holds: h1 looks at each block's immediate support, h2 looks at the entire structure beneath it. Same search, same moves, different heuristic: one gets stuck, the other solves the problem.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Steepest-ascent hill climbing: move to the best neighbour as long as it is strictly better than the current state. h1 gives +1 to a block that sits on the right thing (the table for a bottom block) and −1 otherwise. h2 gives a block +k when it and the k−1 blocks below it all stand on the right things, and −k (its height in the stack) otherwise. The goal scores n under h1 and n(n+1)/2 for a single tower under h2. (The exact course picture is not reproduced here; this is the standard construction of the example.)</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start
+loop
+    pick the neighbour M (move one top block to the table or onto another stack) with the highest h(M)
+    if h(M) ≤ h(N): return N      // local maximum or plateau: stuck
+    N ← M
+    if N is the goal: return N
+
+h1(N) = Σ over blocks: +1 if on the thing it should be on in the goal, −1 otherwise
+h2(N) = Σ over blocks: +k if its whole structure of k blocks (down to the table) is right, −k otherwise</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>start from the initial state</td><td>Score it with the chosen heuristic.</td></tr><tr><td>generate every neighbour</td><td>Move the top block of any stack to the table or onto any other stack. Ties are broken alphabetically by move name.</td></tr><tr><td>pick the best neighbour</td><td>Steepest ascent: highest h wins.</td></tr><tr><td>if it is not strictly better, stop</td><td>A local maximum (or plateau): hill climbing cannot see past it.</td></tr><tr><td>otherwise move and repeat</td><td>Stop when the goal is reached.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">h1 = Σ ±1 per block, + if on the right thing</div><p class="read">count blocks that are locally right</p><p class="why">Cheap, but a block resting on a wrongly built tower still scores +1, so dismantling that tower looks like a loss.</p></div><div class="formula"><div class="f">h2 = Σ ±k per block, + if its whole support structure is correct</div><p class="read">credit a correct structure of k blocks with k, penalise a wrong one with k</p><p class="why">A wrongly placed block pulls down everything above it, so dismantling a wrong tower is rewarded and building a right one is rewarded more with height.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>The same algorithm with a different evaluation function turns failure into success: the quality of the heuristic decides whether a hill-climber can find the goal.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>one pass over the neighbours per move</div><div class="prop"><span>space</span>O(1) states</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>A block that is on the right thing is not necessarily correct: if what it stands on is wrong, h2 counts it as wrong.</li><li>Stuck does not mean the goal is unreachable: it means no single move improves h.</li><li>The goal is read from on(x,y) and ontable(x) facts; a block with no fact is assumed to belong on the table.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="statespace-simple.html"><span>← Previous</span><b>Simple search (no node pairs)</b></a><a class="pg next" href="tsp-brute-force.html"><span>Next →</span><b>Brute force (exact)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Graphplan — step by step · Search Studio</title>
+<meta name="description" content="Graphplan builds a layered graph in polynomial time that over-approximates what can be true after each number of steps, then does a much smaller backward search inside it. The graph alternates proposition layers P0, P1, … and action layers A0, A1, …. A no-op (persistence) action carries each proposi">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/plan-graphplan.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Graphplan — step by step · Search Studio"><meta property="og:description" content="Graphplan builds a layered graph in polynomial time that over-approximates what can be true after each number of steps, then does a much smaller backward search inside it. The graph alternates proposition layers P0, P1, … and action layers A0, A1, …. A no-op (persistence) action carries each proposi"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/plan-graphplan.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Graphplan","description":"Graphplan builds a layered graph in polynomial time that over-approximates what can be true after each number of steps, then does a much smaller backward search inside it. The graph alternates proposition layers P0, P1, … and action layers A0, A1, …. A no-op (persistence) action carries each proposi","url":"https://1mystic.github.io/SearchStudio/learn/plan-graphplan.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Graphplan","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/planning/graphplan.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 8 · Planning</p><h1>Graphplan</h1></div><a class="btn primary" href="../#try-plan-graphplan">Run it step by step</a></div>
+<p class="intro">Graphplan builds a layered graph in polynomial time that over-approximates what can be true after each number of steps, then does a much smaller backward search inside it. The graph alternates proposition layers P0, P1, … and action layers A0, A1, …. A no-op (persistence) action carries each proposition unchanged to the next layer. Mutex pairs record things that can never hold together (propositions) or be done together (actions) at that level.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Layer P0 is the initial state. Action layer Ai holds every action whose preconditions are all in Pi and pairwise non-mutex, plus a no-op for each proposition. Pi+1 holds every add effect. Two actions in the same layer are mutex by: (1) inconsistent effects, one adds what the other deletes; (2) interference, one deletes a precondition of the other; (3) competing needs, a precondition of one is mutex with a precondition of the other in Pi. Two propositions in Pi+1 are mutex by inconsistent support: every pair of actions that achieve them is mutex. When all goals are in a layer and pairwise non-mutex, extract a plan backwards: choose a set of non-mutex actions achieving the goals, make their preconditions the subgoals one layer earlier, and repeat; a goal set that fails at a layer is remembered as a nogood. Actions in one layer are mutually non-mutex so they may be done in any order, which gives the flat plan.</p>
+<h2><small>02</small>Pseudocode</h2><pre>P0 ← initial state;  i ← 0
+loop
+    if all goals ∈ Pi and no two goals are mutex in Pi:
+        plan ← EXTRACT(goals, i);  if plan ≠ failure: return plan
+    if graph has levelled off and nogoods stopped growing: return failure
+    Ai ← actions whose preconditions are in Pi and pairwise non-mutex, plus a no-op for every proposition
+    mark action mutexes: inconsistent effects, interference, competing needs
+    Pi+1 ← all add-effects of Ai
+    mark proposition mutexes: inconsistent support (every pair of achievers is mutex)
+    i ← i + 1
+
+EXTRACT(G, i):  if i = 0 return [ ]
+    if G ∈ nogood(i) return failure
+    choose non-mutex actions in Ai−1 that achieve every g ∈ G (try no-ops first)
+    G' ← union of their preconditions;  plan ← EXTRACT(G', i−1)
+    if none works: add G to nogood(i); return failure</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>P0 ← initial state</td><td>Layer 0 holds exactly what is true at the start.</td></tr><tr><td>goals present and non-mutex in Pi?</td><td>A necessary, not a sufficient, condition for a plan of i layers.</td></tr><tr><td>Ai: applicable actions and no-ops</td><td>An action enters only if its preconditions are in Pi and no two are mutex.</td></tr><tr><td>mark action mutexes</td><td>Inconsistent effects, interference, competing needs.</td></tr><tr><td>Pi+1 and its mutexes</td><td>Inconsistent support: all ways of making the two propositions are mutex.</td></tr><tr><td>backward extraction</td><td>Pick non-mutex achievers for the goals, recurse on their preconditions; remember failed goal sets.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">p, q mutex in Pi+1  ⇔  every achiever of p is mutex with every achiever of q</div><p class="read">inconsistent support</p><p class="why">If no non-mutex pair of actions can make both, they cannot both be true after that step.</p></div><div class="formula"><div class="f">a, b mutex  ⇐  add(a) ∩ del(b) ≠ ∅  or  del(a) ∩ pre(b) ≠ ∅  or  pre(a) and pre(b) contain a mutex pair</div><p class="read">inconsistent effects, interference, competing needs</p><p class="why">Each rule names a way the two actions cannot both be carried out in one parallel step.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Mutex reasoning prunes huge numbers of impossible combinations cheaply before any search, and the first layer in which the goals are non-mutex is a lower bound on the plan length (the plan returned has the fewest layers).</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes (finds a plan whenever one exists)</div><div class="prop"><span>optimal</span>fewest layers</div><div class="prop"><span>time</span>graph: polynomial; extraction: exponential in the worst case</div><div class="prop"><span>space</span>polynomial in propositions × layers</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Goals appearing without mutex is necessary, not sufficient: extraction can still fail and the graph must be extended.</li><li>A no-op is an action: it can be mutex with real actions (for example a no-op that keeps AE true is mutex with any action that deletes AE).</li><li>Layers count parallel steps; in the one-arm blocks world nearly every pair of actions is mutex, so layers and plan steps coincide.</li><li>Nogoods are goal sets proved unachievable at a layer: a repeat visit is cut immediately instead of searched again. Try example plan-graphplan-nogoods: the goals are non-mutex at P4 but extraction fails at P4 and P5 and succeeds at P6, reusing nogoods.</li><li>The termination test (graph levelled off and the nogood table at the layer where it levelled stopped growing) proves that no plan exists; it is checked after every failed extraction.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="plan-gsp.html"><span>← Previous</span><b>Goal Stack Planning</b></a><a class="pg next" href="plan-pop.html"><span>Next →</span><b>Partial Order Planning</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

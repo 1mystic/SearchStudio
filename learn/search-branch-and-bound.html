@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Branch &amp; Bound (state space) — step by step · Search Studio</title>
+<meta name="description" content="Branch &amp; Bound explores a tree of paths, always refining the cheapest partial path. Nothing records which states have already been reached, so the same state can be generated again by a different path. This tracer shows how often each state occurs in the search tree.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-branch-and-bound.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Branch &amp; Bound (state space) — step by step · Search Studio"><meta property="og:description" content="Branch &amp; Bound explores a tree of paths, always refining the cheapest partial path. Nothing records which states have already been reached, so the same state can be generated again by a different path. This tracer shows how often each state occurs in the search tree."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-branch-and-bound.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Branch & Bound (state space)","description":"Branch & Bound explores a tree of paths, always refining the cheapest partial path. Nothing records which states have already been reached, so the same state can be generated again by a different path. This tracer shows how often each state occurs in the search tree.","url":"https://1mystic.github.io/SearchStudio/learn/search-branch-and-bound.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Branch & Bound (state space)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/branch-and-bound.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 5 · Graph search · optimal</p><h1>Branch &amp; Bound (state space)</h1></div><a class="btn primary" href="../#try-search-branch-and-bound">Run it step by step</a></div>
+<p class="intro">Branch &amp; Bound explores a tree of paths, always refining the cheapest partial path. Nothing records which states have already been reached, so the same state can be generated again by a different path. This tracer shows how often each state occurs in the search tree.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Each OPEN entry is one partial path from S, stored as a node pair (node, parent, g). A refinement takes the cheapest entry and replaces it by its children, one per neighbour that is not already on that path (so a path never loops). There is no CLOSED list, so two different paths to the same state are both kept as separate tree nodes. The goal test is applied when the goal is picked from OPEN; its g is then the cost of the cheapest path, because every other entry on OPEN costs at least as much.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, g=0)]                      # a search TREE: no CLOSED list
+repeat
+    N ← node on OPEN with least g                # ties: alphabetical, then oldest
+    remove N from OPEN;  count one refinement
+    if GoalTest(N): return the path of N         # g(N) is the bound: nothing on OPEN is cheaper
+    for each child C of N not already on N's own path
+        add (C, N, g(N)+k(N,C)) to OPEN          # even if C already occurs elsewhere in the tree</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>OPEN ← [(S, nil, 0)]</td><td>The search tree has one node.</td></tr><tr><td>N ← least-g entry</td><td>Each pick is one refinement.</td></tr><tr><td>if GoalTest(N): return</td><td>g(N) is the bound for every other entry.</td></tr><tr><td>children not on N's path</td><td>Duplicates of a state in other branches are not removed.</td></tr><tr><td>count occurrences</td><td>Total tree nodes = sum of the occurrence counts of all states.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">g(C) = g(N) + k(N, C)</div><p class="read">cost of the extended path</p><p class="why">Each tree node carries the cost of its own path.</p></div><div class="formula"><div class="f">tree size = Σ occurrences(state)</div><p class="read">every path prefix is a node</p><p class="why">Without CLOSED, merging never happens, so the tree can be much larger than the graph.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>It finds the optimal path like UCS, but because it does not merge duplicates it does more work. Adding a CLOSED list (and updating g on cheaper paths) turns it into Dijkstra's algorithm. The occurrence counts show exactly what a CLOSED list saves.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes (finite graph, no loops on a path)</div><div class="prop"><span>optimal</span>yes (non-negative costs)</div><div class="prop"><span>time</span>exponential in the worst case</div><div class="prop"><span>space</span>all tree nodes</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Duplicates: on 'Graph T' A appears twice, B twice and G three times, while Dijkstra on the same graph closes each node once; on the 4×5 grid the tree has hundreds of nodes for 20 states.</li><li>The goal state may itself appear several times in the tree; only the first one picked ends the search.</li><li>Do not stop when the goal is generated: stop when it is picked.</li><li>A pick of a node is counted as a refinement even when it is the goal.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-dijkstra.html"><span>← Previous</span><b>Dijkstra's Algorithm</b></a><a class="pg next" href="search-british-museum.html"><span>Next →</span><b>British Museum (brute force on paths)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

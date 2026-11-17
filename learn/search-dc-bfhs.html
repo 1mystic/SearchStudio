@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Divide and Conquer BFHS (DC-BFHS) — step by step · Search Studio</title>
+<meta name="description" content="Deleting layers saves memory but loses the parent pointers needed to print the path. Divide and Conquer BFHS keeps one thing instead: the middle node of the best path. Each half is then a smaller search of the same kind. **Supplementary:** from Zhou and Hansen; the relay idea matches Divide and Conq">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-dc-bfhs.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Divide and Conquer BFHS (DC-BFHS) — step by step · Search Studio"><meta property="og:description" content="Deleting layers saves memory but loses the parent pointers needed to print the path. Divide and Conquer BFHS keeps one thing instead: the middle node of the best path. Each half is then a smaller search of the same kind. **Supplementary:** from Zhou and Hansen; the relay idea matches Divide and Conq"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-dc-bfhs.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Divide and Conquer BFHS (DC-BFHS)","description":"Deleting layers saves memory but loses the parent pointers needed to print the path. Divide and Conquer BFHS keeps one thing instead: the middle node of the best path. Each half is then a smaller search of the same kind. **Supplementary:** from Zhou and Hansen; the relay idea matches Divide and Conq","url":"https://1mystic.github.io/SearchStudio/learn/search-dc-bfhs.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Divide and Conquer BFHS (DC-BFHS)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/bfhs.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 6 · Graph search · space saving</p><h1>Divide and Conquer BFHS (DC-BFHS)</h1></div><a class="btn primary" href="../#try-search-dc-bfhs">Run it step by step</a></div>
+<p class="intro">Deleting layers saves memory but loses the parent pointers needed to print the path. Divide and Conquer BFHS keeps one thing instead: the middle node of the best path. Each half is then a smaller search of the same kind. **Supplementary:** from Zhou and Hansen; the relay idea matches Divide and Conquer Frontier Search from the course. The beam-search version (DC beam search) is not implemented here.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Run BFHS to find the optimal cost C and the layer count L. Run it again with every node on layer ⌊L/2⌋ acting as a relay: its descendants carry the relay's name and its g. The goal's relay R splits the problem into S→R (cost g(R)) and R→T (cost C − g(R)). Solve each recursively; in the sub-searches the exact cost is the upper bound U and h = 0 (the original h aims at T, not R).</p>
+<h2><small>02</small>Pseudocode</h2><pre>DC-BFHS(S, T, U):
+    run BFHS from S to T with bound U, no parent pointers      # gives cost C and the number of layers L
+    if L ≤ 1: return [S, T]
+    run it again, each node at layer ⌊L/2⌋ becoming its own relay and passing it on to descendants
+    R ← the relay of the best goal, with g(R)
+    return DC-BFHS(S, R, g(R)) ++ DC-BFHS(R, T, C − g(R))      # drop the repeated R</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>BFHS S→T, no parents</td><td>Gives the cost and the number of layers.</td></tr><tr><td>mark layer ⌊L/2⌋ nodes as relays</td><td>Every descendant inherits its ancestor's relay.</td></tr><tr><td>R ← relay of the goal</td><td>A node halfway along an optimal path.</td></tr><tr><td>solve S→R and R→T</td><td>Exact costs are known, so U is exact in the halves.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">C = g(R) + cost(R→T)</div><p class="read">an optimal path through R splits into two optimal halves</p><p class="why">Each half of an optimal path is itself optimal, so solving the halves and joining them gives an optimal whole.</p></div><div class="formula"><div class="f">memory ≈ boundary layers of the largest sub-search</div><p class="read">no pointers, no deep layers</p><p class="why">The sub-searches run one at a time, so their memory is not added up.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Shows how to get the path from a search that keeps almost nothing: on the 4×5 grid the boundary CLOSED is at most 9 against A*'s 19. The cost is a second pass per level of recursion.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes if U ≥ C*</div><div class="prop"><span>optimal</span>yes with admissible h</div><div class="prop"><span>time</span>≈ 2 × BFHS</div><div class="prop"><span>space</span>boundary layers</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The relay must be recorded in the same run that finds the best goal; a different tie-break could give a different path and relay.</li><li>A sub-search uses h = 0, so it expands more nodes than the first run did.</li><li>The relay layer ⌊L/2⌋ is by number of moves, not by cost; on weighted graphs the halves can have unequal cost.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-bfhs.html"><span>← Previous</span><b>Breadth First Heuristic Search (BFHS)</b></a><a class="pg next" href="search-beam-stack.html"><span>Next →</span><b>Beam Stack Search</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

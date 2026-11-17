@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A* on a state space — step by step · Search Studio</title>
+<meta name="description" content="A* adds the cost paid so far to the heuristic estimate of what remains. On the 8-puzzle, with h = tiles out of place or Manhattan distance, it finds a shortest solution while expanding far fewer boards than breadth-first search.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/statespace-astar.html">
+<meta property="og:type" content="article"><meta property="og:title" content="A* on a state space — step by step · Search Studio"><meta property="og:description" content="A* adds the cost paid so far to the heuristic estimate of what remains. On the 8-puzzle, with h = tiles out of place or Manhattan distance, it finds a shortest solution while expanding far fewer boards than breadth-first search."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/statespace-astar.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"A* on a state space","description":"A* adds the cost paid so far to the heuristic estimate of what remains. On the 8-puzzle, with h = tiles out of place or Manhattan distance, it finds a shortest solution while expanding far fewer boards than breadth-first search.","url":"https://1mystic.github.io/SearchStudio/learn/statespace-astar.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"A* on a state space","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/statespace/a-star.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 5 · Graph search · informed</p><h1>A* on a state space</h1></div><a class="btn primary" href="../#try-statespace-astar">Run it step by step</a></div>
+<p class="intro">A* adds the cost paid so far to the heuristic estimate of what remains. On the 8-puzzle, with h = tiles out of place or Manhattan distance, it finds a shortest solution while expanding far fewer boards than breadth-first search.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Node pairs are (state, parent, g) with f = g + h. Every move costs 1, so g is the depth along the current best path. OPEN is ordered by f with alphabetical ties, the goal test is on picking, and a cheaper path to a known state updates its parent. If h never overestimates the true remaining moves (admissible) the first goal picked is optimal.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, g=0)] ordered by f = g + h
+while OPEN not empty
+    N ← the pair with the least f;  remove it       # ties: alphabetical
+    if GoalTest(N): return the path
+    CLOSED ← N : CLOSED
+    for each child C of MoveGen(N) with g' = g(N) + 1
+        new: add (C, N, g') to OPEN
+        cheaper than its pair on OPEN or CLOSED: update parent and g (reopen if CLOSED)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← least-f pair on OPEN</td><td>f = g + h.</td></tr><tr><td>if GoalTest(N): return path</td><td>With admissible h this is a shortest solution.</td></tr><tr><td>children: g' = g(N) + 1</td><td>Unit cost per move.</td></tr><tr><td>cheaper path found: update</td><td>Change the parent and g; reopen if CLOSED.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">f(N) = g(N) + h(N)</div><p class="read">paid plus estimated remainder</p><p class="why">An estimate of the cheapest solution through N.</p></div><div class="formula"><div class="f">h₁ ≤ h₂ ≤ h*</div><p class="read">tiles out of place ≤ Manhattan ≤ true moves left</p><p class="why">Each misplaced tile needs ≥ 1 move and each needs ≥ its Manhattan distance, so both are admissible and h₂ dominates h₁: A* with h₂ expands no more states than with h₁.</p></div><div class="formula"><div class="f">missionaries: h = 2·⌈(n − k)/(k − 1)⌉ + 1</div><p class="read">n people on the left bank, boat holds k (**supplementary**)</p><p class="why">Each round trip moves at most k − 1 people across net, and the last trip moves k; ignoring the safety rule only lowers the bound, so it is admissible.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>A better (larger, still admissible) h prunes more of the search. Run example space-8-puzzle-12 with each heuristic and compare the 'expanded' count: both return the same 12-move solution, Manhattan after 16 expansions, tiles out of place after 79, and h = 0 does not finish within the 400-expansion cap. (On the easy five-move board space-8-puzzle the two tie at 6.)</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes with admissible h</div><div class="prop"><span>time</span>exponential in general</div><div class="prop"><span>space</span>exponential in general</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Admissible is not enough to compare: the larger of two admissible heuristics is better informed.</li><li>The blank is never counted in either heuristic; counting it can overestimate.</li><li>With h = 0 (water jugs have no good h) A* degenerates to Uniform Cost Search, here the same as BFS.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-heuristic-comparison.html"><span>← Previous</span><b>Heuristic comparison (A* with h = 0, h, h*)</b></a><a class="pg next" href="align-dp.html"><span>Next →</span><b>Sequence alignment (dynamic programming)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

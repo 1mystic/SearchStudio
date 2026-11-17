@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Iterated hill climbing — step by step · Search Studio</title>
+<meta name="description" content="One hill climb ends at the first local maximum it meets, and which one it meets depends on where it started. Iterated hill climbing runs the same N1 hill climb from several starting assignments and keeps the best. It is the simplest way of adding randomness to local search.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-ihc.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Iterated hill climbing — step by step · Search Studio"><meta property="og:description" content="One hill climb ends at the first local maximum it meets, and which one it meets depends on where it started. Iterated hill climbing runs the same N1 hill climb from several starting assignments and keeps the best. It is the simplest way of adding randomness to local search."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-ihc.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Iterated hill climbing","description":"One hill climb ends at the first local maximum it meets, and which one it meets depends on where it started. Iterated hill climbing runs the same N1 hill climb from several starting assignments and keeps the best. It is the simplest way of adding randomness to local search.","url":"https://1mystic.github.io/SearchStudio/learn/sat-ihc.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Iterated hill climbing","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/iterated-hill-climbing.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 4 · SAT · stochastic</p><h1>Iterated hill climbing</h1></div><a class="btn primary" href="../#try-sat-ihc">Run it step by step</a></div>
+<p class="intro">One hill climb ends at the first local maximum it meets, and which one it meets depends on where it started. Iterated hill climbing runs the same N1 hill climb from several starting assignments and keeps the best. It is the simplest way of adding randomness to local search.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Choose r starting bit strings (random, or listed explicitly). From each run strict N1 hill climbing (best one-flip neighbour, ties to the lowest bit, move only if h strictly increases). Remember the string with the largest h. Stop early if some run reaches h = m.</p>
+<h2><small>02</small>Pseudocode</h2><pre>best ← none
+for each start S (given, or r random bit strings)
+    N ← HillClimbing_N1(S)
+    if h(N) &gt; h(best): best ← N
+    if h(best) = m: stop (solved)
+return best</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>for each start S</td><td>Starts come from the 'starts' parameter if it is filled in, otherwise from the seeded random generator, so a run can be repeated exactly.</td></tr><tr><td>N ← HillClimbing_N1(S)</td><td>Exactly the deterministic hill climbing of week 3, run to its end.</td></tr><tr><td>if h(N) &gt; h(best): best ← N</td><td>Only strictly better results replace the best; ties keep the earlier one.</td></tr><tr><td>stop when h = m</td><td>A solution cannot be improved, so further restarts are pointless.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">P(at least one start reaches the solution) = 1 − (1 − q)^r</div><p class="read">q = fraction of starts whose hill climb ends at the solution</p><p class="why">Starts are independent, so all r fail with probability (1 − q)^r. **Supplementary** (not in the course notes).</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>On the four-variable course example hill climbing from 0000 stops at 1000 (h 5). Among five starts only 0101 climbs on to 1101 (h 6). More starts means more chances, but each start is a fresh gamble: nothing learned in one run is used in the next.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>r hill climbs</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Restarts are independent: iterated hill climbing does not remember where earlier runs failed.</li><li>Two different starts can end in the same local maximum, so r starts do not give r different answers (on sat-four-var the starts 1110 and 0010 both climb to 1010).</li><li>Failing on all r starts does not prove the formula unsatisfiable.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="statespace-best-first.html"><span>← Previous</span><b>Best First on a state space</b></a><a class="pg next" href="sat-stochastic-hc.html"><span>Next →</span><b>Stochastic hill climbing (fixed T)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

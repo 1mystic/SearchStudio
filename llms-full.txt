@@ -27,7 +27,8 @@ Complete on finite graphs and optimal when every edge costs the same. Uses a lot
 
 Complete: yes. Optimal: yes for unit costs. Time: O(b^d). Space: O(b^d).
 
-- Trap: Optimal in number of edges, not in total cost when edge costs differ.
+- Trap: Optimal in number of edges, not in total cost when edge costs differ: on graph-weighted or graph-greedy-detour the fewest-edge path is not the cheapest.
+- Trap: Compare with DFS on graph-dfs-deep: BFS returns the 3-edge path but must hold a whole level on OPEN.
 - Trap: Children are added in MoveGen order (alphabetical here).
 
 ## Depth First Search (week 2, Graph search · uninformed)
@@ -57,8 +58,44 @@ Memory-light, but neither optimal nor guaranteed to finish on infinite or very d
 
 Complete: finite graphs only. Optimal: no. Time: O(b^m). Space: O(b·m).
 
-- Trap: The path found depends heavily on MoveGen order.
+- Trap: DFS returns the first goal it dives into, not the shortest path: on example graph-dfs-deep it returns a 5-edge path S–A–C–D–E–G while BFS finds the 3-edge S–B–F–G.
+- Trap: The path found depends heavily on MoveGen order: reverse the order of the neighbours and the other branch would be tried first.
 - Trap: Do not confuse the order children are pushed with the order they are expanded.
+- Trap: On an infinite or very deep graph DFS may never come back from one branch; the CLOSED list only protects it on finite graphs (**supplementary**: the course graphs here are all finite).
+
+## Depth-Bounded DFS (week 2, Graph search · uninformed)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-dfs-bounded.html
+
+Depth-bounded DFS is plain Depth First Search with a ceiling on depth. A node at the bound is tested but never expanded, so the search cannot dive forever down one branch.
+
+Definition: OPEN is a stack of node pairs (N, parent, depth). The start node has depth 0 and a child has depth(parent)+1. When the node taken from OPEN has depth equal to the bound, it is goal-tested but no children are generated. If OPEN empties without reaching the goal, there is no goal within the bound (the search is incomplete: a deeper goal is not ruled out).
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, 0)];  CLOSED ← [ ]
+while OPEN not empty
+    (N, parent, d) ← head(OPEN);  remove it
+    if GoalTest(N): return the path
+    CLOSED ← (N, parent, d) : CLOSED
+    if d < depthBound:
+        children ← MoveGen(N) minus nodes on OPEN or CLOSED
+        OPEN ← [(C, N, d+1) for C in children] ++ OPEN     # stack
+return failure   (no goal within the bound)
+```
+
+- depth(C) = depth(N) + 1: a child is one level deeper. Depth is what the bound limits.
+- expand N only if depth(N) < bound: stop generating at the ceiling. This guarantees every branch has finite length, so the search terminates.
+
+It is the building block of DFID: run it with bound 0, 1, 2, … to get the completeness of BFS with the memory of DFS. On its own it is incomplete, and the path it finds is not guaranteed to be shortest.
+
+Complete: no (only if the goal is within the bound). Optimal: no. Time: O(b^bound). Space: O(b·bound).
+
+- Trap: A bound that is too small fails even though a goal exists: failure only means no goal within the bound (graph-dfs-deep: bound 2 fails, bound 3 finds the goal at depth 3).
+- Trap: Even a bound that is large enough can fail with a CLOSED list: a node first reached by a long route is closed at the bound and a later short route to it is skipped (graph-dfid-closed, bound 3 fails; DFID succeeds there because it reopens such nodes).
+- Trap: A bound that is too large behaves like plain DFS and can find a long, winding path.
+- Trap: The goal test applies to nodes at the bound too; only their expansion is skipped.
 
 ## Depth First Iterative Deepening (week 2, Graph search · uninformed)
 
@@ -84,7 +121,139 @@ Combines BFS's optimal depth with DFS's small memory; the repeated work is small
 Complete: yes. Optimal: yes for unit costs. Time: O(b^d). Space: O(b·d).
 
 - Trap: Count expansions over all rounds, not just the last.
-- Trap: With CLOSED checking, DB-DFS can miss a shallower route to a node seen earlier via a deeper path.
+- Trap: Plain depth-bounded DFS with CLOSED can miss a goal inside the bound when a node was first reached by a deeper route; here DB-DFS reopens a node found again at a smaller depth, so the first bound that works is the true shallowest goal depth (try example graph-dfid-closed, and compare Depth-Bounded DFS there).
+- Trap: DFID re-expands the upper levels in every round: on a wide graph that is a small overhead, on a thin chain it is large (try graph-dfs-deep and read the dry-run table).
+
+## BFS on a state space (week 2, Graph search · uninformed)
+
+URL: https://1mystic.github.io/SearchStudio/learn/statespace-bfs.html
+
+Water jugs, the 8-puzzle and missionaries-and-cannibals all have a start state, a goal test and a rule for the legal moves. Nobody draws their graph: MoveGen writes the neighbours of a state when asked. Breadth First Search explores in rings, so the first goal it picks is a solution with the fewest moves.
+
+Definition: A state-space problem is (S, GoalTest, MoveGen). OPEN holds node pairs (state, parent, depth) that have been generated but not expanded; CLOSED holds those already expanded. BFS keeps OPEN as a queue. The goal test is applied when a node is picked from OPEN. A child that is already on OPEN or CLOSED is not added again, which is what makes this graph search rather than tree search. The parent in each pair lets us read the solution back.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, 0)];  CLOSED ← [ ]
+while OPEN not empty
+    (N, parent, d) ← head(OPEN);  remove it
+    if GoalTest(N): return the path via parent pointers
+    CLOSED ← (N, parent, d) : CLOSED
+    children ← MoveGen(N) minus states on OPEN or CLOSED
+    OPEN ← OPEN ++ [(C, N, d+1) for C in children]     # append = queue
+return failure
+```
+
+- nodes ≤ 1 + b + b² + … + b^d: at most b^d states in the last ring. Every state in ring k has up to b children, so rings grow geometrically; CLOSED stops repeats from adding more.
+- solution length = depth of the first goal picked: fewest moves. All states at depth k are picked before any at depth k + 1.
+
+The water-jug problem (8, 5, 3 litres, aim for 4) has only 16 reachable states, so BFS finishes quickly and the answer, 7 pourings, is the shortest. On the 8-puzzle the rings grow fast, which is why informed search (A*) matters.
+
+Complete: yes (finite state space). Optimal: yes, fewest moves (unit move cost). Time: O(b^d). Space: O(b^d).
+
+- Trap: Without CLOSED the same state is generated again and again (pour A→B then B→A). Graph search cuts these cycles.
+- Trap: The goal test is on picking from OPEN, not on generating, so the last ring is generated before the search stops.
+- Trap: BFS needs memory for a whole ring: on example space-8-puzzle-12 (a 12-move board) it hits the 400-expansion cap long before the goal, while A* with Manhattan distance needs 16 expansions.
+- Trap: Ties and the order of children follow MoveGen's order. A different order gives a different but equally short solution.
+
+## DFS on a state space (week 2, Graph search · uninformed)
+
+URL: https://1mystic.github.io/SearchStudio/learn/statespace-dfs.html
+
+Depth First Search follows one line of moves as far as it goes, and only when it hits a dead end (or a state it has seen) does it return to the most recent choice. On a state space with MoveGen in code this finds a solution fast, but not necessarily a short one.
+
+Definition: The same node pairs (state, parent, depth) and the same OPEN/CLOSED lists as BFS, but OPEN is a stack: the children of the picked node are put at the front in MoveGen order, so the first child is picked next. The goal test is on picking. A child already on OPEN or CLOSED is not added again. An optional depth bound stops the dive.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, 0)];  CLOSED ← [ ]
+while OPEN not empty
+    (N, parent, d) ← head(OPEN);  remove it
+    if GoalTest(N): return the path via parent pointers
+    CLOSED ← (N, parent, d) : CLOSED
+    if depth bound reached: continue
+    children ← MoveGen(N) minus states on OPEN or CLOSED
+    OPEN ← [(C, N, d+1) for C in children] ++ OPEN     # prepend = stack
+return failure
+```
+
+- solution depth ≥ shortest depth d: a goal is found, maybe deep. DFS commits to the first child each time, so the first goal it reaches lies on whatever branch it dived into.
+
+On the water-jug problem DFS reaches a state with 4 litres but often by a longer pouring sequence than BFS. On the 8-puzzle without a bound it can wander through thousands of states, which is why the studio has an expansion cap and an optional depth bound.
+
+Complete: yes on a finite space with CLOSED. Optimal: no. Time: O(b^m). Space: linear on a tree; with CLOSED, all states seen.
+
+- Trap: DFS is not optimal: on example space-jug-seven (7 litres in some jug) BFS needs 5 pourings, DFS 9. Run both and compare the solution tables.
+- Trap: On the 8-puzzle DFS wanders: space-8-puzzle exhausts the 400-expansion cap without reaching a goal five moves away.
+- Trap: Without CLOSED, DFS can loop forever on a state space with cycles (pour back and forth). CLOSED fixes that.
+- Trap: With a depth bound and CLOSED, a state first reached by a deep path is closed and not retried by a shorter one, so the search can miss a solution within the bound (supplementary note).
+- Trap: The order of children is MoveGen's order; a different order sends the dive down another branch.
+
+## Simple search (no node pairs) (week 2, Graph search · uninformed)
+
+URL: https://1mystic.github.io/SearchStudio/learn/statespace-simple.html
+
+The first search procedures in the course keep only states on OPEN. They answer 'is a goal reachable?' but not 'how do I get there?'. This tracer runs that version on a state space so you can see the answer arrive without a path.
+
+Definition: OPEN is a list of states, CLOSED a list of states. Each loop picks the head of OPEN, tests it, moves it to CLOSED and adds its unseen children. Nothing records which state generated which, so when the goal is picked there is no chain of parents to follow. Replacing each state by a node pair (state, parent, depth) fixes that.
+
+Pseudocode:
+
+```
+OPEN ← [S];  CLOSED ← [ ]
+while OPEN not empty
+    N ← head(OPEN);  remove it
+    if GoalTest(N): return "goal reached"        # but by which moves?
+    CLOSED ← N : CLOSED
+    children ← MoveGen(N) minus states on OPEN or CLOSED
+    OPEN ← OPEN ++ children  (queue)  or  children ++ OPEN  (stack)
+return failure
+```
+
+- path recovery needs one pointer per state: parent(N). The path is the chain goal, parent(goal), parent(parent(goal)), … back to the start; with no pointers there is no chain.
+
+This is the motivation for node pairs: one extra field per entry turns 'a goal exists' into 'here is a solution'.
+
+Complete: yes (finite space, with CLOSED). Optimal: n/a: no path is returned. Time: as BFS / DFS. Space: as BFS / DFS.
+
+- Trap: Reaching the goal is not the same as having the solution. For puzzles the moves are the answer: run this on space-water-jug and the last step says the path is lost, while BFS on the same problem prints the 7 pourings.
+- Trap: Switching OPEN between queue and stack changes how many states are expanded (15 for the queue, 9 for the stack on space-water-jug) but never recovers the path.
+- Trap: Without CLOSED (not offered here) the procedure may never stop on a cyclic state space.
+
+## Hill climbing in the blocks world (h1 vs h2) (week 3, Planning)
+
+URL: https://1mystic.github.io/SearchStudio/learn/plan-hill-climbing.html
+
+Here a state is a set of stacks and a move takes the top block of one stack and puts it on the table or on top of another stack. The heuristic is only as good as the information it holds: h1 looks at each block's immediate support, h2 looks at the entire structure beneath it. Same search, same moves, different heuristic: one gets stuck, the other solves the problem.
+
+Definition: Steepest-ascent hill climbing: move to the best neighbour as long as it is strictly better than the current state. h1 gives +1 to a block that sits on the right thing (the table for a bottom block) and −1 otherwise. h2 gives a block +k when it and the k−1 blocks below it all stand on the right things, and −k (its height in the stack) otherwise. The goal scores n under h1 and n(n+1)/2 for a single tower under h2. (The exact course picture is not reproduced here; this is the standard construction of the example.)
+
+Pseudocode:
+
+```
+N ← start
+loop
+    pick the neighbour M (move one top block to the table or onto another stack) with the highest h(M)
+    if h(M) ≤ h(N): return N      // local maximum or plateau: stuck
+    N ← M
+    if N is the goal: return N
+
+h1(N) = Σ over blocks: +1 if on the thing it should be on in the goal, −1 otherwise
+h2(N) = Σ over blocks: +k if its whole structure of k blocks (down to the table) is right, −k otherwise
+```
+
+- h1 = Σ ±1 per block, + if on the right thing: count blocks that are locally right. Cheap, but a block resting on a wrongly built tower still scores +1, so dismantling that tower looks like a loss.
+- h2 = Σ ±k per block, + if its whole support structure is correct: credit a correct structure of k blocks with k, penalise a wrong one with k. A wrongly placed block pulls down everything above it, so dismantling a wrong tower is rewarded and building a right one is rewarded more with height.
+
+The same algorithm with a different evaluation function turns failure into success: the quality of the heuristic decides whether a hill-climber can find the goal.
+
+Complete: no. Optimal: no. Time: one pass over the neighbours per move. Space: O(1) states.
+
+- Trap: A block that is on the right thing is not necessarily correct: if what it stands on is wrong, h2 counts it as wrong.
+- Trap: Stuck does not mean the goal is unreachable: it means no single move improves h.
+- Trap: The goal is read from on(x,y) and ontable(x) facts; a block with no fact is assumed to belong on the table.
 
 ## Brute force (exact) (week 3, TSP · exact)
 
@@ -114,6 +283,35 @@ Complete: yes. Optimal: yes. Time: O(n!). Space: O(n).
 - Trap: Counting (n−1)! instead of (n−1)!/2 for a symmetric instance.
 - Trap: Using brute force on large n: the studio limits it to 9 cities.
 
+## Brute force (truth table) (week 3, SAT · exact)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-brute-force.html
+
+A SAT instance asks for an assignment of true or false to every variable that makes every clause true. With n variables there are 2ⁿ assignments, so the most direct method is to try them all. This is the baseline against which the local-search methods of this week are measured.
+
+Definition: Treat the assignment as a bit string (bit i = 1 means variable i is true). Enumerate every bit string, evaluate every clause, and record h = the number of satisfied clauses. A string with h = m satisfies the formula.
+
+Pseudocode:
+
+```
+for each bit string X of length n, in counting order 00…0, 00…1, …
+    h(X) ← number of clauses satisfied by X
+    if h(X) = m: X is a solution
+return the solutions (or, if none, the rows with the largest h)
+```
+
+- |search space| = 2ⁿ: two choices per variable. This is why n is limited to 6 here: 2⁶ = 64 rows still fit on a screen; 2²⁰ is already a million.
+- h(X) = Σᵢ [clauseᵢ satisfied by X]: the heuristic is the number of true clauses. The same h guides every local-search method in this section; local search tries to climb to h = m without enumerating the table.
+
+Brute force is complete and exact, which makes it the reference answer: every local-search result can be checked against its truth table. Its cost is the reason local search exists.
+
+Complete: yes. Optimal: yes (finds every solution). Time: O(2ⁿ · m). Space: O(n).
+
+- Trap: A solution is h = m (all clauses), not just a high h.
+- Trap: There can be several solutions, or none; do not stop at the first unless asked.
+- Trap: The truth table grows as 2ⁿ: adding one variable doubles it.
+- Trap: No row with h = m proves the formula unsatisfiable: on sat-unsat the best rows have h = 4 of 5 clauses, and brute force can say 'none' for certain. Local search failing says nothing of the kind.
+
 ## Nearest Neighbour (week 3, TSP · constructive)
 
 URL: https://1mystic.github.io/SearchStudio/learn/tsp-nearest-neighbour.html
@@ -135,13 +333,45 @@ return tour   (closing edge back to start is implied)
 - next = argmin over unvisited j of C(c, j): pick the cheapest edge out of the current city that leads somewhere new. Each choice is locally best; nothing guarantees the sum of choices is globally best.
 - NN ≤ ½(⌈log₂ n⌉ + 1) · OPT  (metric TSP): in the worst case NN can be about log n times worse than optimal. Bad cases exist where greedy local moves strand far-away cities.
 
-Cheap and intuitive. Its weakness is the end game: the last cities are whatever is left over, often far apart, and the forced return edge can be the longest edge in the tour.
+Cheap and intuitive. Its weakness is the end game: the last cities are whatever is left over, often far apart, and the forced return edge can be the longest edge in the tour. It always returns a tour, but never promises an optimal one.
 
 Complete: always returns a tour. Optimal: no. Time: O(n²). Space: O(n).
 
-- Trap: The tour depends on the start city: run it from every city and keep the best.
+- Trap: The tour depends on the start city: run it from every city and keep the best. On Six cities (examples) the tour costs 264 from A (its forced return leg B→A = 92 is the longest edge) but 240 from C, and the optimum is 224 (try the start city setting).
 - Trap: Do not forget the forced return edge in the cost.
 - Trap: Write the answer in path representation starting from the asked city.
+
+## Hill climbing (N1) (week 3, SAT · local search)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-hill-climbing.html
+
+Local search treats the assignments as states and a flip of one variable as a move. The heuristic h counts satisfied clauses, so a solution is a state with h = m. Hill climbing walks uphill on h and never accepts a step that does not strictly improve it.
+
+Definition: The neighbourhood N1 of a bit string is the n strings that differ from it in exactly one bit. Pick the neighbour with the highest h (ties go to the lowest bit, i.e. the alphabetically first variable). Move only if its h is strictly greater than the current h; otherwise stop.
+
+Pseudocode:
+
+```
+N ← start
+loop
+    if h(N) = m: return N                      # solved
+    nbrs ← all strings obtained by flipping one bit of N     # N1
+    B ← the neighbour with the largest h (ties: lowest bit)
+    if h(B) > h(N): N ← B
+    else: return N                             # local maximum or plateau
+```
+
+- |N1| = C(n,1) = n: n neighbours per state. Each iteration costs n evaluations of h.
+- move iff h(B) > h(N): strictly better only. This rule is what makes the method stop on plateaus; tabu search and simulated annealing relax it.
+
+It is cheap and often gets close, but a state whose neighbours are all no better is a trap even when h < m. On the course example it climbs 0000 (h 4) → 1000 (h 5) and stops, although 1101 (h 6) is a solution two flips away.
+
+Complete: no. Optimal: no. Time: O(n · m) per move. Space: O(n).
+
+- Trap: Stopping with h < m does not mean the formula is unsatisfiable, only that this start is stuck.
+- Trap: Equal h is not an improvement: a plateau stops strict hill climbing.
+- Trap: Ties between equally good neighbours go to the lowest bit; a different rule can give a different path.
+- Trap: Two different traps: on a plateau some neighbour has equal h, at a strict local maximum every neighbour is worse. The captions say which one. Course example sat-four-var stops on a plateau (1000: three neighbours with h 5); the example 'Local-maximum trap' (sat-local-trap) stops at 0100, where all four neighbours have h 6.
 
 ## Greedy heuristic (week 3, TSP · constructive)
 
@@ -172,6 +402,39 @@ Complete: always returns a tour. Optimal: no. Time: O(n² log n). Space: O(n²).
 - Trap: Track degrees and fragments carefully; most exam errors are an illegal acceptance.
 - Trap: The last accepted edge is forced and may be long.
 - Trap: 'Greedy from city X' only changes where you start writing the tour.
+- Trap: Watch both rejection reasons on Six cities (examples): CE = 31 is refused as a premature cycle (A–C–E would close a triangle), CF, BD, AD … are refused because a city would get a degree of 3. The result, 238, is not the optimum 224.
+
+## Beam search (week 3, SAT · local search)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-beam.html
+
+Hill climbing follows a single path and so can be trapped. Beam search keeps a small population of w assignments: the w best of everything reachable in one flip from the current beam. A wider beam explores more routes at the cost of w times more work per level.
+
+Definition: Level 0 is [start]. At each level, generate the N1 neighbours of every assignment in the beam (removing duplicates), sort them by h, and keep the best w. Stop when no solution appears and the best h of the new beam is not higher than that of the old one; return the best assignment seen.
+
+Pseudocode:
+
+```
+OPEN ← [start]                       # the beam, best first
+loop
+    if some X in OPEN has h(X) = m: return X
+    cand ← distinct N1 neighbours of every X in OPEN
+    OPEN ← the w best of cand by h (ties: order of generation, lowest bit first)
+    if h(head of OPEN) ≤ h(previous head): stop
+return the best assignment seen
+```
+
+- |cand| ≤ w · n: at most w·n candidates per level. The work per level is linear in the beam width.
+- w = 1 ⇒ hill climbing; w ≥ 2ⁿ ⇒ breadth-first over the whole space: the width interpolates between the two. The same dial as in graph and TSP beam search.
+
+The beam lets a runner-up survive. Hill climbing keeps only the single best neighbour, but the second-best string may have a neighbour that beats everything reachable from the best one. On the example 'Local-maximum trap' (sat-local-trap) from 0000: w = 1 is hill climbing and stops at 0100 (h 7); w = 2 also keeps 0001 (h 7), and its neighbour 0011 has h 8, a solution, at level 2. The beam is still incomplete: it stops as soon as the head does not improve, so it cannot cross a plateau, and if all w members fall into the same basin it stalls like hill climbing. On the course example sat-four-var even w = 4 stops at 1000 (h 5), because the head of the beam does not improve at level 2.
+
+Complete: no. Optimal: no. Time: O(levels · w · n · m). Space: O(w · n).
+
+- Trap: The beam holds the w best of all neighbours together, not w neighbours per member.
+- Trap: Remove duplicate neighbours, or the beam fills up with copies of the same string.
+- Trap: Stopping rule: the head not improving. A level whose beam is merely as good as the last one ends the search, so a wider beam does not help on a plateau (try sat-four-var with w = 1 to 4).
+- Trap: A wider beam is not always better; it costs w times more evaluations and only helps when a runner-up leads somewhere the best member does not.
 
 ## Savings heuristic (week 3, TSP · constructive)
 
@@ -202,7 +465,39 @@ Complete: always returns a tour. Optimal: no. Time: O(n² log n). Space: O(n²).
 
 - Trap: The savings formula has a minus on C(i,j), not on the base distances.
 - Trap: A pair is refused if either city is interior, even if they are in different sub-tours.
-- Trap: Know which pairs merged and which did not: exams ask for the first three of each.
+- Trap: Know which pairs merged and which did not: exams ask for the first three of each (Six cities, base A: merged BF, BD, CF; refused DF, BC, CD).
+- Trap: The result depends on the base city: on Six cities base A gives 224 (the optimum) but base E gives 229, and there AD (S = 42) is refused because D is already interior, not because of a cycle.
+
+## Variable Neighbourhood Descent (N1 → N1–n) (week 3, SAT · local search)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-vnd.html
+
+A local maximum depends on the neighbourhood: a state can have no better one-flip neighbour and still have a better string two flips away. VND uses that. It searches the small, cheap neighbourhood first and only widens it when it is stuck.
+
+Definition: Let Nk be the strings that differ from the current one in exactly k bits, so |Nk| = C(n,k), and let N1–k = N1 ∪ … ∪ Nk. Start with k = 1. Move to the best member of N1–k if it is strictly better, and reset k to 1. Otherwise increase k. When k passes n, the state is a local maximum of every neighbourhood, hence a global maximum of h (N1–n is the whole space).
+
+Pseudocode:
+
+```
+N ← start;  k ← 1
+while k ≤ n and h(N) < m
+    nbrs ← all strings that differ from N in at most k bits     # N1–k
+    B ← the neighbour with the largest h (ties: fewest flips, then lowest bit)
+    if h(B) > h(N): N ← B;  k ← 1
+    else: k ← k + 1
+return N
+```
+
+- |Nk| = C(n,k): choose which k of the n bits to flip. This is why the neighbourhoods grow so fast: for n = 4 the sizes are 4, 6, 4, 1.
+- |N1–k| = C(n,1) + … + C(n,k): cumulative size. |N1–n| = 2ⁿ − 1, so the last phase is brute force: VND ends exactly at a global maximum, at brute-force cost in the worst case.
+
+On the course example, hill climbing stops at 1000 (h 5), but flipping the pair b, d reaches 1101 (h 6), a solution. VND finds it by widening to N1–2 at 1000. Most of the time the cheap neighbourhood does the work and the expensive ones are only paid for when needed. The same escape works at a strict local maximum: on 'Local-maximum trap' (sat-local-trap) N1 fails at 0100 (all four neighbours have h 6) and N1–2 flips c and d to reach the solution 0111. The first step lists the sizes C(n,k): 4, 6, 4, 1 for four variables, 6, 15, 20, 15, 6, 1 for the six-variable sat-random-3sat; set the largest neighbourhood to 1 to see plain hill climbing fail.
+
+Complete: yes if run up to N1–n (it then covers the space). Optimal: yes with N1–n. Time: up to O(2ⁿ · m). Space: O(n).
+
+- Trap: After an improvement return to N1, not to the neighbourhood that found it.
+- Trap: N1–2 contains the one-flip neighbours as well as the pairs: 4 + 6 = 10 strings for n = 4, not 6.
+- Trap: If the whole sequence fails the result is a true global maximum of h, but a global maximum with h < m means the formula is unsatisfiable.
 
 ## 2-city exchange (week 3, TSP · perturbation)
 
@@ -230,6 +525,7 @@ Hill climbing is fast and always improves until it stops, but it stops at the fi
 Complete: no. Optimal: no (local optimum). Time: n(n−1)/2 evaluations per step. Space: O(n).
 
 - Trap: Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).
+- Trap: A local optimum is not the global one: on Six cities, started from the Greedy tour (238), 2-city exchange stops at 229, the optimum is 224. Variable neighbourhood descent continues from such a tour with a different move.
 - Trap: Count neighbours with the right formula for the operator.
 - Trap: In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change.
 
@@ -258,8 +554,37 @@ Often reaches the goal quickly, but is not optimal and can be misled by a poor h
 
 Complete: finite graphs. Optimal: no. Time: O(b^m) worst case. Space: O(b^m).
 
-- Trap: Best First ignores g; A* adds it.
+- Trap: Best First ignores g, so it is not optimal even when h is admissible: on graph-greedy-detour it takes S–A–G (cost 11) and never looks at the cost-4 route S–B–G; on graph-weighted it returns cost 13 where UCS finds 12. A* adds g.
 - Trap: Ties in h decide the path: state your tie-breaking.
+
+## Best neighbour, fixed moves (week 3, SAT · local search)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-best-neighbour.html
+
+Hill climbing quits when no neighbour is better. A simple escape is to keep moving anyway: take the best neighbour even if it is worse or equal, for a fixed number of moves, and remember the best string seen. The trouble is that the best neighbour of a state is often the state we just left.
+
+Definition: At each of the k moves, evaluate the N1 neighbours of the current string, move to the one with the highest h (ties to the lowest bit) regardless of whether h improves, and update the best string seen. Return the best string seen.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N
+repeat for a fixed number of moves
+    B ← the N1 neighbour with the largest h (ties: lowest bit)
+    N ← B                                   # even if h(B) ≤ h(N)
+    if h(N) > h(bestSeen): bestSeen ← N
+return bestSeen
+```
+
+- N′ = argmax over N1(N) of h: the best neighbour, uphill or not. Flipping a variable back and forth keeps being the best choice, so the walk can cycle: x → y → x → y …
+
+It shows why memory is needed. From the solution 1101 on the course example the best neighbour is 0101 (h 5) and from there the best neighbour is 1101 again: a cycle of length 2. Tabu search forbids the move back for a few iterations to break such cycles. The cycle also appears while still unsolved: on 'Local-maximum trap' (sat-local-trap) the walk goes 0000 → 0100 (h 7) → 1100 (h 6, downhill) → 0100 → 1100 … and never reaches the solutions 0011 or 0111, because 0100 is always the best neighbour of 1100.
+
+Complete: no. Optimal: no. Time: moves × n × m. Space: O(n).
+
+- Trap: The last string is not the answer; the best string seen is.
+- Trap: A revisited string means a cycle: from then on the walk repeats forever.
+- Trap: With a solution reached the walk would normally stop; turn the stop off to watch the cycling.
 
 ## 2-edge exchange (2-opt) (week 3, TSP · perturbation)
 
@@ -288,6 +613,7 @@ Hill climbing is fast and always improves until it stops, but it stops at the fi
 Complete: no. Optimal: no (local optimum). Time: n(n−3)/2 evaluations per step. Space: O(n).
 
 - Trap: Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).
+- Trap: A local optimum is not the global one: on Six cities, started from the Greedy tour (238), 2-opt stops at 229 although the optimum is 224 (the last step says so). Started from the Nearest-neighbour tour it reaches 224, so the start matters.
 - Trap: Count neighbours with the right formula for the operator.
 - Trap: In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change.
 
@@ -316,9 +642,10 @@ Constant memory and very fast, but incomplete: local optima, plateaus and ridges
 
 Complete: no. Optimal: no. Time: O(b) per step. Space: O(1).
 
-- Trap: Hill climbing never backtracks.
-- Trap: A plateau (equal h) stops the course version.
+- Trap: Hill climbing never backtracks: on example graph-hill-trap it climbs to L (h = 1), a dead end, and stops with the goal unreached although S–B–C–G exists.
+- Trap: A plateau (equal h) stops the course version: try example graph-plateau, where B has the same h as A.
 - Trap: Reaching a node with h = 0 that is not the goal means h is misleading there.
+- Trap: Even when it reaches the goal, the path need not be cheapest: on graph-greedy-detour it takes the cheap-looking edge with cost 10 (it uses only h, never the cost g).
 
 ## Or-opt (move a city) (week 3, TSP · perturbation)
 
@@ -346,6 +673,7 @@ Hill climbing is fast and always improves until it stops, but it stops at the fi
 Complete: no. Optimal: no (local optimum). Time: about n² evaluations per step. Space: O(n).
 
 - Trap: Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).
+- Trap: A different move set has different local optima: on Six cities from the Greedy tour (238) Or-opt reaches the optimum 224, where 2-opt and 2-city exchange both stop at 229.
 - Trap: Count neighbours with the right formula for the operator.
 - Trap: In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change.
 
@@ -368,14 +696,51 @@ while goal not in OPEN
 return the goal's path
 ```
 
-- memory ≤ w per level: the beam width bounds the frontier. That is the whole point: predictable memory. w = 1 is hill climbing that may move uphill; w = ∞ is breadth-first search.
+- memory ≤ w per level: the beam width bounds the frontier. That is the whole point: predictable memory. w = 1 is hill climbing except that it keeps moving even when the best child is worse (and fails only when no unseen child is left); w = ∞ is breadth-first search.
 
 Keeps several alternatives alive, so one bad estimate does not end the search, but anything outside the beam is lost forever.
 
 Complete: no. Optimal: no. Time: O(w · b · d). Space: O(w · d).
 
-- Trap: Beam search is incomplete: the only path to the goal can fall outside the beam.
+- Trap: Beam search is incomplete: the only path to the goal can fall outside the beam. On graph-hill-trap, w = 1 keeps only L and runs out of new nodes (fails); w = 2 keeps B too and reaches G. Change w and compare.
 - Trap: Ties in h decide which nodes survive.
+- Trap: A wider beam is not always cheaper or shorter: w only changes which nodes survive, it never optimises cost.
+
+## Tabu search (week 3, SAT · local search)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-tabu.html
+
+Best-neighbour walking cycles because the best move is often the one that undoes the last. Tabu search adds a short-term memory: a variable that has just been flipped may not be flipped again for a few iterations, which forces the walk onward, even through worse or equal states.
+
+Definition: At every iteration choose the best flip that is not tabu and take it even if h gets worse. The flipped variable becomes tabu for the tenure tt iterations. A tabu flip is still allowed when it gives an h larger than the best seen (the aspiration criterion). Optionally a long-term frequency memory subtracts λ times the number of past flips of a variable from its score, steering the search towards variables rarely flipped.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N
+for t = 1, 2, …
+    if h(N) = m: stop
+    rank the one-bit flips i by  score(i) = h(flip(N,i)) − λ · freq(i)    (ties: lowest bit)
+    take the first flip that is not tabu,
+         or is tabu but gives h > h(bestSeen)             # aspiration
+    N ← flip(N,i);  tabu(i) ← t + tt;  freq(i) ← freq(i) + 1
+    if h(N) > h(bestSeen): bestSeen ← N
+return bestSeen
+```
+
+- tabu(i) at iteration t ⇔ t ≤ tabuUntil(i),  tabuUntil(i) = t₀ + tt: flipped at t₀, forbidden for the next tt iterations. Too short a tenure lets the walk cycle; too long blocks good moves. On the course example tt = 2 is enough to get out.
+- allow a tabu flip if h(new) > h(bestSeen): aspiration criterion. Tabu exists to stop cycling, never to block a new record.
+- score(i) = h(flip(N,i)) − λ · freq(i): frequency penalty (**supplementary**: the weight λ is a common implementation choice, not fixed by the course). Long-term memory of how often each variable has been flipped diversifies the search; λ = 0 switches it off.
+
+From 0000 on the course example: flip a (→ 1000, h 5); a is now tabu, and the best remaining flips tie at h 5, so b (the lowest bit) gives 1100, a sideways move; from 1100, a and b are tabu, and flipping d gives 1101, h 6, the unique solution. Hill climbing could never take the sideways move, and best-neighbour walking would have gone back to 0000. The tenure matters. On 'Local-maximum trap' (sat-local-trap) tenure 1 only forbids the immediate undo and the walk goes round 0000 → 0100 → 1100 → 1000 → 0000 and never finds a solution; tenure 2 breaks the loop and reaches 0111 in 5 flips. With tenure 4 and aspiration off every flip becomes tabu at 1111 and the search stops; with aspiration on, the tabu flip of a is allowed because 0111 (h 8) beats the best h seen (7).
+
+Complete: no. Optimal: no. Time: iterations × n × m. Space: O(n).
+
+- Trap: The tabu element is the variable (the move), not the whole string.
+- Trap: Tabu takes the best allowed move even when h decreases; only bestSeen is monotone.
+- Trap: Apply aspiration before rejecting a tabu flip.
+- Trap: With tenure 2 a variable flipped at iteration 1 is still tabu at iterations 2 and 3 and free again at 4.
+- Trap: Too short a tenure cycles (tenure 1 on sat-local-trap), too long a tenure freezes the search (tenure 4 with aspiration off stops when every flip is tabu). Aspiration is what rescues a record-breaking move from a long tenure.
 
 ## 3-edge exchange (week 3, TSP · perturbation)
 
@@ -396,13 +761,14 @@ loop
     node ← best
 ```
 
-- |N₃e| = O(n³): choose three edges, then a reconnection. Denser than 2-edge exchange: fewer local optima, more work per step.
+- |N₃e| = O(n³): choose three edges, then a reconnection. Many more neighbours than 2-edge exchange, so more work per step; the extra moves reach tours that a 2-edge descent cannot.
 
-Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A denser neighbourhood has fewer such traps but costs more per step.
+Hill climbing is fast and always improves until it stops, but it stops at the first tour with no better neighbour. A 3-edge move changes all three edges it touches (the studio lists only these pure moves, not the 2-opt ones), so its local optima differ from 2-opt's: it is most useful after a 2-edge descent, which is what variable neighbourhood descent does.
 
 Complete: no. Optimal: no (local optimum). Time: O(n³) evaluations per step. Space: O(n).
 
 - Trap: Hill climbing stops when no neighbour is strictly better, even if equal-cost neighbours exist (a plateau).
+- Trap: Do not assume a 3-edge local optimum is also a 2-edge local optimum: on Six cities from the Nearest-neighbour tour pure 3-edge exchange stops at 229 while 2-edge exchange from the same tour reaches 224. From the 2-opt optimum 229 (Greedy start) a 3-edge move does reach 224: see variable neighbourhood descent.
 - Trap: Count neighbours with the right formula for the operator.
 - Trap: In an asymmetric TSP a 2-edge move reverses a block, so many edge costs change.
 
@@ -424,7 +790,7 @@ for i ← 1 to n
 return node
 ```
 
-- LocalOpt(N₁) ⊉ LocalOpt(N₂): being stuck in one neighbourhood does not mean being stuck in another. Different moves reach different tours; a denser neighbourhood contains moves the sparse one lacks.
+- local optimum of N₁  ⇏  local optimum of N₂: being stuck in one neighbourhood does not mean being stuck in another. Different moves reach different tours; a denser neighbourhood contains moves the sparse one lacks.
 
 Sparse neighbourhoods are cheap and do most of the work; dense ones are used only near the end, where they escape the sparse operator's traps.
 
@@ -432,6 +798,36 @@ Complete: no. Optimal: no. Time: sum of the phases' hill climbs. Space: O(n).
 
 - Trap: The course version runs each MoveGen once, in order; some variants restart from MoveGen(1) after any improvement.
 - Trap: A phase can make no progress at all: that is fine.
+- Trap: Six cities from the Greedy tour (default order): 2-edge 238→229, 2-city 229→229 (no progress), 3-edge 229→224, the optimum. 2-opt alone is stuck at 229.
+
+## Random walk (week 3, SAT · stochastic)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-random-walk.html
+
+Hill climbing is trapped by local maxima; the opposite extreme is a walk that ignores h entirely. A random walk picks a neighbour uniformly at random and always moves there. It explores everything eventually, but only by luck does it hit a solution.
+
+Definition: From the current string choose one of the n one-flip neighbours uniformly at random (using the seeded generator) and move to it. Keep a record of the best string met on the way.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N
+repeat k times
+    i ← random bit index
+    N ← N with bit i flipped            # always accepted
+    if h(N) > h(bestSeen): bestSeen ← N
+return bestSeen
+```
+
+- P(pick bit i) = 1/n: every neighbour equally likely. That is what 'uniformly at random' means; h plays no part in the choice.
+
+It is the baseline against which the other stochastic methods are judged: stochastic hill climbing and simulated annealing keep the randomness but let h bias the acceptance. On the ten-variable example sat-ten-var, 30 steps from 0000000000 find a solution for only 7 of 100 seeds, against 51 of 100 for simulated annealing (seed 2: the walk ends at h 46 of 48, annealing solves it).
+
+Complete: no. Optimal: no. Time: k steps. Space: O(n).
+
+- Trap: Different seeds give different walks; compare methods over several seeds.
+- Trap: It may step straight off a solution; return bestSeen, not the last string.
+- Trap: It can revisit the same strings: the walk has no memory (tabu search adds one).
 
 ## Beam search (week 3, TSP · local search)
 
@@ -463,6 +859,7 @@ Complete: no. Optimal: no. Time: w · |N| per level. Space: O(w).
 - Trap: w = 1 behaves exactly like hill climbing.
 - Trap: Merge duplicate tours when generating neighbours of several beam members.
 - Trap: Stopping is on the level's best, not on any member improving.
+- Trap: The width matters: Six cities from the Greedy tour with 2-city exchange gives 229 for w = 1 (plain hill climbing) and w = 2, but 224 (the optimum) for w = 3.
 
 ## Tabu search (week 3, TSP · local search)
 
@@ -470,7 +867,7 @@ URL: https://1mystic.github.io/SearchStudio/learn/tsp-tabu.html
 
 Tabu search always moves, even downhill, to escape local optima. To avoid simply stepping back to where it came from, it keeps a short-term memory of recent moves that are forbidden (tabu) for a few iterations.
 
-Definition: At each iteration, move to the best neighbour whose move is not tabu. Mark that move tabu for tt iterations (the tenure). A tabu move is allowed anyway if it gives a tour better than any seen (aspiration). Return the best tour seen.
+Definition: At each iteration, move to the best neighbour whose move is not tabu. Mark that move tabu for tt iterations (the tenure). A tabu move is allowed anyway if it gives a tour better than any seen (aspiration; the studio can switch it off to show the difference). Return the best tour seen.
 
 Pseudocode:
 
@@ -485,7 +882,7 @@ repeat for k iterations
 return bestSeen
 ```
 
-- tabu(m) ⇔ t < expiry(m),  expiry(m) = t(used) + tt: a move stays forbidden for tt iterations. Short tenure risks cycling; long tenure can block good moves.
+- tabu(m) ⇔ t_used < t ≤ t_used + tt: a move stays forbidden for tt iterations. Short tenure risks cycling; long tenure can block good moves.
 - aspiration: allow m if cost(m(N)) < cost(bestSeen): a forbidden move is fine if it finds a new best. Tabu exists to stop cycling, not to block real improvements.
 
 Memory turns a greedy walk into a systematic one. On small instances a short tenure leads to cycles; a frequency memory (prefer rarely-used moves) further diversifies the search.
@@ -493,8 +890,9 @@ Memory turns a greedy walk into a systematic one. On small instances a short ten
 Complete: no. Optimal: no. Time: iterations × |N|. Space: O(tt).
 
 - Trap: Tabu takes the best non-tabu move even if it is worse than the current tour.
-- Trap: Apply aspiration before rejecting a tabu move.
+- Trap: Apply aspiration before rejecting a tabu move. Seven cities (tabu aspiration) in the examples: in iteration 4 swap D↔F is still tabu from iteration 1, but it gives 241 < bestSeen 249, so it is taken and reaches the optimum; with aspiration off the best found is only 249.
 - Trap: Return bestSeen, not the final current tour.
+- Trap: The tenure matters: on Six cities in 8 iterations, tenure 2 lands on an already visited tour 5 times (short memory, cycling), tenure 3 only 3 times and it explores tours costing 237 and 233 on the way.
 
 ## Iterated hill climbing (week 3, TSP · local search)
 
@@ -523,6 +921,35 @@ Complete: no. Optimal: no. Time: r × hill climb. Space: O(n).
 
 - Trap: Each restart is independent: nothing is learned between restarts.
 - Trap: Random starts are usually much worse than constructive tours.
+- Trap: Different starts end in different local optima: on Six cities with 5 restarts the optima are 229, 224, 224, 229, 224, so one climb can be stuck at 229 while another finds 224.
+
+## Best neighbour, k moves (week 3, TSP · local search)
+
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-best-neighbour-moves.html
+
+Hill climbing stops when no neighbour is better. A tempting fix is to keep going: always move to the best neighbour, even if it is worse. With no memory, this does not escape for long. From a local optimum the best neighbour is worse, but from there the best neighbour is usually the local optimum again, so the search bounces back and forth.
+
+Definition: Repeat a fixed number k of times: generate all neighbours of the current tour with the chosen MoveGen and move to the cheapest one (ties alphabetically by tour). There is no test for improvement and no memory of visited tours.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N
+repeat k moves
+    N ← the best neighbour of N          # lowest cost, even if worse than N
+    if N better than bestSeen: bestSeen ← N
+    if N was visited before: report the cycle
+return bestSeen
+```
+
+- cycle length = move now − move when this tour was first visited: how many moves until the tour returns. A deterministic rule applied to a state we already visited must reproduce the same path again.
+
+It shows why local search needs more than a greedy best-neighbour rule: tabu search adds a memory (forbidden moves) and simulated annealing adds randomness precisely to break this cycle.
+
+Complete: no. Optimal: no. Time: k scans of the neighbourhood. Space: O(n).
+
+- Trap: Reporting the final tour instead of the best tour seen.
+- Trap: Thinking that moving uphill alone is enough to escape a local optimum: without memory or randomness it goes straight back. On Six cities the walk bounces between 224 and 229 for ever (a cycle of length 2 from move 1), exactly the repetition that tabu search's memory forbids.
 
 ## Random walk (week 3, TSP · local search)
 
@@ -549,6 +976,7 @@ Pure exploration can in principle reach anything, but without guidance it rarely
 Complete: no. Optimal: no. Time: k samples. Space: O(n).
 
 - Trap: Simulated annealing at very high temperature behaves almost like this (a coin flip per move).
+- Trap: Do not expect it to settle: on Six cities started from the Greedy tour (238) the cost jumps up and down by tens of units from step to step with no downward trend (more steps give a range of roughly 220 to 380), and the last step reports that range. Only the remembered bestSeen is useful.
 
 ## Simulated annealing (week 3, TSP · local search)
 
@@ -578,11 +1006,207 @@ return bestSeen
 
 Accepting some worse moves lets SA leave local optima; cooling makes it settle. With this sigmoid rule even a better move can be rejected (P < 1), so always keep the best tour seen.
 
-Complete: no. Optimal: only with impractically slow cooling. Time: k samples. Space: O(n).
+Complete: no. Optimal: no guarantee in practice (only in the limit of extremely slow cooling). Time: k samples. Space: O(n).
 
 - Trap: ΔE sign: define it so that positive means better for the problem at hand.
 - Trap: With the sigmoid rule, P(better move) < 1 at finite T.
 - Trap: Return bestSeen: the current tour can wander off the best one.
+- Trap: Temperature is the whole story: on Six cities with the default settings worse moves are accepted at k = 1 (T = 30) and k = 7 (T = 11); at k = 12 (T = 5) only an improving move is taken, and the run escapes the 229 trap to reach 224. Try T0 = 1: the sigmoid is so steep that it behaves like hill climbing and stays at 229.
+
+## Best First on a state space (week 3, Graph search · informed)
+
+URL: https://1mystic.github.io/SearchStudio/learn/statespace-best-first.html
+
+Best First Search trusts the heuristic completely. In the 8-puzzle, h counts tiles out of place or their Manhattan distance to the goal squares; the board that looks nearest to the goal is expanded first.
+
+Definition: OPEN holds node pairs (state, parent, h) ordered by h. The goal test is on picking from OPEN, ties break alphabetically (by state), and a state already on OPEN or CLOSED is not added again. Unlike A*, the cost already paid is ignored.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, h(S))];  CLOSED ← [ ]
+while OPEN not empty
+    N ← the pair with the least h;  remove it      # ties: alphabetical
+    if GoalTest(N): return the path
+    CLOSED ← N : CLOSED
+    children ← MoveGen(N) minus states on OPEN or CLOSED
+    OPEN ← OPEN ++ children, sorted by h
+```
+
+- tiles out of place: h₁ = number of tiles not on their goal square: blank not counted. Each such tile needs at least one move.
+- Manhattan: h₂ = Σ |row − goal row| + |col − goal col|: sum of tile distances. A tile moves one square per move, so it needs at least its Manhattan distance; h₂ ≥ h₁.
+
+Both heuristics are admissible for the 8-puzzle, but Best First ignores g, so it may take a long way round. Compare the length of its solution with A*'s on the same board.
+
+Complete: yes on a finite space with CLOSED. Optimal: no. Time: exponential worst case. Space: exponential worst case.
+
+- Trap: Best First is not optimal even with an admissible h: on example space-8-puzzle-12 it returns a 44-move solution with tiles out of place (the shortest has 12). With Manhattan distance it happens to find 12 moves there, which is luck, not a guarantee.
+- Trap: A heuristic that is 0 everywhere turns the order into ties, i.e. alphabetical order of states.
+- Trap: For water jugs there is no useful h (it is 0); for missionaries and cannibals the studio uses the full-boat crossing bound.
+
+## Iterated hill climbing (week 4, SAT · stochastic)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-ihc.html
+
+One hill climb ends at the first local maximum it meets, and which one it meets depends on where it started. Iterated hill climbing runs the same N1 hill climb from several starting assignments and keeps the best. It is the simplest way of adding randomness to local search.
+
+Definition: Choose r starting bit strings (random, or listed explicitly). From each run strict N1 hill climbing (best one-flip neighbour, ties to the lowest bit, move only if h strictly increases). Remember the string with the largest h. Stop early if some run reaches h = m.
+
+Pseudocode:
+
+```
+best ← none
+for each start S (given, or r random bit strings)
+    N ← HillClimbing_N1(S)
+    if h(N) > h(best): best ← N
+    if h(best) = m: stop (solved)
+return best
+```
+
+- P(at least one start reaches the solution) = 1 − (1 − q)^r: q = fraction of starts whose hill climb ends at the solution. Starts are independent, so all r fail with probability (1 − q)^r. **Supplementary** (not in the course notes).
+
+On the four-variable course example hill climbing from 0000 stops at 1000 (h 5). Among five starts only 0101 climbs on to 1101 (h 6). More starts means more chances, but each start is a fresh gamble: nothing learned in one run is used in the next.
+
+Complete: no. Optimal: no. Time: r hill climbs. Space: O(n).
+
+- Trap: Restarts are independent: iterated hill climbing does not remember where earlier runs failed.
+- Trap: Two different starts can end in the same local maximum, so r starts do not give r different answers (on sat-four-var the starts 1110 and 0010 both climb to 1010).
+- Trap: Failing on all r starts does not prove the formula unsatisfiable.
+
+## Stochastic hill climbing (fixed T) (week 4, SAT · stochastic)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-stochastic-hc.html
+
+Stochastic hill climbing keeps the idea of preferring uphill moves but replaces the hard rule 'only if better' by a probability. A better neighbour is accepted with probability above one half, a worse one with probability below one half, and the temperature T decides how sharp that preference is. T stays fixed; simulated annealing is the version that lowers it.
+
+Definition: Choose a random neighbour X of N. Let ΔE = h(X) − h(N); for SAT we maximise h, so ΔE > 0 is an improvement. Accept X with probability P = 1/(1 + e^(−ΔE/T)); draw u uniformly in [0, 1) and move if u < P.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N
+repeat k times
+    X ← random neighbour of N (flip a random bit)
+    ΔE ← h(X) − h(N)                  # positive = improvement (we maximise h)
+    P ← 1 / (1 + e^(−ΔE / T))
+    if random u < P: N ← X
+    if h(N) > h(bestSeen): bestSeen ← N
+return bestSeen
+```
+
+- P = 1 / (1 + e^(−ΔE/T)): a sigmoid in ΔE/T. ΔE = 0 gives exactly ½; ΔE > 0 gives more than ½ and ΔE < 0 less than ½, approaching 1 and 0 as |ΔE|/T grows.
+- T → 0: hill climbing;   T → ∞: random walk: the two extremes. Small T makes the sigmoid a step at ΔE = 0 (only improving moves); large T flattens it to ½ (a coin flip, i.e. random walk).
+
+A worse neighbour can still be accepted, so the search can walk down off a local maximum such as 1000 (h 5) towards 1101 (h 6). Because T never falls, it keeps wandering even after it has found a good string, which is why we report bestSeen.
+
+Complete: no. Optimal: no. Time: k samples. Space: O(n).
+
+- Trap: With the sigmoid rule even an improving move can be rejected (P < 1 at finite T).
+- Trap: ΔE is h(new) − h(current) here: do not copy the TSP sign.
+- Trap: Fixed T is a compromise: too hot is a random walk (try T = 100), too cold is hill climbing (try T = 0.05). Annealing varies it.
+
+## Simulated annealing (week 4, SAT · stochastic)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-sa.html
+
+Simulated annealing borrows from metalworking: hot metal moves freely, then settles as it cools. The search accepts worse moves often while the temperature is high and becomes stricter as it cools, so it explores first and exploits later.
+
+Definition: Pick a random one-flip neighbour X of N. Compute ΔE = h(X) − h(N) (positive means X satisfies more clauses) and move with probability P = 1/(1 + e^(−ΔE/T)). After every step lower T according to the cooling schedule. Return the best string seen.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N;  T ← T0
+repeat k times
+    X ← N with a random bit flipped
+    ΔE ← h(X) − h(N)                  # positive = improvement (we maximise h)
+    P ← 1 / (1 + e^(−ΔE / T))
+    if random u < P: N ← X
+    if h(N) > h(bestSeen): bestSeen ← N
+    T ← next temperature (geometric: α·T, or linear down to Tend)
+return bestSeen
+```
+
+- P = 1 / (1 + e^(−ΔE/T)): a sigmoid of ΔE scaled by temperature. ΔE > 0 gives P > ½, ΔE < 0 gives P < ½; larger |ΔE|/T pushes P toward 1 or 0.
+- T → ∞: P → ½;   T → 0: P → 1 if ΔE > 0, 0 if ΔE < 0: hot = coin flip, cold = hill climbing. Temperature sets the balance between exploration and exploitation.
+- Tₖ = T₀ · αᵏ: geometric cooling after k steps. Slow cooling (α close to 1) leaves more time to escape local maxima.
+- Tₖ = T₀ − k · (T₀ − Tend)/steps: linear cooling. **Supplementary**: an alternative schedule, not in the course notes; it reaches Tend exactly at the last step.
+
+Accepting some worse moves lets the search leave a local maximum such as 1000 (h 5) and cooling makes it settle near a good string. With the sigmoid rule even an improving move can be rejected, so always keep bestSeen. Compare with the random walk, which ignores h: on sat-ten-var (10 variables, 3 solutions among 1024) 30 steps solve it for 51 of 100 seeds with annealing and 7 of 100 with the random walk; seed 2 shows it (annealing solves it, the walk reaches only h 46 of 48). Raise T0 a lot and annealing degrades towards the random walk, lower it and it behaves like hill climbing.
+
+Complete: no. Optimal: only with impractically slow cooling. Time: k samples. Space: O(n).
+
+- Trap: ΔE sign: for SAT it is h(new) − h(current), the reverse of the TSP cost version.
+- Trap: At finite T an improving move is still rejected with probability 1 − P.
+- Trap: Return bestSeen: the current string may wander off the best one.
+- Trap: Results depend on the seed; the same seed repeats the run exactly.
+
+## Genetic algorithm (week 4, SAT · genetic)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-ga.html
+
+A genetic algorithm keeps a whole population of candidate assignments instead of a single one. Fitter strings (more clauses satisfied) are more likely to become parents; crossover mixes the bits of two parents and mutation occasionally flips a bit, which can create strings that neither parent could.
+
+Definition: Fitness of a string is h, the number of satisfied clauses. Selection probability is p = h / Σh (roulette wheel: the cumulative probabilities partition [0, 1) and a uniform u picks the interval it falls in). Pairs of selected parents are crossed at a random one-point cut, and each child is mutated with probability pm by flipping one random bit.
+
+Pseudocode:
+
+```
+Pop ← N bit strings (given, or random)
+repeat for g generations
+    fitness(x) ← h(x);   p(x) ← h(x) / Σ h
+    pool ← N strings drawn by roulette-wheel (spin u, take the first x with cumulative p ≥ u)
+    for each consecutive pair (a, b) of the pool
+        cut ← random point in 1..n−1;   children ← a[0..cut)+b[cut..), b[0..cut)+a[cut..)
+        with probability pm flip one random bit of each child
+    Pop ← the children
+return the best string ever seen
+```
+
+- p(xᵢ) = h(xᵢ) / Σⱼ h(xⱼ): selection probability proportional to fitness. The probabilities sum to 1, and a string with twice the fitness gets twice the share of the wheel.
+- cumulative cᵢ = p(x₁) + … + p(xᵢ): the wheel's boundaries. u falls in the interval (cᵢ₋₁, cᵢ] of exactly one member, so the draw has the right probabilities.
+
+Crossover recombines good partial assignments, mutation keeps diversity. On the course example a single generation can produce the solution 1101 when mutation flips the right bit of a child that is one flip away from it. The method is incomplete: with few generations or a tiny population it may never find a solution.
+
+Complete: no. Optimal: no. Time: N·g evaluations. Space: O(N·n).
+
+- Trap: Crossover only recombines bit values already present in the population; only mutation creates new ones. Default population 1000,0110,0011,1100, 1 generation: with pm = 0.5 and seed 9 the solution 1101 is made by mutation (child 1100 mutated at d); with pm = 0 and seed 1 it is made by crossover alone (1100 × 0011 cut after c gives 1101). With the population 1000,0110,1100,0100, where every string has d = 0, pm = 0 can never produce 1101 however many generations you run, while pm = 0.5 usually finds it.
+- Trap: Fitness-proportional selection is weak when all h values are close: the probabilities are then almost equal.
+- Trap: If every h is 0 the wheel would divide by zero; the trace falls back to uniform probabilities.
+- Trap: A solution found in a child must be recorded when it appears: the next generation may lose it.
+- Trap: Results depend on the seed and on the initial population; the same inputs repeat the run exactly.
+
+## Stochastic hill climbing (week 4, TSP · local search)
+
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-stochastic-hc.html
+
+Ordinary hill climbing only ever accepts improvements and so gets stuck at the first local optimum. Stochastic hill climbing keeps the 'look at one random neighbour' step but accepts it with a probability that depends on how much better or worse it is, so it can sometimes walk downhill and escape.
+
+Definition: At a fixed temperature T, move from N to a random neighbour X with probability P = 1/(1 + e^(−ΔE/T)), where ΔE = cost(N) − cost(X) (positive means X is shorter). Unlike simulated annealing, T never changes.
+
+Pseudocode:
+
+```
+N ← start;  bestSeen ← N
+repeat k times
+    X ← random neighbour of N
+    ΔE ← cost(N) − cost(X)            # positive = improvement
+    P ← 1 / (1 + e^(−ΔE / T))         # T is fixed
+    if random u < P: N ← X
+    if N better than bestSeen: bestSeen ← N
+return bestSeen
+```
+
+- P = 1 / (1 + e^(−ΔE/T)): sigmoid of ΔE/T. ΔE > 0 gives P > ½, ΔE < 0 gives P < ½, ΔE = 0 gives P = ½ whatever T is.
+- T large: P → ½;   T small: P → 1 (ΔE>0) or 0 (ΔE<0): hot is a coin flip, cold is hill climbing. T scales ΔE: dividing by a big T squashes all differences; a small T amplifies them.
+
+A fixed T is a fixed compromise: too hot and the search wanders at random, too cold and it behaves like plain hill climbing and stalls in a local optimum. Annealing resolves this by lowering T over time.
+
+Complete: no. Optimal: no. Time: k samples. Space: O(n).
+
+- Trap: ΔE is cost(current) − cost(next): improvement positive, the opposite of some textbooks.
+- Trap: Even an improving move is only accepted with probability P < 1 at finite T, so keep the best tour seen.
+- Trap: The same seed gives the same run; change the seed, not the code, to see a different one.
 
 ## Genetic algorithm (week 4, TSP · genetic)
 
@@ -613,7 +1237,7 @@ Selection pushes toward good tours, crossover mixes their good parts, and mutati
 Complete: no. Optimal: no. Time: O(g · N · n). Space: O(N · n).
 
 - Trap: Fitness must be inverted for a minimisation problem.
-- Trap: If the population converges early: raise mutation, lower selection pressure, enlarge the population.
+- Trap: If the population converges early: raise mutation, lower selection pressure, enlarge the population. Nine cities (GA premature convergence) in the examples: with Generations 30, Replace k 3 and mutation 0 the whole population becomes one tour costing 329 (optimum 255); with mutation 0.9 the same run reaches 255. Watch the distinct tours counter.
 - Trap: Cumulative probabilities decide roulette picks; recompute them carefully.
 
 ## Crossover lab (week 4, TSP · genetic)
@@ -645,6 +1269,38 @@ Complete: n/a. Optimal: n/a. Time: O(n) to O(n²) per child. Space: O(n).
 - Trap: Know the exact fill convention for OX in your course (left to right here).
 - Trap: PMX: keep following the mapping chain until the city is not already placed.
 - Trap: Naive single-point crossover on paths is invalid in general.
+
+## Representation lab (week 4, TSP · genetic)
+
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-representation-lab.html
+
+A genetic algorithm needs a way to write a tour as a string it can cut and recombine. The same tour can be written as the path (visit order), as an adjacency list (who follows whom) or as an ordinal string (index into a shrinking list). Each representation allows different crossover operators and has different pitfalls.
+
+Definition: Path: the cities in visiting order. Adjacency: entry i is the city that follows the i-th city (alphabetical order) in the tour. Ordinal: with a reference list of the tour's cities in alphabetical order, gene 1 is the position of the first tour city in that list; delete it; gene 2 is the position of the second tour city in the remaining list; and so on.
+
+Pseudocode:
+
+```
+Ordinal encode:  ref ← the cities of the tour in alphabetical order
+    for each city c of the tour, in order:  gene ← position of c in ref (1-based);  delete c from ref
+Ordinal decode:  ref ← same list;  for each gene g: city ← g-th city of ref;  delete it from ref
+Adjacency encode: a[c] ← the city after c in the tour (cyclic), listed in alphabetical order of c
+Adjacency decode: start at the first city, repeatedly go to a[current]; valid iff all n cities are visited before returning
+Crossover: cut two ordinal strings after k genes and swap the tails; decode both children
+```
+
+- gene i ∈ {1, …, n−i+1}: the i-th gene indexes a list that already lost i−1 cities. Mixing the first genes of one string with the later genes of another never leaves this range, so decoding cannot fail.
+- a[c] = successor of c: adjacency stores edges, directed along the tour. A list is a tour only if following a[ ] from any city visits all n cities before returning; two or more separate cycles are legal lists but not tours.
+- a_reverse = a⁻¹: the reversed tour's adjacency is the inverse permutation. A tour and its reverse are the same cycle with the same cost, so both lists are valid representations.
+
+Ordinal representation is the course's example of a representation chosen so that a plain one-point crossover is legal. The price is that gene positions mean different things depending on earlier genes, so a child can look unlike either parent.
+
+Complete: n/a. Optimal: n/a. Time: O(n²). Space: O(n).
+
+- Trap: The reference list is the tour's own cities in alphabetical order, not the order of the tour.
+- Trap: Genes count from 1, and the list shrinks after every deletion.
+- Trap: Adjacency is read in alphabetical order of the city, not along the tour.
+- Trap: A valid-looking adjacency list can break into sub-cycles; check that it is one cycle through every city.
 
 ## Ant colony optimisation (week 4, TSP · swarm)
 
@@ -678,6 +1334,44 @@ Complete: no. Optimal: no. Time: O(m · n²) per iteration. Space: O(n²).
 - Trap: Normalise only over unvisited cities.
 - Trap: Evaporate before depositing (course order).
 - Trap: β = 0 ignores distance; α = 0 ignores pheromone and gives a randomised nearest neighbour.
+- Trap: Reinforcement is visible in the update steps: on Six cities the pheromone on the six strongest edges rises from about 60% to about 70% of the total within a few iterations (40% if spread evenly), while unused edges evaporate. A larger ρ forgets faster.
+
+## Branch & bound (exact) (week 5, TSP · exact)
+
+URL: https://1mystic.github.io/SearchStudio/learn/tsp-branch-and-bound.html
+
+Brute force looks at every tour. Branch and bound looks at families of tours: a node stands for 'every tour that contains these edges and avoids those edges', and a cheap lower bound says how good any tour in the family could possibly be. If even the optimistic bound cannot beat the best tour already found, the whole family is discarded unseen.
+
+Definition: A node is a pair (included edges, excluded edges). Its lower bound is ½ Σ over cities of the cost of the two cheapest admissible edges at that city: every tour uses exactly two edges at each city, and each edge is counted from both ends, hence the half. Branching picks an undecided edge e and creates two children: include e and exclude e. A node is a complete tour when every city has two included edges.
+
+Pseudocode:
+
+```
+best ← ∞ (or the cost of a known tour);  OPEN ← [root: no edge decided]
+while OPEN is not empty
+    N ← pick a node from OPEN                       # DFS: newest;  best-first: lowest bound
+    LB(N) ← ½ · Σ over cities of the two cheapest admissible edges
+             (included edges first; excluded edges, edges at a city that already has 2 included
+              edges, and edges closing a short cycle are not admissible)
+    if LB(N) ≥ best: prune N
+    else if every city has 2 included edges: best ← cost (a complete tour)
+    else  e ← cheapest undecided edge in the bound
+          children: N + include e,  N + exclude e   (drop infeasible ones)
+return best
+```
+
+- LB = ½ Σ_c (e₁(c) + e₂(c)): half the sum over cities of the two cheapest admissible edges at c. Any tour has two edges at each city and each edge touches two cities, so its cost is half the sum of those per-city costs; choosing the cheapest two at every city can only lower that sum.
+- prune if LB ≥ best: the optimistic cost is not below the incumbent. No tour in this family can be strictly better than the best tour already found.
+
+The bound costs O(n²) per node but can remove huge subtrees. It is tight when the cheap edges at each city fit together into one tour, and weak when they do not, which is why the order in which edges are decided and a good first tour matter.
+
+Complete: yes. Optimal: yes. Time: O(n!) worst case. Space: O(n) per node, DFS.
+
+- Trap: The bound is half the sum, not the sum.
+- Trap: An included edge counts for both of its cities; a city with two included edges contributes exactly those two.
+- Trap: An edge at a city that already has two included edges is not admissible for its other end either.
+- Trap: A bound can be a fraction (x.5); compare it with integer tour costs without rounding.
+- Trap: Pruning depends on the best tour found so far. On Six cities depth-first picks 68 nodes, finds five successively better tours (238, 237, 233, 229, 224) and prunes 24 subtrees; best-first picks 49 nodes and finds only the optimum; depth-first with Initial best 229 picks 55. The Initial best must be above the optimum: below it no tour is found.
 
 ## Uniform Cost Search (week 5, Graph search · optimal)
 
@@ -708,7 +1402,104 @@ Optimal for non-negative edge costs; it is Dijkstra's algorithm stopped at the g
 Complete: yes. Optimal: yes. Time: O(b^(1+C*/ε)). Space: same.
 
 - Trap: Apply the goal test when the goal is removed from OPEN, not when it is generated.
-- Trap: Remember to update g and the parent on cheaper paths.
+- Trap: Remember to update g and the parent on cheaper paths: in 'Dijkstra demo' G is first reached at 9 (via C) and then improved to 8 (via D); keeping the first path would give a wrong answer.
+- Trap: UCS ignores the goal's direction: it expands every node cheaper than the optimum (compare the expansions of A* on the 'Weighted graph' example: 8 for UCS, 5 for A*).
+
+## Dijkstra's Algorithm (week 5, Graph search · optimal)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-dijkstra.html
+
+Dijkstra's algorithm is Uniform Cost Search written as a table. Each node carries a best-known distance d. The WHITE node with the smallest d is made BLACK, and then its neighbours are checked to see whether going through it gives them a shorter distance.
+
+Definition: Colour every node WHITE and give it d = ∞, except the start with d = 0. Pick the WHITE node N with least d and colour it BLACK: its d is now the true shortest distance from the start. For each WHITE neighbour C of N with edge cost k, if d(N)+k < d(C) then set d(C) = d(N)+k and parent(C) = N (a relaxation). Stop when the goal is coloured BLACK, then follow the parents back to the start.
+
+Pseudocode:
+
+```
+d(S) ← 0;  d(v) ← ∞ for the rest;  all nodes WHITE
+repeat
+    N ← WHITE node with least d(N)           # ties: alphabetical
+    colour N BLACK
+    if N = goal: return the path (follow parents)
+    for each WHITE neighbour C of N with edge cost k:
+        if d(N) + k < d(C):                  # relaxation
+            d(C) ← d(N) + k;  parent(C) ← N
+until no WHITE node has d < ∞              # goal unreachable
+```
+
+- d(N) + k(N,C) < d(C)  ⇒  d(C) ← d(N) + k(N,C): relaxation. A shorter way to C through the newly final node N has been found, so C's estimate improves.
+- pick argmin d over WHITE nodes: closest unfinished node. With non-negative costs no later path can reach it more cheaply, so it can be made BLACK.
+
+It gives the shortest path to every node it blackens, and to the goal once the goal is picked. It is the same search as UCS: OPEN is the set of WHITE nodes with finite d, CLOSED is the BLACK set. It has no sense of direction, so it spreads in all directions.
+
+Complete: yes (finite graph). Optimal: yes (non-negative costs). Time: O(V²) or O(E log V). Space: O(V).
+
+- Trap: Only WHITE neighbours are relaxed: a BLACK node is already final.
+- Trap: Edge costs must not be negative; with negative edges a BLACK node could still improve.
+- Trap: d of a node can change several times before it turns BLACK (for example G falling from 9 to 8): only the BLACK value is final.
+- Trap: Count picks, not relaxations.
+
+## Branch & Bound (state space) (week 5, Graph search · optimal)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-branch-and-bound.html
+
+Branch & Bound explores a tree of paths, always refining the cheapest partial path. Nothing records which states have already been reached, so the same state can be generated again by a different path. This tracer shows how often each state occurs in the search tree.
+
+Definition: Each OPEN entry is one partial path from S, stored as a node pair (node, parent, g). A refinement takes the cheapest entry and replaces it by its children, one per neighbour that is not already on that path (so a path never loops). There is no CLOSED list, so two different paths to the same state are both kept as separate tree nodes. The goal test is applied when the goal is picked from OPEN; its g is then the cost of the cheapest path, because every other entry on OPEN costs at least as much.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, g=0)]                      # a search TREE: no CLOSED list
+repeat
+    N ← node on OPEN with least g                # ties: alphabetical, then oldest
+    remove N from OPEN;  count one refinement
+    if GoalTest(N): return the path of N         # g(N) is the bound: nothing on OPEN is cheaper
+    for each child C of N not already on N's own path
+        add (C, N, g(N)+k(N,C)) to OPEN          # even if C already occurs elsewhere in the tree
+```
+
+- g(C) = g(N) + k(N, C): cost of the extended path. Each tree node carries the cost of its own path.
+- tree size = Σ occurrences(state): every path prefix is a node. Without CLOSED, merging never happens, so the tree can be much larger than the graph.
+
+It finds the optimal path like UCS, but because it does not merge duplicates it does more work. Adding a CLOSED list (and updating g on cheaper paths) turns it into Dijkstra's algorithm. The occurrence counts show exactly what a CLOSED list saves.
+
+Complete: yes (finite graph, no loops on a path). Optimal: yes (non-negative costs). Time: exponential in the worst case. Space: all tree nodes.
+
+- Trap: Duplicates: on 'Graph T' A appears twice, B twice and G three times, while Dijkstra on the same graph closes each node once; on the 4×5 grid the tree has hundreds of nodes for 20 states.
+- Trap: The goal state may itself appear several times in the tree; only the first one picked ends the search.
+- Trap: Do not stop when the goal is generated: stop when it is picked.
+- Trap: A pick of a node is counted as a refinement even when it is the goal.
+
+## British Museum (brute force on paths) (week 5, Graph search · optimal)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-british-museum.html
+
+The British Museum method looks at every possible path, one by one, and keeps the cheapest. It needs no cleverness and no heuristic, and its answer is the optimum. Its cost is the number of paths, which explodes as the graph grows.
+
+Definition: Enumerate all simple paths (no repeated node) from S to the goal by depth-first exploration, in alphabetical order of neighbours. Each time a path reaches the goal, compare its cost with the best so far and keep the cheaper (the earlier one is kept on a tie). The answer has the same cost as Uniform Cost Search. The tracer shows each complete path found; after the first 40 it only reports improvements, and it counts everything.
+
+Pseudocode:
+
+```
+best ← none;  cost* ← ∞
+DFS over simple paths from S (a node may not repeat on the current path):
+    if the path ends at the goal:
+        if cost(path) < cost*: best ← path;  cost* ← cost(path)
+        (do not extend a path past the goal)
+return best
+```
+
+- cost(path) = Σ k(edge): sum of edge costs. Paths are compared by total cost.
+- answer = min over all simple S→goal paths: exhaustive minimum. Nothing is skipped, so the minimum is the true optimum.
+
+It shows how much work the intelligent methods avoid. Uniform Cost Search finds the same cost while looking at a tiny fraction of the paths.
+
+Complete: yes. Optimal: yes. Time: exponential (number of simple paths). Space: O(path length).
+
+- Trap: The number of simple paths can be exponential in the number of nodes.
+- Trap: It must not reuse a node on the same path, otherwise cycles give infinitely many paths.
+- Trap: Finding the first path is not enough: all paths must be tried.
 
 ## A* (week 5, Graph search · optimal)
 
@@ -736,13 +1527,111 @@ while OPEN not empty
 - consistent: h(N) ≤ k(N,M) + h(M): the triangle inequality for h. Then f never decreases along a path and closed nodes never need reopening.
 - weighted A*: f = g + w·h, w > 1: trust the heuristic more. Faster, but the path can be up to w times the optimum.
 
-A* is optimal with an admissible h and is as efficient as any algorithm using the same h. Overestimating h (inadmissible) can make it return a worse path: try the 'inadmissible' example.
+A* is optimal with an admissible h and is as efficient as any algorithm using the same h. Compare the two examples 'Weighted graph for UCS and A*' (admissible h: optimal cost 12, fewer expansions than UCS) and 'Same graph, inadmissible h(B) = 12' (h overestimates, A* returns cost 13 instead of 12). If h is admissible but not monotone, a node may be closed before its cheapest path is known; A* then reopens it when the cheaper path appears: try 'Admissible but not monotone h: A* reopens C'.
 
-Complete: yes. Optimal: yes with admissible h. Time: exponential in general. Space: same.
+Complete: yes. Optimal: yes with admissible h. Time: exponential in general. Space: exponential (OPEN and CLOSED).
 
-- Trap: Admissible ≠ consistent: consistency implies admissibility, not the reverse.
+- Trap: Admissible ≠ consistent: consistency implies admissibility, not the reverse. Example 'Admissible but not monotone h' has h ≤ h* everywhere yet A* must reopen C.
 - Trap: h = 0 makes A* behave like UCS.
-- Trap: With an inadmissible h the first goal found may not be optimal.
+- Trap: With an inadmissible h the first goal picked may not be optimal (example 'Same graph, inadmissible h(B) = 12').
+- Trap: The goal test is on picking from OPEN, not on generating: the goal can sit on OPEN with a worse g while a cheaper route is still being found.
+
+## Weighted A* (week 5, Graph search · optimal)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-weighted-astar.html
+
+Weighted A* multiplies the heuristic by a factor w ≥ 1. With w = 1 it is A*; with a large w it behaves like Best First Search. You trade optimality for speed, and the trade is controlled: the path is never worse than w times the best one.
+
+Definition: OPEN is ordered on f(N) = g(N) + w·h(N). Everything else is as in A*: a goal test when a node is picked, and cheaper paths update the pair (node, parent, g). If h is admissible (h ≤ h*), the cost of the path returned satisfies cost ≤ w · C*, where C* is the optimal cost. The tracer computes C* with a separate Uniform Cost Search and checks the bound at the end.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, g=0)] ordered by f = g + w·h
+while OPEN not empty
+    N ← node with least f;  remove it
+    if GoalTest(N): return the path               # cost ≤ w · C*  (admissible h)
+    move N to CLOSED
+    for each child C with g' = g(N) + k(N,C)
+        new: add to OPEN
+        cheaper than its pair on OPEN/CLOSED: update parent and g (reopen if CLOSED)
+```
+
+- f(N) = g(N) + w·h(N): cost so far plus w times the estimate. w > 1 inflates h, which pulls the search toward the goal.
+- cost(path) ≤ w · C*   (h admissible, w ≥ 1): at most w times the optimum. w·h(N) ≤ w·h*(N), so w·h is within a factor w of an admissible estimate, and the first goal picked can be only that much worse than the best.
+
+Fewer expansions than A* on many graphs, at the price of a controlled loss of optimality. It is a good compromise when A* is too slow. The bound is a guarantee, not a prediction: the actual path is often optimal.
+
+Complete: yes. Optimal: no: within w · C* with admissible h. Time: often much less than A*. Space: same as A*.
+
+- Trap: The bound needs an admissible h. With an inadmissible h there is no guarantee at all (try the inadmissible example).
+- Trap: w = 1 gives plain A*; w < 1 is not weighted A* (it drifts toward UCS and loses the bound meaning).
+- Trap: A larger w does not always expand fewer nodes on every graph; it usually does.
+- Trap: The trade in numbers: on the 'Dijkstra demo' graph w = 2 returns S–C–G at cost 9 (optimum 8, bound 2 × 8 = 16) after 3 expansions instead of A*'s 5; on the 4×5 grid w = 2 expands 8 nodes instead of 20 and still finds cost 7. Set w = 1 to get A* back.
+
+## Heuristic comparison (A* with h = 0, h, h*) (week 5, Graph search · optimal)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-heuristic-comparison.html
+
+The quality of a heuristic shows in how much search it saves. Here the same graph is searched by A* with three heuristics: no information (h = 0), the given h, and the perfect h = h*, the true remaining cost.
+
+Definition: A* orders OPEN on f = g + h. With h = 0 it expands nodes in order of g, which is Uniform Cost Search. With h = h* (the exact cost to the goal, computed by Dijkstra from the goal) f is constant along an optimal path, so only that path is expanded (up to ties). An admissible h lies between the two: h ≤ h*, and a larger h (closer to h*) never expands more nodes than a smaller admissible one, apart from ties. **Supplementary:** the effective branching factor b* is not part of the lecture notation; it is the b that makes a uniform tree of depth d (the solution length) hold exactly as many nodes as were generated, 1 + b* + … + b*^d = generated. A smaller b* (closer to 1) means a better heuristic.
+
+Pseudocode:
+
+```
+for each heuristic H in [ h = 0,  h (given),  h = h* ]:
+    run A* with f = g + H
+    record: nodes expanded, nodes generated, path cost
+    b* ← the branching factor of a uniform tree of depth d (solution length)
+         with the same number of nodes:   generated = 1 + b* + b*² + … + b*^d
+compare the three rows
+```
+
+- 0 ≤ h ≤ h*  ⇒  expansions(h*) ≤ expansions(h) ≤ expansions(0): a more informed admissible h expands no more nodes (up to ties). A* expands every node with f < C*; raising h raises f and removes nodes from that set.
+- generated = 1 + b* + b*² + … + b*^d: effective branching factor (supplementary). It turns a node count into a single branching number that can be compared across problems.
+
+It makes the value of heuristic information concrete. On an inadmissible h the middle row can be cheaper to run but return a worse path: the path cost column then differs from the other two.
+
+Complete: yes. Optimal: yes for h = 0 and h*; yes for h admissible. Time: 3 × A*. Space: 3 × A*.
+
+- Trap: Admissible does not mean good: h = 0 is admissible and almost useless.
+- Trap: With an inadmissible h the middle row may have a higher cost than the others (example 'Same graph, inadmissible h(B) = 12': 13 against 12).
+- Trap: Ties can make the counts differ by one or two; the ordering of the three rows is what matters.
+- Trap: h* needs the true remaining costs, which in practice means already having solved the problem.
+
+## A* on a state space (week 5, Graph search · informed)
+
+URL: https://1mystic.github.io/SearchStudio/learn/statespace-astar.html
+
+A* adds the cost paid so far to the heuristic estimate of what remains. On the 8-puzzle, with h = tiles out of place or Manhattan distance, it finds a shortest solution while expanding far fewer boards than breadth-first search.
+
+Definition: Node pairs are (state, parent, g) with f = g + h. Every move costs 1, so g is the depth along the current best path. OPEN is ordered by f with alphabetical ties, the goal test is on picking, and a cheaper path to a known state updates its parent. If h never overestimates the true remaining moves (admissible) the first goal picked is optimal.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, g=0)] ordered by f = g + h
+while OPEN not empty
+    N ← the pair with the least f;  remove it       # ties: alphabetical
+    if GoalTest(N): return the path
+    CLOSED ← N : CLOSED
+    for each child C of MoveGen(N) with g' = g(N) + 1
+        new: add (C, N, g') to OPEN
+        cheaper than its pair on OPEN or CLOSED: update parent and g (reopen if CLOSED)
+```
+
+- f(N) = g(N) + h(N): paid plus estimated remainder. An estimate of the cheapest solution through N.
+- h₁ ≤ h₂ ≤ h*: tiles out of place ≤ Manhattan ≤ true moves left. Each misplaced tile needs ≥ 1 move and each needs ≥ its Manhattan distance, so both are admissible and h₂ dominates h₁: A* with h₂ expands no more states than with h₁.
+- missionaries: h = 2·⌈(n − k)/(k − 1)⌉ + 1: n people on the left bank, boat holds k (**supplementary**). Each round trip moves at most k − 1 people across net, and the last trip moves k; ignoring the safety rule only lowers the bound, so it is admissible.
+
+A better (larger, still admissible) h prunes more of the search. Run example space-8-puzzle-12 with each heuristic and compare the 'expanded' count: both return the same 12-move solution, Manhattan after 16 expansions, tiles out of place after 79, and h = 0 does not finish within the 400-expansion cap. (On the easy five-move board space-8-puzzle the two tie at 6.)
+
+Complete: yes. Optimal: yes with admissible h. Time: exponential in general. Space: exponential in general.
+
+- Trap: Admissible is not enough to compare: the larger of two admissible heuristics is better informed.
+- Trap: The blank is never counted in either heuristic; counting it can overestimate.
+- Trap: With h = 0 (water jugs have no good h) A* degenerates to Uniform Cost Search, here the same as BFS.
 
 ## Sequence alignment (dynamic programming) (week 6, Sequence alignment)
 
@@ -771,6 +1660,42 @@ Complete: yes. Optimal: yes. Time: O(m·n). Space: O(m·n).
 
 - Trap: Costs are minimised here; scoring versions maximise similarity instead.
 - Trap: Off-by-one: row i refers to letter aᵢ, i.e. a[i−1] in code.
+- Trap: Several alignments can share the optimal cost; the traceback prefers the diagonal move on ties, so a different tie-break prints a different but equally good alignment.
+- Trap: The costs decide the shape: in 'ACGTC vs AGTC, gap 2, mismatch 3' the single gap that the length difference forces goes after the A, where it lets G, T and C match exactly (cost 2); anywhere else it would add mismatches of 3 each.
+
+## A* with upper-bound pruning of OPEN (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-astar-ub.html
+
+OPEN is where A* spends much of its memory. If we already know some solution of cost U, any node whose estimate f = g + h exceeds U cannot be on a cheaper solution (with an admissible h), so it is not worth storing. **Supplementary:** this is the bound used in Zhou and Hansen's space-saving A* variants; it is not in the lecture slides.
+
+Definition: Run A* as usual, but when a child C is generated with f(C) = g(C) + h(C) > U, drop it instead of adding it to OPEN. U can be given or obtained cheaply, for instance from greedy best-first search. If OPEN becomes empty without reaching the goal, the quick solution that produced U is returned.
+
+Pseudocode:
+
+```
+U ← cost of a quick solution (greedy by h) or a given bound
+OPEN ← [(S, nil, 0)]
+while OPEN not empty
+    N ← node with least f = g + h;  remove it
+    if GoalTest(N): return the path
+    move N to CLOSED
+    for each child C with g' = g(N) + k(N,C)
+        if g' + h(C) > U: discard C  (never enters OPEN)
+        else add / update C exactly as A* does
+return the quick solution if OPEN empties (it was optimal or h was inadmissible)
+```
+
+- discard C when g(C) + h(C) > U: the best possible cost through C is already worse than a known solution. With h ≤ h*, g(C) + h(C) never overestimates the cheapest solution through C, so such a C cannot improve on U.
+- C* ≤ U: the optimum is at most the bound. U is the cost of a real solution. A bound below C* would wrongly discard every solution; the run then reports failure.
+
+A better bound prunes more: on the 'Dijkstra demo' graph the greedy bound U = 9 keeps peak OPEN at 2 where A* needs 3. The saving is on OPEN only: CLOSED is as large as in A*. Combine with CLOSED-pruning methods (BFHS, SMGS) for real savings.
+
+Complete: yes if U ≥ C*. Optimal: yes with admissible h and U ≥ C*. Time: at most A*'s. Space: OPEN smaller than A*, CLOSED same.
+
+- Trap: With an inadmissible h, a node with f > U may still lead to a cheaper path, so pruning can lose the optimum (the search then falls back to the quick solution).
+- Trap: A bound that is too small yields no solution at all.
+- Trap: Nodes with f = U are kept: they may still give a solution of cost exactly U.
 
 ## Sequence alignment (A*) (week 6, Sequence alignment)
 
@@ -791,11 +1716,144 @@ run A*: pick least f = g + h from OPEN; update cheaper paths; stop when (m,n) is
 
 - h(i,j) = gap · |(m − i) − (n − j)|: at least this many gaps are unavoidable. Each gap shortens the length difference by one, so this many gap moves remain in any completion: h never overestimates.
 
-Optimal like dynamic programming, usually with fewer states. With large sequences, frontier search and DCFS keep its memory small.
+Optimal like dynamic programming, usually with fewer states: the more alike the sequences, the fewer lattice points A* has to expand, because the cheap diagonal path keeps f low and everything else waits on OPEN. With large sequences, frontier search and DCFS keep its memory small.
 
-Complete: yes. Optimal: yes. Time: ≤ O(m·n log). Space: ≤ O(m·n).
+Complete: yes. Optimal: yes. Time: ≤ O(m·n·log(m·n)). Space: ≤ O(m·n).
 
-- Trap: A weak h (such as 0) makes A* behave like Dijkstra and expand most of the table.
+- Trap: A weak h (such as 0) makes A* behave like Dijkstra and expand most of the table. When both sequences have the same length h is 0 at the start, so the saving comes only from the cheap diagonal moves: compare 'ACGTTGCAAT vs ACGTAGCAAT, one substitution' (11 of 121 points) with 'ACGTAC vs TGCATG, unrelated' (19 of 49).
+- Trap: A* is only guaranteed to find the optimal cost, not a unique alignment: several alignments can tie, and the tie-break decides which one is shown.
+
+## Breadth First Heuristic Search (BFHS) (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-bfhs.html
+
+A* remembers every node it has expanded. Breadth First Heuristic Search borrows breadth-first search's layering: it knows that a node can only be regenerated from a neighbouring layer, so older layers can be thrown away. An upper bound U on f keeps the layers narrow. **Supplementary:** BFHS is from Zhou and Hansen's work on memory-bounded graph search; it is beyond the lecture slides.
+
+Definition: Layer k holds the nodes reached with k moves. Expand layer k completely to build layer k+1. A child is discarded if f = g + h > U. Duplicate detection looks only at the current layer, the previous layer and the layer being built, which is enough on undirected graphs and means all earlier layers can be deleted. When a goal is picked with g < U, U shrinks to g. The search ends when a layer is empty.
+
+Pseudocode:
+
+```
+U ← cost of a quick solution (greedy) or a given bound
+layer0 ← [S]
+while the current layer is not empty
+    for each node N in the layer (least f first)
+        if GoalTest(N) and g(N) < U: remember N, U ← g(N)
+        else for each child C:  if g(C) + h(C) > U: discard
+                                 elif C is already in the current, previous or next layer with g ≤ g(C): skip
+                                 else put C in the next layer
+    delete the layer before the previous one          # keep only the boundary
+    move to the next layer
+return the best goal found (or the quick solution)
+```
+
+- CLOSED = layers k and k−1: only the boundary is stored. Every neighbour of a layer-k node is in layer k−1, k or k+1 (in a graph of unit moves), so older layers can never be regenerated through duplicate detection.
+- discard C when g(C) + h(C) > U: bound pruning. It keeps the layers narrow and, with h ≤ h*, never discards the optimal path when U ≥ C*.
+
+BFHS stores far fewer expanded nodes than A* on graphs whose layers are narrow compared with the whole explored region: on the 4×5 grid its peak CLOSED is 8 against A*'s 19. It pays with expanding every node with f ≤ U, even ones A* would never reach.
+
+Complete: yes if U ≥ C*. Optimal: yes with admissible h. Time: A*-like. Space: two layers + one.
+
+- Trap: Costs are compared across layers, so a node can be reached in a later layer with a lower g; this tracer keeps the cheaper copy only when it is still in a retained layer.
+- Trap: A bad (large) U weakens the pruning but never breaks the answer.
+- Trap: In the original BFHS no parent pointers are kept, so only the cost is known; here parent links are kept just to print the path. Divide and Conquer BFHS shows how to recover it without them.
+
+## Divide and Conquer BFHS (DC-BFHS) (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-dc-bfhs.html
+
+Deleting layers saves memory but loses the parent pointers needed to print the path. Divide and Conquer BFHS keeps one thing instead: the middle node of the best path. Each half is then a smaller search of the same kind. **Supplementary:** from Zhou and Hansen; the relay idea matches Divide and Conquer Frontier Search from the course. The beam-search version (DC beam search) is not implemented here.
+
+Definition: Run BFHS to find the optimal cost C and the layer count L. Run it again with every node on layer ⌊L/2⌋ acting as a relay: its descendants carry the relay's name and its g. The goal's relay R splits the problem into S→R (cost g(R)) and R→T (cost C − g(R)). Solve each recursively; in the sub-searches the exact cost is the upper bound U and h = 0 (the original h aims at T, not R).
+
+Pseudocode:
+
+```
+DC-BFHS(S, T, U):
+    run BFHS from S to T with bound U, no parent pointers      # gives cost C and the number of layers L
+    if L ≤ 1: return [S, T]
+    run it again, each node at layer ⌊L/2⌋ becoming its own relay and passing it on to descendants
+    R ← the relay of the best goal, with g(R)
+    return DC-BFHS(S, R, g(R)) ++ DC-BFHS(R, T, C − g(R))      # drop the repeated R
+```
+
+- C = g(R) + cost(R→T): an optimal path through R splits into two optimal halves. Each half of an optimal path is itself optimal, so solving the halves and joining them gives an optimal whole.
+- memory ≈ boundary layers of the largest sub-search: no pointers, no deep layers. The sub-searches run one at a time, so their memory is not added up.
+
+Shows how to get the path from a search that keeps almost nothing: on the 4×5 grid the boundary CLOSED is at most 9 against A*'s 19. The cost is a second pass per level of recursion.
+
+Complete: yes if U ≥ C*. Optimal: yes with admissible h. Time: ≈ 2 × BFHS. Space: boundary layers.
+
+- Trap: The relay must be recorded in the same run that finds the best goal; a different tie-break could give a different path and relay.
+- Trap: A sub-search uses h = 0, so it expands more nodes than the first run did.
+- Trap: The relay layer ⌊L/2⌋ is by number of moves, not by cost; on weighted graphs the halves can have unequal cost.
+
+## Beam Stack Search (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-beam-stack.html
+
+Plain beam search forgets nodes outside the beam and can miss the goal. Beam stack search keeps a small record of what was forgotten: for every layer, the interval of f values it has already covered. When the search runs dry it backtracks and goes after the part of f-space it skipped. **Supplementary:** this is Zhou and Hansen's algorithm; it is not in the lecture slides.
+
+Definition: Layer k holds nodes reached with k moves, at most w of them. The beam stack has one item [lo, hi) per layer. Children of layer k go to layer k+1 only if f is in [lo, hi) and f ≤ U. If there are more than w, the w with least f survive and hi becomes the f of the best node dropped. When a layer has no children (dead end or goal), backtrack to the deepest layer with hi < U, set lo ← hi and hi ← ∞, and rebuild that layer from the one above. Ties in f are broken alphabetically, so the intervals are over (f, name) pairs and the search always terminates.
+
+Pseudocode:
+
+```
+U ← cost of a quick solution (greedy) or a given bound
+layer 0 ← [S];  beam stack ← [ [lo=−∞, hi=∞) per layer ]
+loop
+    if a node of the current layer is the goal and g < U: remember it, U ← g
+    candidates ← children of the layer with f ≤ U and f in [lo, hi) of the next layer's stack item
+    if more than w candidates: keep the w with least f, set hi of that item to the f of the best discarded one
+    if the next layer is non-empty: go down one layer
+    else BACKTRACK: pop to the deepest layer whose hi < U;  lo ← hi, hi ← ∞;  rebuild that layer
+    stop when no layer has hi left to explore
+return the best goal found
+```
+
+- stored nodes ≤ w · (layers): each layer holds at most w nodes. The beam width bounds the memory regardless of the graph.
+- layer k item = [lo_k, hi_k): f-values already covered up to hi_k. Every dropped node has f ≥ hi_k, so once all slices are searched nothing with f ≤ U is missed; with admissible h the optimum is found.
+
+On the 4×5 grid with w = 2 it stores at most 14 nodes where A* stores 20, at the price of 40 expansions against A*'s 19 (it backtracks 3 times). A wide enough beam makes it behave like A*; w = 1 turns it into depth-first-like backtracking. Memory stays small either way, so it trades time for space.
+
+Complete: yes (with backtracking). Optimal: yes with admissible h. Time: up to exponential. Space: O(w · depth).
+
+- Trap: With w = 1 it can revisit the same node many times.
+- Trap: A bound U that is too low prunes the solution; the greedy bound is always safe.
+- Trap: The cost equals UCS/A* only when h is admissible; with an inadmissible h it returns the best path it saw, which may not be optimal.
+- Trap: Cycles are avoided here by never generating a node that is already on its own path.
+
+## Smart Memory Graph Search (SMGS) (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-smgs.html
+
+A* keeps every expanded node in CLOSED for two reasons: to avoid regenerating it, and to read the path back. A node whose neighbours have all been expanded can no longer be regenerated, so the first reason is gone. The second still holds for nodes on the way to the frontier. SMGS deletes the rest. The name and the idea of a boundary and relay nodes follow the lecture material on space-saving search; the exact deletion rule below is this site's reading of it, so treat the details as **supplementary**.
+
+Definition: Run A*. After each expansion classify every CLOSED node. Boundary: at least one neighbour has not been expanded yet, so it may still be regenerated. Interior: all neighbours are expanded. A relay node is an interior node that is an ancestor, through parent pointers, of an OPEN or boundary node. Delete interior nodes that are not relays. The path to the goal is read from the nodes that remain.
+
+Pseudocode:
+
+```
+OPEN ← [(S, nil, 0)];  CLOSED ← empty
+while OPEN not empty
+    N ← node with least f;  remove it
+    if GoalTest(N): return the path (follow parents through the kept nodes)
+    move N to CLOSED;  generate children as in A*
+    for each X in CLOSED:
+        if every neighbour of X has been expanded:  X is interior
+    live ← OPEN ∪ {CLOSED nodes that are not interior}      # the boundary
+    relay ← interior nodes that are ancestors of a live node
+    delete every interior node that is not a relay
+```
+
+- |CLOSED| ≤ |boundary| + |relay|: only the edge of the expanded region plus the needed ancestors. Everything else is deleted, so on wide graphs CLOSED is a thin shell instead of a solid blob.
+
+Saves CLOSED memory at no cost in nodes expanded (on the 4×5 grid it deletes 9 nodes and the peak CLOSED falls from 19 to 17; the saving grows with the size of the graph). The relay rule is conservative: it keeps whole parent chains. Divide and conquer methods (DCFS, DC-BFHS) cut even those.
+
+Complete: yes. Optimal: yes with admissible h. Time: same as A*. Space: boundary + relay nodes.
+
+- Trap: If an h is inconsistent a node can be reopened with a better g; its deleted neighbours are simply regenerated as new nodes.
+- Trap: Savings depend on the graph: on a tree or a path nearly every node stays a boundary or relay node.
 
 ## Admissibility & monotone check (week 6, Graph search · optimal)
 
@@ -822,8 +1880,40 @@ Knowing which property holds tells you whether A* is optimal (admissible) and wh
 
 Complete: n/a. Optimal: n/a. Time: O(E log V). Space: O(V).
 
-- Trap: Admissible does not imply monotone.
+- Trap: Admissible does not imply monotone: the 'Admissible but not monotone h' example passes the first table and fails on the edge B→C (3 > 1 + 0); A* then reopens C.
 - Trap: Check both directions of an undirected edge.
+
+## Frontier Search (week 6, Graph search · space saving)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-frontier.html
+
+In A* the CLOSED list does two jobs: it stops the search regenerating nodes it has already expanded, and it lets us rebuild the path. Frontier search replaces the first job with a few bits on each OPEN node, and drops CLOSED entirely. This is in the course's discussion of memory-saving search (frontier search and its divide and conquer version); the used-operator bits are shown here in their simplest form, so treat the exact bookkeeping as **supplementary**.
+
+Definition: Each OPEN node stores the set of neighbours that have already been expanded and generated it (its used operators). When N is expanded it never generates a child in used(N). Children already on OPEN merge: the new parent is added to their used set and the cheaper g is kept. After expansion N is discarded. Because no expanded node is stored, the search returns the cost; the path needs a relay recursion (see Divide and Conquer Frontier Search).
+
+Pseudocode:
+
+```
+OPEN ← [(S, g=0, used={})]                 # no CLOSED list
+while OPEN not empty
+    N ← node with least f;  remove it
+    if GoalTest(N): return its cost
+    for each child C of N with g' = g(N) + k(N,C), if C is not in used(N):
+        if C is on OPEN: used(C) ← used(C) ∪ {N};  if g' is lower, update g(C)
+        else add (C, g', used = {N}) to OPEN
+    (N itself is forgotten)
+```
+
+- memory = |OPEN|: there is no CLOSED list. In grid-like graphs the frontier is a thin front, much smaller than everything expanded so far.
+- h consistent (h(N) ≤ k(N,M) + h(M)): needed for correctness. Then a node is expanded with its final g, so never needing to be reopened. Reversible moves (undirected graph) are also needed, so the used bit can be set.
+
+A* minus its biggest list: on the 4×5 grid it holds at most 5 nodes in total where A* holds 20 (19 of them CLOSED). It trades away the path: on its own it can only report the cost, and DCFS or DC-BFHS recover the path.
+
+Complete: yes. Optimal: yes with admissible, consistent h. Time: same as A*. Space: OPEN only.
+
+- Trap: With an inconsistent heuristic a node may need reopening, which frontier search cannot do: on 'Admissible but not monotone h: A* reopens C' it returns S–C–G = 6 although the optimum is 5 (A* reopens C and finds S–A–B–C–G).
+- Trap: Only for undirected graphs here: a directed edge has no 'reverse operator' to mark as used.
+- Trap: To print the path this tracer carries the path along with each OPEN node. That is for the display only and is not counted in the memory figures.
 
 ## IDA* (week 6, Graph search · space saving)
 
@@ -858,7 +1948,8 @@ Optimal with admissible h and linear memory. It repeats work in every pass, whic
 
 Complete: yes. Optimal: yes with admissible h. Time: A* × number of bounds (worst case). Space: O(b·d).
 
-- Trap: Count expansions across all passes.
+- Trap: Count expansions across all passes: on 'RBFS switches branches...' the bounds are 5, 6, 7 and the passes expand S, A (bound 5); S, A, B (bound 6); S, A, C (bound 7) and reach G: 8 expansions in total against A*'s 4 (the price of linear memory); the table lists every bound.
+- Trap: The next bound is the smallest f that was cut off, not bound + 1: costs of 1.5 or 2 would skip values if it were incremented.
 - Trap: IDA* has no CLOSED list, so on graphs it may revisit nodes by different paths.
 
 ## Recursive Best-First Search (week 6, Graph search · space saving)
@@ -872,19 +1963,19 @@ Definition: At each node, expand the child with the lowest backed-up value F whi
 Pseudocode:
 
 ```
-RBFS(N, F(N), limit):
+RBFS(N, fm(N), limit):
     if GoalTest(N): return SUCCESS
     children ← MoveGen(N) not on the current path
-    for each child C: F(C) ← max(g(C) + h(C), F(N))     # inherit a backed-up value
+    for each child C: fm(C) ← max(g(C) + h(C), fm(N))     # inherit a backed-up value
     loop
-        best ← child with least F;  if F(best) > limit: return FAIL, F(best)
+        best ← child with least F;  if fm(best) > limit: return FAIL, fm(best)
         alt ← second least F (∞ if none)
-        result, F(best) ← RBFS(best, F(best), min(limit, alt))
+        result, fm(best) ← RBFS(best, fm(best), min(limit, alt))
         if result = SUCCESS: return SUCCESS
 call RBFS(S, h(S), ∞)
 ```
 
-- F(N) = backed-up minimum of f over N's explored subtree: the best f value seen below N. Lets RBFS return to a forgotten subtree knowing exactly how promising it was.
+- F(C) = max( g(C) + h(C), F(N) )  for a child C of N: a child inherits its parent's backed-up value when that is larger. When a subtree is abandoned, its F is replaced by the best (smallest) F that was cut off below it. RBFS can then return to a forgotten subtree knowing exactly how promising it was, and the max keeps F from falling below what is already known.
 
 Linear space and optimal with admissible h. It may re-expand the same nodes many times when the best path keeps switching.
 
@@ -892,6 +1983,7 @@ Complete: yes. Optimal: yes with admissible h. Time: can exceed A*. Space: O(b·
 
 - Trap: The limit passed down is the second-best F, not the parent's f.
 - Trap: Keep backed-up values; recomputing g + h throws the information away.
+- Trap: RBFS forgets subtrees, so it re-expands them: on 'RBFS switches branches...' A is expanded twice (A* expands each node once), and on ties it can switch back and forth often.
 
 ## Divide & Conquer Frontier Search (week 6, Graph search · space saving)
 
@@ -914,7 +2006,7 @@ DCFS(S, G):
 
 - memory ≈ |frontier|, not |frontier| + |expanded|: only the boundary of the search is stored. For grid-like spaces (such as sequence alignment) the frontier is much smaller than the expanded region.
 
-Trades extra time (the recursive searches) for a large memory saving. It is the basis of memory-efficient sequence alignment.
+On the 4×5 grid the frontier never holds more than a handful of nodes and no CLOSED list is stored, at the cost of 66 expansions in total against A*'s 20. Trades extra time (the recursive searches) for a large memory saving. It is the basis of memory-efficient sequence alignment.
 
 Complete: yes. Optimal: yes with admissible h. Time: a small multiple of one search. Space: frontier only.
 
@@ -977,6 +2069,7 @@ Always returns the minimax value. How much it prunes depends on move ordering: t
 Complete: yes. Optimal: same value as minimax. Time: O(b^(d/2)) best, O(b^d) worst. Space: O(b·d).
 
 - Trap: Pruned subtrees are never evaluated: count leaves carefully.
+- Trap: How much is pruned depends on the move ordering, never the value: on example game-four-ply the Child order parameter gives 10 leaves (as given), 7 (best first) and 15 (worst first), all with value 8.
 - Trap: The value returned at a pruned node is a bound, not an exact value; only the root's value is exact.
 
 ## SSS* (week 7, Game playing)
@@ -1011,7 +2104,37 @@ Dominates alpha-beta in leaves evaluated, at the cost of an OPEN list that can g
 Complete: yes. Optimal: minimax value. Time: ≤ alpha-beta leaves. Space: O(b^(d/2)).
 
 - Trap: Ties in merit are broken by leftmost position.
+- Trap: SSS* never evaluates more leaves than alpha-beta with the same left-to-right order (game-four-ply: 8 against 10) but keeps a large OPEN list.
 - Trap: When a MAX parent is solved, remove all its other descendants from OPEN.
+
+## Expectiminimax (supplementary) (week 7, Game playing)
+
+URL: https://1mystic.github.io/SearchStudio/learn/game-expectiminimax.html
+
+**Supplementary (Russell & Norvig): not in the course lectures.** In backgammon-like games a die roll lies between your move and the opponent's reply. Expectiminimax adds a third kind of node, the chance node, whose value is the average of its outcomes weighted by their probabilities.
+
+Definition: Leaves hold e(N) for MAX. A MAX node backs up the maximum of its children, a MIN node the minimum, and a chance node the expected value Σ P(C)·v(C), where the probabilities on its outgoing edges sum to 1. The chance nodes do not change whose turn it is: in this studio a chance node sits between a player's move and the next player's node.
+
+Pseudocode:
+
+```
+Expectiminimax(N):
+    if N is a leaf: return e(N)
+    if N is MAX:    return max over children C of Expectiminimax(C)
+    if N is MIN:    return min over children C of Expectiminimax(C)
+    if N is CHANCE: return Σ over children C of P(C) · Expectiminimax(C)
+```
+
+- v(chance) = Σ over outcomes C of P(C) · v(C): the expected value of the roll. Neither player controls the dice, so the best estimate of a position before the roll is its average over the outcomes.
+
+Showing that values matter, not just their order: with chance nodes only the numbers (not merely which leaf is bigger) decide the move, so the evaluation function must be a proper scale. Alpha-beta and SSS* in this studio decline trees with chance nodes because their pruning rules assume pure MAX/MIN.
+
+Complete: yes (finite tree). Optimal: maximises expected value against an optimal opponent. Time: O(b^d · n^d). Space: O(b·d).
+
+- Trap: A chance node's value can be a fraction that is not any leaf's value.
+- Trap: Probabilities on the edges of one chance node must sum to 1.
+- Trap: Treating chance nodes as MIN, MAX or a plain average gives a wrong value or a wrong move: the last caption on example game-chance-gamble lists them (4, 8 and 5 against the true 6.5).
+- Trap: Minimax would be wrong here: it treats the roll as a choice. Pruning is also harder, because an average is only bounded if the leaf values are.
 
 ## Forward state-space planning (week 8, Planning)
 
@@ -1099,6 +2222,49 @@ Complete: no. Optimal: no. Time: linear in plan length (when it works). Space: O
 
 - Trap: Push preconditions so that the one to achieve first is on top.
 - Trap: Always re-check the conjunct goal after its parts are popped.
+- Trap: Goal clobbering: achieving one goal can undo another (the Sussman anomaly). Run example plan-sussman: 10 steps instead of 6; the captions say 'Goal clobbering' when it happens.
+
+## Graphplan (week 8, Planning)
+
+URL: https://1mystic.github.io/SearchStudio/learn/plan-graphplan.html
+
+Graphplan builds a layered graph in polynomial time that over-approximates what can be true after each number of steps, then does a much smaller backward search inside it. The graph alternates proposition layers P0, P1, … and action layers A0, A1, …. A no-op (persistence) action carries each proposition unchanged to the next layer. Mutex pairs record things that can never hold together (propositions) or be done together (actions) at that level.
+
+Definition: Layer P0 is the initial state. Action layer Ai holds every action whose preconditions are all in Pi and pairwise non-mutex, plus a no-op for each proposition. Pi+1 holds every add effect. Two actions in the same layer are mutex by: (1) inconsistent effects, one adds what the other deletes; (2) interference, one deletes a precondition of the other; (3) competing needs, a precondition of one is mutex with a precondition of the other in Pi. Two propositions in Pi+1 are mutex by inconsistent support: every pair of actions that achieve them is mutex. When all goals are in a layer and pairwise non-mutex, extract a plan backwards: choose a set of non-mutex actions achieving the goals, make their preconditions the subgoals one layer earlier, and repeat; a goal set that fails at a layer is remembered as a nogood. Actions in one layer are mutually non-mutex so they may be done in any order, which gives the flat plan.
+
+Pseudocode:
+
+```
+P0 ← initial state;  i ← 0
+loop
+    if all goals ∈ Pi and no two goals are mutex in Pi:
+        plan ← EXTRACT(goals, i);  if plan ≠ failure: return plan
+    if graph has levelled off and nogoods stopped growing: return failure
+    Ai ← actions whose preconditions are in Pi and pairwise non-mutex, plus a no-op for every proposition
+    mark action mutexes: inconsistent effects, interference, competing needs
+    Pi+1 ← all add-effects of Ai
+    mark proposition mutexes: inconsistent support (every pair of achievers is mutex)
+    i ← i + 1
+
+EXTRACT(G, i):  if i = 0 return [ ]
+    if G ∈ nogood(i) return failure
+    choose non-mutex actions in Ai−1 that achieve every g ∈ G (try no-ops first)
+    G' ← union of their preconditions;  plan ← EXTRACT(G', i−1)
+    if none works: add G to nogood(i); return failure
+```
+
+- p, q mutex in Pi+1  ⇔  every achiever of p is mutex with every achiever of q: inconsistent support. If no non-mutex pair of actions can make both, they cannot both be true after that step.
+- a, b mutex  ⇐  add(a) ∩ del(b) ≠ ∅  or  del(a) ∩ pre(b) ≠ ∅  or  pre(a) and pre(b) contain a mutex pair: inconsistent effects, interference, competing needs. Each rule names a way the two actions cannot both be carried out in one parallel step.
+
+Mutex reasoning prunes huge numbers of impossible combinations cheaply before any search, and the first layer in which the goals are non-mutex is a lower bound on the plan length (the plan returned has the fewest layers).
+
+Complete: yes (finds a plan whenever one exists). Optimal: fewest layers. Time: graph: polynomial; extraction: exponential in the worst case. Space: polynomial in propositions × layers.
+
+- Trap: Goals appearing without mutex is necessary, not sufficient: extraction can still fail and the graph must be extended.
+- Trap: A no-op is an action: it can be mutex with real actions (for example a no-op that keeps AE true is mutex with any action that deletes AE).
+- Trap: Layers count parallel steps; in the one-arm blocks world nearly every pair of actions is mutex, so layers and plan steps coincide.
+- Trap: Nogoods are goal sets proved unachievable at a layer: a repeat visit is cut immediately instead of searched again. Try example plan-graphplan-nogoods: the goals are non-mutex at P4 but extraction fails at P4 and P5 and succeeds at P6, reusing nogoods.
+- Trap: The termination test (graph levelled off and the nogood table at the layer where it levelled stopped growing) proves that no plan exists; it is checked after every failed extraction.
 
 ## Partial Order Planning (week 8, Planning)
 
@@ -1131,6 +2297,38 @@ Complete: yes (with systematic search). Optimal: shortest plan with iterative de
 
 - Trap: Check threats for new links and for new steps.
 - Trap: Never order a step before Start or after Finish.
+- Trap: The plan-space search is exponential: this studio declines problems with more than 4 blocks. Try example plan-sussman: 6 steps, no goal clobbering, because the subgoal orderings are chosen only when threats force them.
+
+## Means-ends analysis (week 8, Planning)
+
+URL: https://1mystic.github.io/SearchStudio/learn/plan-mea.html
+
+Means-ends analysis (the idea behind Newell and Simon's General Problem Solver) works from differences. Compare the current state with the goal, choose the most important difference, and find an operator that reduces it. If the operator cannot be applied yet, its preconditions become a new sub-goal, solved by the same procedure. The difference table says which operator removes which kind of difference.
+
+Definition: Difference table for the blocks world: on(x,y) is removed by stack(x,y); ontable(x) by putdown(x); clear(x) by unstack(z,x) for the block z on x; holding(x) by pickup(x) (x on the table) or unstack(x,y); AE by putdown of the held block. Importance: positional differences first, lower blocks of the goal tower before higher ones (a tower is built from the bottom), then clear, then AE, then holding. Sub-goals are solved in the same importance order. Because MEA never protects facts it has already achieved, a later sub-goal can undo an earlier one: on the Sussman anomaly it keeps destroying and re-making the same facts and the loop check stops it.
+
+Pseudocode:
+
+```
+MEA(state, goal):
+    while goal ⊄ state
+        d ← the most important difference (goal fact not in state)
+        O ← operator that adds d            // from the difference table
+        MEA(state, pre(O))                  // sub-goal: make O applicable
+        if O is not applicable: fail
+        state ← apply(O, state)
+    return
+```
+
+- difference = goal − state: goal facts not currently true. These are exactly what remains to be achieved.
+
+It is the first goal-directed planner: instead of blind search it only considers operators relevant to a difference. Its failure on interacting goals motivates goal protection, partial-order planning and Graphplan.
+
+Complete: no. Optimal: no. Time: depends on the differences. Space: depth of sub-goaling.
+
+- Trap: MEA is not complete: it does not protect earlier achievements, so it can undo its own work and cycle (the Sussman anomaly). Run example plan-sussman to watch it fail and plan-reverse to watch it succeed.
+- Trap: The result depends on the importance ordering and on the difference table; a different table can succeed where this one fails.
+- Trap: A sub-goal may clobber a fact achieved earlier: after each operator, recompute all differences.
 
 ## AO* (week 9, Problem decomposition)
 
@@ -1163,7 +2361,39 @@ With admissible estimates AO* finds an optimal solution graph. The marked soluti
 Complete: yes. Optimal: yes with admissible h. Time: exponential in general. Space: the explicit graph.
 
 - Trap: An AND connector costs the sum, not the minimum, of its children.
-- Trap: Propagate revisions to all ancestors whose marked connector uses the node.
+- Trap: Propagate revisions to all ancestors whose marked connector uses the node. Try example andor-revision: the marked connector of A changes twice.
+- Trap: A node with no connectors that is not solved is a dead end: its cost is FUTILITY, and every connector using it must be revised (example andor-futility: A abandons B for the AND connector C+D).
+
+## Backward chaining (goal tree) (week 9, Problem decomposition)
+
+URL: https://1mystic.github.io/SearchStudio/learn/rules-backward-chaining.html
+
+Forward chaining starts from the facts and derives everything it can. Backward chaining starts from a query (the goal) and works the other way: which rule could conclude this, and what would I then have to show? Only rules relevant to the goal are ever examined, which is why it suits diagnosis and question answering.
+
+Definition: To prove a goal G: (1) if some fact unifies with G, G is solved; (2) otherwise, for each rule whose THEN part unifies with G, make each IF condition a sub-goal. The conditions of one rule form an AND connector (all must be proved); the different rules that could conclude G are OR alternatives. Variables are bound by unification and the bindings are carried from one condition to the next. This is the same AND–OR structure as in problem decomposition.
+
+Pseudocode:
+
+```
+Prove(goal, bindings):
+    for each fact f that unifies with goal: succeed (f is a solved leaf)
+    for each rule R whose consequent unifies with goal:        # OR over rules
+        prove every condition of R in turn, carrying the bindings   # AND over conditions
+        if all succeed: goal is proved by R
+    if nothing works: goal fails (backtrack to the last choice)
+    (a goal identical to one of its own ancestors fails: it would loop)
+```
+
+- solved(G) = fact(G) ∨ ⋁ over rules R concluding G of ⋀ solved(c), c in IF(R): a goal is solved by a fact, or by some rule all of whose conditions are solved. OR across the alternative rules and AND across the conditions of one rule is exactly an AND–OR graph.
+
+Every goal it proves is also derived by forward chaining (both are sound), but it only does the work needed for the query. An ancestor check is needed because rule bases can be recursive.
+
+Complete: no for recursive rule bases (depth-first), yes on acyclic ones. Optimal: n/a. Time: exponential in the worst case. Space: the goal tree (depth × branching).
+
+- Trap: The first matching fact or rule is not always the right one: bindings may make a later condition fail, and then it must backtrack. Try example rules-backtrack: rule F1 fails on (heavy tweety), the grey branch is undone, and F2 proves the goal.
+- Trap: Rule variables are renamed apart for each use, so ?x in two different uses are different variables.
+- Trap: Without the ancestor check a recursive rule (ancestor defined through ancestor) can loop forever.
+- Trap: This stepper proves the first answer found; a query with variables may have several answers.
 
 ## Forward chaining (week 10, Rule-based systems)
 
@@ -1190,7 +2420,8 @@ Data-driven reasoning, natural for monitoring and configuration. Naive matching 
 Complete: derives every consequence (add-only rules). Optimal: n/a. Time: match cost per cycle. Space: WM + conflict set.
 
 - Trap: A variable must bind to the same value in every condition of a rule.
-- Trap: Conflict resolution changes the order, not the final set of derived facts (for rules that only add).
+- Trap: Conflict resolution changes the order, not the final set of derived facts (for rules that only add). Try example rules-conflict with the three strategies: the first firing is R1 ann, R1 bob or R2 ann.
+- Trap: With remove actions or NOT conditions the strategy can change the final facts, because firing one rule can destroy the match of another.
 
 ## Rete algorithm (week 10, Rule-based systems)
 
@@ -1198,7 +2429,7 @@ URL: https://1mystic.github.io/SearchStudio/learn/rules-rete.html
 
 Most cycles of a rule system change only a few facts, yet naive matching re-checks every rule against everything. The Rete algorithm compiles the rules into a network that remembers partial matches, so each new fact is matched only where it matters.
 
-Definition: Alpha nodes test single patterns and store matching facts. Beta (join) nodes combine a stored partial match (token) from the left with a fact from the right when their variable bindings agree, and pass the result on. Terminal nodes add complete matches to the conflict set. Rules that share leading patterns share nodes.
+Definition: Alpha nodes test single patterns and store matching facts. Beta (join) nodes combine a stored partial match (token) from the left with a fact from the right when their variable bindings agree, and pass the result on. A negative (NOT) node passes a token on only while no fact matches the negated pattern with consistent bindings; when such a fact arrives later it blocks the token and withdraws everything built from it, and when that fact is removed the token is released again. Terminal nodes add complete matches to the conflict set. Rules that share leading patterns share nodes.
 
 Pseudocode:
 
@@ -1220,6 +2451,8 @@ Complete: same matches as naive matching. Optimal: n/a. Time: proportional to ch
 
 - Trap: Joins compare bindings of shared variables only.
 - Trap: Node sharing comes from identical condition prefixes.
+- Trap: A negated condition makes the system non-monotonic: a match can enter the conflict set and later be withdrawn when a blocking fact arrives. Try example rules-negation: R2 opus is withdrawn after R1 adds (penguin opus).
+- Trap: Rete returns the same facts as forward chaining, including with NOT conditions and remove actions; here it fires by rule order, then recency.
 
 ## Backtracking (week 11, Constraint processing)
 
@@ -1243,12 +2476,14 @@ Backtrack(assignment, i):
 
 - search tree size ≤ d + d² + … + dⁿ: up to dⁿ complete assignments. Each level multiplies the branches by the domain size.
 
-Complete and simple, but it discovers failures late. Look-ahead (forward checking) and consistency (arc consistency) detect them earlier.
+Complete and simple, but it discovers failures late (thrashing). Look-ahead (forward checking) and consistency (arc consistency) detect them earlier.
 
-Complete: yes. Optimal: n/a (any solution). Time: O(dⁿ). Space: O(n).
+Complete: yes. Optimal: n/a (any solution). Time: O(dⁿ) worst case. Space: O(n).
 
 - Trap: Count every value tried as a node.
-- Trap: Backtracking returns to the most recent variable, even if it is not the cause of the failure.
+- Trap: Thrashing: backtracking returns to the most recent variable, even if it is not the cause of the failure, and so it rediscovers the same dead end under every combination of irrelevant earlier values. Try example 'Thrashing': 45 values tried where forward checking needs 6.
+- Trap: The variable order changes the tree a lot, and a bad order is only found out by running it. Try example 'Variable ordering': 58 values in the given order, 7 with 'most constraints first'. It is a heuristic, not a guarantee: on the Australia map the given order is better (11 vs 15 values).
+- Trap: Backtracking only checks a value against EARLIER variables, so a conflict with a later variable is found only when that variable is reached. Forward checking moves that test forward.
 
 ## Forward checking (week 11, Constraint processing)
 
@@ -1276,7 +2511,9 @@ Usually far fewer nodes than plain backtracking; pairs well with choosing the va
 
 Complete: yes. Optimal: n/a. Time: O(dⁿ) worst case. Space: O(n·d) for domain copies.
 
-- Trap: Forward checking does not check two future variables against each other; arc consistency does.
+- Trap: Forward checking does not check two future variables against each other; arc consistency does. Try example 'G = W wipes out E': forward checking accepts G = W and only fails two assignments later.
+- Trap: It only pays off together with a good variable order. Smallest domain first (MRV) picks the variable most likely to fail next (the 'fail-first' principle); see example 'Variable ordering' (27 values in the given order, 6 with MRV).
+- Trap: Forward checking removes the thrashing of plain backtracking on example 'Thrashing': 6 values against 45, because A = r empties D(E) at once, but it spends extra work at every node pruning domains.
 
 ## Arc consistency (AC-1, AC-3) (week 11, Constraint processing)
 
@@ -1306,10 +2543,43 @@ AC-1: repeat Revise on all arcs until a full pass changes nothing
 
 Cheap reasoning that shrinks domains; sometimes it solves the problem outright (the chain example), sometimes it only prunes (map colouring).
 
-Complete: no (filtering only). Optimal: n/a. Time: O(e·d³). Space: O(e).
+Complete: no (filtering only). Optimal: n/a. Time: O(e·d³) for AC-3 (AC-1: O(n·e·d³)). Space: O(e).
 
 - Trap: Arcs are directed: (X, Y) and (Y, X) are different.
-- Trap: Arc consistency does not guarantee a solution exists.
+- Trap: Arc consistency does not guarantee a solution exists, nor that it finds one. Three outcomes to compare: 'Ordering chain' is solved by AC-3 alone (every domain becomes one value); 'Variable ordering' is pruned (D = 1, E = 2) but A, B, C stay ambiguous so search is needed; on the Australia map nothing is deleted at all. The 'Two colours on a triangle' example passes arc consistency yet has no solution: only path consistency sees it.
+- Trap: AC-1 and AC-3 delete exactly the same values; AC-3 only does less work (fewer revisions), which you can see in the revisions counter by switching the algorithm.
+
+## Path consistency (PC, i-consistency) (week 11, Constraint processing)
+
+URL: https://1mystic.github.io/SearchStudio/learn/csp-path-consistency.html
+
+Arc consistency looks at one constraint at a time. Path consistency looks at a path of two constraints through a third variable, which is the smallest way to notice that constraints interact.
+
+Definition: The network is i-consistent if every consistent assignment to any i − 1 variables can be extended to any i-th variable. Arc consistency is 2-consistency; path consistency is 3-consistency: every consistent pair (X = a, Y = b) can be extended to every third variable Z. Enforcing it deletes pairs from the relation R(X,Y), possibly making a new implicit constraint between variables that had none.
+
+Pseudocode:
+
+```
+PC-1:
+    R(X,Y) ← allowed pairs of the constraint, or all pairs if X and Y are unconstrained
+    repeat
+        for each triangle (X, Z, Y)
+            R(X,Y) ← R(X,Y) ∩ ( R(X,Z) ∘ R(Z,Y) )       # (a,b) needs a witness c in D(Z)
+    until no relation changed
+    if some R(X,Y) is empty: no solution
+```
+
+- R(X,Y) ← R(X,Y) ∩ { (a,b) : ∃ c ∈ D(Z), (a,c) ∈ R(X,Z) ∧ (c,b) ∈ R(Z,Y) }: keep a pair only if the third variable can be given a value that works with both. In any solution containing X = a, Y = b, the variable Z has some value c, and that value must satisfy both constraints, so pairs with no such c cannot be in a solution.
+- k-consistency: every consistent (k−1)-assignment extends to any k-th variable: k = 1 node, k = 2 arc, k = 3 path. Higher k reasons about bigger groups, at a higher cost; k = n gives a backtrack-free search.
+
+Two colours on a triangle: each value has a partner on every edge, so arc consistency removes nothing, yet three mutually different variables with two values cannot exist. Path consistency empties a relation and proves it.
+
+Complete: no (filtering only). Optimal: n/a. Time: O(n³·d³) per sweep. Space: O(n²·d²).
+
+- Trap: Try example 'Two colours on a triangle': run Arc consistency first (nothing is deleted), then this algorithm (a relation becomes empty). Path consistency is strictly stronger than arc consistency, and also costlier.
+- Trap: Path consistency prunes PAIRS (it changes constraints), not just values; domains shrink only afterwards, when arc consistency is run on the tightened relations (done in the last step).
+- Trap: It can add constraints between variables that had none: unconstrained pairs start as 'all pairs allowed'.
+- Trap: The i-consistency hierarchy (strong i-consistency for i = n gives backtrack-free search) is shown as background; only the 3-consistency algorithm is traced. The remark on strong k-consistency is **supplementary**.
 
 ## Waltz algorithm (week 11, Constraint processing)
 
@@ -1340,7 +2610,8 @@ Constraint propagation instead of search: the cube drawing becomes unambiguous o
 Complete: filtering only. Optimal: n/a. Time: linear for planar drawings. Space: O(junctions).
 
 - Trap: Arrow labels are relative to direction: 'out' at one end is 'in' at the other.
-- Trap: Arc consistency can leave several labellings; a search step picks among them.
+- Trap: Arc consistency can leave several labellings; a search step picks among them. Compare the two cube examples: with the background constraint every junction ends with one labelling; without it junction O keeps one but P to U keep 2 or 3 each (several 3-D readings of the same drawing survive).
+- Trap: Waltz filtering is only as good as the catalogue: it assumes trihedral vertices in general position, so drawings of other objects can be labelled wrongly or not at all.
 
 ## Model-based diagnosis (week 11, Constraint processing)
 
@@ -1362,9 +2633,250 @@ diagnoses ← minimal sets of components that intersect every conflict (minimal 
 
 - diagnosis D: D ∩ C ≠ ∅ for every conflict C, D minimal: blame at least one component in every conflict. If any conflict had no faulty member, the contradiction would remain.
 
-The polybox has conflicts {M1, M2, A1} and {M1, M3, A1, A2}, giving the diagnoses {M1}, {A1}, {M2, M3}, {M2, A2}.
+The polybox has conflicts {M1, M2, A1} and {M1, M3, A1, A2}, giving the diagnoses {M1}, {A1} (single faults, they sit in both conflicts) and {M2, M3}, {M2, A2} (double faults). Which diagnoses exist depends on the symptoms: in example 'both outputs wrong' the conflicts are {M1, M2, A1} and {M2, M3, A2} and the single fault {M2} explains both.
 
 Complete: yes (all minimal diagnoses). Optimal: n/a. Time: exponential in components (direct form). Space: O(conflicts).
 
 - Trap: A conflict lists the components used to derive the contradiction, not just the one producing the wrong output.
 - Trap: Diagnoses are minimal: supersets also explain the symptoms but are less likely.
+- Trap: A component in only some of the conflicts cannot be a single fault: M2 is not enough on the Polybox example (it is not in the second conflict) but is enough on 'both outputs wrong'.
+- Trap: If the observations agree with the model there is no conflict and the only minimal diagnosis is the empty set: nothing is faulty.
+
+## SAT as a CSP: backtracking with unit propagation (DPLL) (week 11, SAT · constraint processing)
+
+URL: https://1mystic.github.io/SearchStudio/learn/sat-dpll.html
+
+The local-search methods of weeks 3 and 4 move between complete assignments and can only find solutions. Constraint processing instead builds an assignment variable by variable, so a dead end is detected as soon as one clause becomes impossible, and the search is complete: if no solution exists it says so. This page is the Davis–Putnam–Logemann–Loveland style of backtracking on a CNF formula, viewed as a CSP whose variables have the domain {T, F}.
+
+Definition: A clause is satisfied once some literal is true and empty (a conflict) once all its literals are false. A unit clause has exactly one unassigned literal and none true, so that literal must be true. A pure literal occurs with only one sign in the clauses not yet satisfied, so making it true cannot hurt. Backtrack on an empty clause; otherwise branch on the first unassigned variable (alphabetical order, as in the course), trying T before F.
+
+Pseudocode:
+
+```
+DPLL(assignment):
+    repeat
+        if some clause has every literal false: return FAIL          # empty clause
+        if every clause is satisfied: return assignment
+        if a clause has exactly one unassigned literal and no true literal: assign it true    # unit propagation
+        else if a variable occurs with one polarity only in the open clauses: assign it so    # pure literal
+        else break
+    X ← first unassigned variable
+    for each value v in {T, F}
+        result ← DPLL(assignment + {X = v})
+        if result ≠ FAIL: return result
+        undo X = v and everything it forced
+    return FAIL
+```
+
+- unit: |{ℓ ∈ C : ℓ unassigned}| = 1 and no ℓ ∈ C true: one open literal left in an unsatisfied clause. The clause is false unless that literal is true, so setting it is forced, not a choice, and costs no branching.
+- empty: every ℓ ∈ C false: the conflict test. A clause is a disjunction; if all its literals are false the clause is false, and assignments only ever add more false literals deeper in the tree.
+- leaves ≤ 2^(number of decisions): propagation shrinks the tree. Only decisions branch; forced assignments follow without a choice, so the more propagation, the fewer decisions on any path.
+
+Where hill climbing from 0000 stops at 1000 (h 5), backtracking cannot be fooled by a local maximum: it either reaches an assignment satisfying every clause or has tried all possibilities. Related CSP pages: Backtracking (csp-backtracking) is the plain version of this search, Forward checking (csp-forward-checking) is what unit propagation does after each assignment, and Arc consistency (csp-ac3) generalises it by propagating until nothing more can be removed.
+
+Complete: yes. Optimal: n/a (any satisfying assignment). Time: O(2ⁿ) worst case. Space: O(n) depth.
+
+- Trap: See the pieces separately on the example sat-implication-chain: clauses 1–3 give a chain of unit propagations (a, b, c) with no decision, g is a pure literal, the decision d = T runs into an empty clause (backtrack) and d = F succeeds. Value order F first removes the backtrack; pure literal 'No' makes g a unit propagation instead. sat-unsat shows the UNSAT proof: every branch ends in an empty clause.
+- Trap: A conflict means undo to the last decision; forced assignments are not retried with the other value.
+- Trap: Unassigned variables at the end are free, not False: the printed bit string fills them with 0 only for display.
+- Trap: Pure literals and unit propagation never lose solutions, but without them the same formula needs more backtracks.
+- Trap: An 'UNSAT' answer is a proof (all branches closed), whereas local search failing to find a solution proves nothing.
+
+## Partial look-ahead (week 12, Constraint processing · lookahead)
+
+URL: https://1mystic.github.io/SearchStudio/learn/csp-lookahead-partial.html
+
+Look-ahead methods reason about the future variables after every assignment, so that dead ends are found one or more levels earlier. Forward checking only compares the variable just assigned with its future neighbours; the look-ahead methods also compare the future variables with each other.
+
+Definition: After assigning Xᵢ = a: (1) forward checking, then (2) forward checking, then each future variable Xᵢ is also revised against the LATER future variables Xⱼ (j > i) in one pass. If any future domain becomes empty, reject a at once. This is the "Partial look-ahead" variant: one pass, arcs (Xᵢ, Xⱼ) with i before j.
+
+Pseudocode:
+
+```
+Lookahead(assignment, domains, i):          # mode = partial
+    if i > n: return assignment
+    for each value a in D(Xᵢ)
+        D' ← copy of domains;  D'(Xᵢ) ← {a}
+        forward check: prune D'(Y) of every unassigned neighbour Y against Xᵢ = a
+        extra look-ahead (one pass, arcs (Xᵢ, Xⱼ) with i before j):
+            revise the future variables against each other
+        if no D'(Y) is empty: result ← Lookahead(assignment + {Xᵢ = a}, D', i + 1); if result: return it
+    return failure
+```
+
+- D(Y) ← { b ∈ D(Y) : ∃ c ∈ D(Z), (b, c) allowed by C(Y,Z) }: delete values of a future variable Y that have no support in another future variable Z. A value without support can never be part of a solution extending the current assignment, so deleting it is safe.
+
+A future variable can be squeezed empty by two OTHER future variables. Forward checking cannot see that until one of them is assigned; look-ahead sees it now. Example: after G = W the neighbours of G lose W and become single-valued, which empties D(E); only the look-ahead variants notice (see the example 'G = W wipes out E').
+
+Complete: yes. Optimal: n/a. Time: O(dⁿ) worst case, smaller tree than forward checking. Space: O(n·d) for domain copies.
+
+- Trap: The three variants prune in a strict order: forward checking < partial < full < MAC (each prunes at least what the previous one does). Example 'Look-ahead ladder' shows 17, 6, 5 and 3 values tried before the same conclusion (no solution).
+- Trap: Partial look-ahead depends on the variable order: a variable that is last in the ordering is never revised against anything, so it may miss a wipe-out that full look-ahead finds.
+- Trap: More pruning per node does not always mean less total time; each node costs more.
+- Trap: Which pruning came from forward checking and which from the extra look-ahead is shown in separate columns. The split into 'partial / full / MAC' passes is the usual textbook presentation; the exact pass structure is **supplementary** to the lecture slides.
+
+## Full look-ahead (week 12, Constraint processing · lookahead)
+
+URL: https://1mystic.github.io/SearchStudio/learn/csp-lookahead-full.html
+
+Look-ahead methods reason about the future variables after every assignment, so that dead ends are found one or more levels earlier. Forward checking only compares the variable just assigned with its future neighbours; the look-ahead methods also compare the future variables with each other.
+
+Definition: After assigning Xᵢ = a: (1) forward checking, then (2) forward checking, then every arc between two future variables is revised once, in both directions. If any future domain becomes empty, reject a at once. This is the "Full look-ahead" variant: one pass over all future arcs.
+
+Pseudocode:
+
+```
+Lookahead(assignment, domains, i):          # mode = full
+    if i > n: return assignment
+    for each value a in D(Xᵢ)
+        D' ← copy of domains;  D'(Xᵢ) ← {a}
+        forward check: prune D'(Y) of every unassigned neighbour Y against Xᵢ = a
+        extra look-ahead (one pass over all future arcs):
+            revise the future variables against each other
+        if no D'(Y) is empty: result ← Lookahead(assignment + {Xᵢ = a}, D', i + 1); if result: return it
+    return failure
+```
+
+- D(Y) ← { b ∈ D(Y) : ∃ c ∈ D(Z), (b, c) allowed by C(Y,Z) }: delete values of a future variable Y that have no support in another future variable Z. A value without support can never be part of a solution extending the current assignment, so deleting it is safe.
+
+A future variable can be squeezed empty by two OTHER future variables. Forward checking cannot see that until one of them is assigned; look-ahead sees it now. Example: after G = W the neighbours of G lose W and become single-valued, which empties D(E); only the look-ahead variants notice (see the example 'G = W wipes out E').
+
+Complete: yes. Optimal: n/a. Time: O(dⁿ) worst case, smaller tree than forward checking. Space: O(n·d) for domain copies.
+
+- Trap: The three variants prune in a strict order: forward checking < partial < full < MAC (each prunes at least what the previous one does). Example 'Look-ahead ladder' shows 17, 6, 5 and 3 values tried before the same conclusion (no solution).
+- Trap: Partial look-ahead depends on the variable order: a variable that is last in the ordering is never revised against anything, so it may miss a wipe-out that full look-ahead finds.
+- Trap: More pruning per node does not always mean less total time; each node costs more.
+- Trap: Which pruning came from forward checking and which from the extra look-ahead is shown in separate columns. The split into 'partial / full / MAC' passes is the usual textbook presentation; the exact pass structure is **supplementary** to the lecture slides.
+
+## Arc-consistency look-ahead (MAC) (week 12, Constraint processing · lookahead)
+
+URL: https://1mystic.github.io/SearchStudio/learn/csp-lookahead-mac.html
+
+Look-ahead methods reason about the future variables after every assignment, so that dead ends are found one or more levels earlier. Forward checking only compares the variable just assigned with its future neighbours; the look-ahead methods also compare the future variables with each other.
+
+Definition: After assigning Xᵢ = a: (1) forward checking, then (2) forward checking, then AC-3 on the future variables until nothing changes (maintaining arc consistency). If any future domain becomes empty, reject a at once. This is the "Arc-consistency look-ahead (MAC)" variant: AC-3 to a fixpoint.
+
+Pseudocode:
+
+```
+Lookahead(assignment, domains, i):          # mode = mac
+    if i > n: return assignment
+    for each value a in D(Xᵢ)
+        D' ← copy of domains;  D'(Xᵢ) ← {a}
+        forward check: prune D'(Y) of every unassigned neighbour Y against Xᵢ = a
+        extra look-ahead (AC-3 to a fixpoint):
+            revise the future variables against each other
+        if no D'(Y) is empty: result ← Lookahead(assignment + {Xᵢ = a}, D', i + 1); if result: return it
+    return failure
+```
+
+- D(Y) ← { b ∈ D(Y) : ∃ c ∈ D(Z), (b, c) allowed by C(Y,Z) }: delete values of a future variable Y that have no support in another future variable Z. A value without support can never be part of a solution extending the current assignment, so deleting it is safe.
+
+A future variable can be squeezed empty by two OTHER future variables. Forward checking cannot see that until one of them is assigned; look-ahead sees it now. Example: after G = W the neighbours of G lose W and become single-valued, which empties D(E); only the look-ahead variants notice (see the example 'G = W wipes out E').
+
+Complete: yes. Optimal: n/a. Time: O(dⁿ) worst case, smaller tree than forward checking. Space: O(n·d) for domain copies.
+
+- Trap: The three variants prune in a strict order: forward checking < partial < full < MAC (each prunes at least what the previous one does). Example 'Look-ahead ladder' shows 17, 6, 5 and 3 values tried before the same conclusion (no solution).
+- Trap: Partial look-ahead depends on the variable order: a variable that is last in the ordering is never revised against anything, so it may miss a wipe-out that full look-ahead finds.
+- Trap: More pruning per node does not always mean less total time; each node costs more.
+- Trap: Which pruning came from forward checking and which from the extra look-ahead is shown in separate columns. The split into 'partial / full / MAC' passes is the usual textbook presentation; the exact pass structure is **supplementary** to the lecture slides.
+
+## Conflict-directed backjumping (week 12, Constraint processing · lookback)
+
+URL: https://1mystic.github.io/SearchStudio/learn/csp-cbj.html
+
+Chronological backtracking returns to the previous variable even when that variable has nothing to do with the failure. Conflict-directed backjumping is a look-back method: it analyses the failure and jumps back to the variable that is actually responsible.
+
+Definition: Each variable Xᵢ carries a conflict set conf(Xᵢ): the earlier variables whose current values rejected some value of Xᵢ. When Xᵢ has no value left, jump to the deepest variable h in conf(Xᵢ), unassign everything in between, merge conf(Xᵢ) − {h} into conf(h), and let h try its next value.
+
+Pseudocode:
+
+```
+CBJ(i):                                  # variables X₁…Xₙ in a fixed order
+    conf(Xᵢ) ← { }
+    for each value a in D(Xᵢ)
+        if a clashes with an assigned Xⱼ (j < i): add Xⱼ to conf(Xᵢ); try next value
+        else assign Xᵢ = a; r ← CBJ(i + 1); if r = success: return success
+             if r jumps to h < i: unassign Xᵢ; return r        # Xᵢ is skipped
+    h ← deepest variable in conf(Xᵢ)         # no value left
+    conf(h) ← conf(h) ∪ conf(Xᵢ) − {h}
+    return jump to h
+```
+
+- h = max { j : Xⱼ ∈ conf(Xᵢ) }: the jump target is the latest culprit. Every value of Xᵢ clashes with something in conf(Xᵢ); changing a variable outside it cannot help, and the latest culprit is the nearest place where a change might help.
+- conf(h) ← conf(h) ∪ conf(Xᵢ) − {h}: pass the blame on. If h fails after its other values are tried, the earlier culprits of Xᵢ are also culprits for h.
+
+Finds exactly the same first solution as chronological backtracking, with the same orders, in fewer or equal nodes: jumping over a variable never skips a solution.
+
+Complete: yes. Optimal: n/a. Time: O(dⁿ) worst case, ≤ backtracking. Space: O(n²) for conflict sets.
+
+- Trap: Try example 'Backjumping' (D fails because of A alone): CBJ jumps from D over B and C to A, 10 values tried against 24 for chronological backtracking. On example 'Thrashing' it needs 16 against 45, but forward checking (6) still beats it: CBJ is look-back, it reacts only after the failure.
+- Trap: A jump over a level is only possible when the failing variable has no conflict with the intermediate variables.
+- Trap: Conflict sets are only extended by the variables that clashed, not by every earlier variable.
+- Trap: The culprit recorded for each value here is the first clashing variable in the ordering (the usual Prosser formulation); other books record all of them. Both are sound; the choice of culprit is **supplementary** to the lecture.
+
+## Depth-First Branch and Bound (week 12, Graph search · optimal)
+
+URL: https://1mystic.github.io/SearchStudio/learn/search-dfbnb.html
+
+Depth-First Branch and Bound keeps the small memory of depth-first search but still finds the optimal path. It carries a bound U, the cost of the best complete path found so far, and cuts off any branch that already costs at least U.
+
+Definition: Explore depth-first. The first path to the goal sets U = its cost. From then on, a path to node N is pruned when g(N) + h(N) ≥ U, because with an admissible h no completion of it can be cheaper than U. Whenever a cheaper goal path is found, U is lowered. When the search ends, the best path found is optimal. Only the current path is stored, so memory is linear in the depth. With the option 'g only' the heuristic is ignored (h = 0): then the pruning test is g(N) ≥ U.
+
+Pseudocode:
+
+```
+U ← ∞;  best ← none
+DFBnB(N, g, path):
+    if g + h(N) ≥ U: prune; return                 # cannot improve on the best solution
+    if GoalTest(N): U ← g;  best ← path;  return   # a better solution
+    for each child C of N not on the path, in increasing order of g' + h(C):
+        DFBnB(C, g + k(N,C), path + C)
+return best
+```
+
+- prune N when g(N) + h(N) ≥ U: its best possible total is no better than the bound. With h ≤ h* the true cost of any path through N is at least g(N)+h(N), so continuing cannot help.
+- U ← min(U, g(goal)): tighten the bound at each solution. A smaller U prunes more of the remaining tree.
+
+It needs memory only for the current path, unlike A* whose OPEN list can grow exponentially, and it still returns an optimal path. Its weakness is that, on a graph, it may reach the same state again by many paths. A good first solution (found by ordering children well) makes it prune heavily.
+
+Complete: yes (finite graph). Optimal: yes with admissible h. Time: exponential worst case. Space: O(b·d).
+
+- Trap: The first goal found is not the answer: keep searching with the bound.
+- Trap: With an inadmissible h the pruning can discard the optimal path; with h = 0 ('g only') it is always safe.
+- Trap: A bad child ordering finds a poor U late and prunes little. On the 'Weighted graph' U improves twice (first S–A–C–E–G = 13, then the optimum S–B–E–G = 12) and every later branch is cut by g + h ≥ U.
+- Trap: Prune with ≥ U: a path equal to U cannot improve the answer.
+- Trap: Unlike A*, the first solution is usually not optimal; the search only stops when every branch is pruned. Use 'g only' to see the bound work without a heuristic: more branches survive.
+
+## Nogood recording (week 12, Constraint processing · lookback)
+
+URL: https://1mystic.github.io/SearchStudio/learn/csp-nogood.html
+
+Backtracking can discover the same dead end again and again under different irrelevant assignments. Nogood recording is a look-back method that remembers a dead end in a general form so it is never rediscovered.
+
+Definition: A nogood is a partial assignment that cannot be extended to a solution. When Xᵢ has no value left, the values of the variables in its conflict set form a nogood. Later, any assignment that contains a stored nogood is rejected immediately.
+
+Pseudocode:
+
+```
+Nogood-BT(i):
+    conf(Xᵢ) ← { }
+    for each value a in D(Xᵢ)
+        if some stored nogood ⊆ assignment + {Xᵢ = a}: add its other variables to conf(Xᵢ); skip a   # pruned by a nogood
+        else if a clashes with an assigned Xⱼ: add Xⱼ to conf(Xᵢ); skip a
+        else assign Xᵢ = a; if Nogood-BT(i + 1) succeeds: return success
+             else add the failed child's conflict set − {Xᵢ} to conf(Xᵢ)
+    store nogood { Xⱼ = value(Xⱼ) : Xⱼ ∈ conf(Xᵢ) }         # unless a smaller stored nogood already covers it
+    return failure                                            # chronological: go back to Xᵢ₋₁
+```
+
+- nogood = { Xⱼ = vⱼ : Xⱼ ∈ conf(Xᵢ) }: the culprits and their current values. The values in conf(Xᵢ) alone already exclude every value of Xᵢ, so any assignment containing them is hopeless, whatever else it says.
+
+Small nogoods prune big parts of the tree. In the example 'Nogood recording' the single nogood {A=r} found at D rejects three later values (C=z, B=y, B=z) without any search.
+
+Complete: yes. Optimal: n/a. Time: O(dⁿ) worst case, ≤ backtracking. Space: O(number of nogoods).
+
+- Trap: Try example 'Nogood recording': the dead end at D is stored as {A=r} and later rejects C=z, B=y and B=z without search (10 nodes against 24 for plain backtracking). Nogood recording is chronological, so it still goes back one level at a time; CBJ jumps but forgets, nogoods remember but do not jump.
+- Trap: A nogood only prunes assignments that contain ALL of its variable-value pairs.
+- Trap: Storing every nogood costs memory; real systems bound the size or the number of nogoods.
+- Trap: Nogoods whose variables are already covered by a smaller stored nogood are not stored again. This subsumption test is **supplementary**.

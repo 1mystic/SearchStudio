@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Best neighbour, k moves — step by step · Search Studio</title>
+<meta name="description" content="Hill climbing stops when no neighbour is better. A tempting fix is to keep going: always move to the best neighbour, even if it is worse. With no memory, this does not escape for long. From a local optimum the best neighbour is worse, but from there the best neighbour is usually the local optimum ag">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/tsp-best-neighbour-moves.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Best neighbour, k moves — step by step · Search Studio"><meta property="og:description" content="Hill climbing stops when no neighbour is better. A tempting fix is to keep going: always move to the best neighbour, even if it is worse. With no memory, this does not escape for long. From a local optimum the best neighbour is worse, but from there the best neighbour is usually the local optimum ag"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/tsp-best-neighbour-moves.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Best neighbour, k moves","description":"Hill climbing stops when no neighbour is better. A tempting fix is to keep going: always move to the best neighbour, even if it is worse. With no memory, this does not escape for long. From a local optimum the best neighbour is worse, but from there the best neighbour is usually the local optimum ag","url":"https://1mystic.github.io/SearchStudio/learn/tsp-best-neighbour-moves.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Best neighbour, k moves","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/tsp/best-neighbour-moves.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · TSP · local search</p><h1>Best neighbour, k moves</h1></div><a class="btn primary" href="../#try-tsp-best-neighbour-moves">Run it step by step</a></div>
+<p class="intro">Hill climbing stops when no neighbour is better. A tempting fix is to keep going: always move to the best neighbour, even if it is worse. With no memory, this does not escape for long. From a local optimum the best neighbour is worse, but from there the best neighbour is usually the local optimum again, so the search bounces back and forth.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Repeat a fixed number k of times: generate all neighbours of the current tour with the chosen MoveGen and move to the cheapest one (ties alphabetically by tour). There is no test for improvement and no memory of visited tours.</p>
+<h2><small>02</small>Pseudocode</h2><pre>N ← start;  bestSeen ← N
+repeat k moves
+    N ← the best neighbour of N          # lowest cost, even if worse than N
+    if N better than bestSeen: bestSeen ← N
+    if N was visited before: report the cycle
+return bestSeen</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>N ← best neighbour of N</td><td>The best neighbour is taken even if it is more expensive than N.</td></tr><tr><td>track bestSeen</td><td>The current tour may get worse, so remember the best tour met on the way.</td></tr><tr><td>N visited before → cycle</td><td>The move is deterministic: once a tour repeats, the same sequence repeats for ever.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">cycle length = move now − move when this tour was first visited</div><p class="read">how many moves until the tour returns</p><p class="why">A deterministic rule applied to a state we already visited must reproduce the same path again.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>It shows why local search needs more than a greedy best-neighbour rule: tabu search adds a memory (forbidden moves) and simulated annealing adds randomness precisely to break this cycle.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>k scans of the neighbourhood</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Reporting the final tour instead of the best tour seen.</li><li>Thinking that moving uphill alone is enough to escape a local optimum: without memory or randomness it goes straight back. On Six cities the walk bounces between 224 and 229 for ever (a cycle of length 2 from move 1), exactly the repetition that tabu search's memory forbids.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-ihc.html"><span>← Previous</span><b>Iterated hill climbing</b></a><a class="pg next" href="tsp-random-walk.html"><span>Next →</span><b>Random walk</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

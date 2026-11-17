@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Weighted A* — step by step · Search Studio</title>
+<meta name="description" content="Weighted A* multiplies the heuristic by a factor w ≥ 1. With w = 1 it is A*; with a large w it behaves like Best First Search. You trade optimality for speed, and the trade is controlled: the path is never worse than w times the best one.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-weighted-astar.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Weighted A* — step by step · Search Studio"><meta property="og:description" content="Weighted A* multiplies the heuristic by a factor w ≥ 1. With w = 1 it is A*; with a large w it behaves like Best First Search. You trade optimality for speed, and the trade is controlled: the path is never worse than w times the best one."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-weighted-astar.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Weighted A*","description":"Weighted A* multiplies the heuristic by a factor w ≥ 1. With w = 1 it is A*; with a large w it behaves like Best First Search. You trade optimality for speed, and the trade is controlled: the path is never worse than w times the best one.","url":"https://1mystic.github.io/SearchStudio/learn/search-weighted-astar.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Weighted A*","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/weighted-astar.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 5 · Graph search · optimal</p><h1>Weighted A*</h1></div><a class="btn primary" href="../#try-search-weighted-astar">Run it step by step</a></div>
+<p class="intro">Weighted A* multiplies the heuristic by a factor w ≥ 1. With w = 1 it is A*; with a large w it behaves like Best First Search. You trade optimality for speed, and the trade is controlled: the path is never worse than w times the best one.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>OPEN is ordered on f(N) = g(N) + w·h(N). Everything else is as in A*: a goal test when a node is picked, and cheaper paths update the pair (node, parent, g). If h is admissible (h ≤ h*), the cost of the path returned satisfies cost ≤ w · C*, where C* is the optimal cost. The tracer computes C* with a separate Uniform Cost Search and checks the bound at the end.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [(S, nil, g=0)] ordered by f = g + w·h
+while OPEN not empty
+    N ← node with least f;  remove it
+    if GoalTest(N): return the path               # cost ≤ w · C*  (admissible h)
+    move N to CLOSED
+    for each child C with g' = g(N) + k(N,C)
+        new: add to OPEN
+        cheaper than its pair on OPEN/CLOSED: update parent and g (reopen if CLOSED)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>f(N) = g(N) + w·h(N)</td><td>w = 1 is A*; w &gt; 1 favours nodes that look close to the goal.</td></tr><tr><td>N ← least-f node</td><td>Ties alphabetical.</td></tr><tr><td>if GoalTest(N): return</td><td>Not guaranteed optimal when w &gt; 1.</td></tr><tr><td>update cheaper paths</td><td>Reopen CLOSED nodes if needed.</td></tr><tr><td>check cost ≤ w · C*</td><td>Holds when h is admissible.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">f(N) = g(N) + w·h(N)</div><p class="read">cost so far plus w times the estimate</p><p class="why">w &gt; 1 inflates h, which pulls the search toward the goal.</p></div><div class="formula"><div class="f">cost(path) ≤ w · C*   (h admissible, w ≥ 1)</div><p class="read">at most w times the optimum</p><p class="why">w·h(N) ≤ w·h*(N), so w·h is within a factor w of an admissible estimate, and the first goal picked can be only that much worse than the best.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Fewer expansions than A* on many graphs, at the price of a controlled loss of optimality. It is a good compromise when A* is too slow. The bound is a guarantee, not a prediction: the actual path is often optimal.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>no: within w · C* with admissible h</div><div class="prop"><span>time</span>often much less than A*</div><div class="prop"><span>space</span>same as A*</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The bound needs an admissible h. With an inadmissible h there is no guarantee at all (try the inadmissible example).</li><li>w = 1 gives plain A*; w &lt; 1 is not weighted A* (it drifts toward UCS and loses the bound meaning).</li><li>A larger w does not always expand fewer nodes on every graph; it usually does.</li><li>The trade in numbers: on the 'Dijkstra demo' graph w = 2 returns S–C–G at cost 9 (optimum 8, bound 2 × 8 = 16) after 3 expansions instead of A*'s 5; on the 4×5 grid w = 2 expands 8 nodes instead of 20 and still finds cost 7. Set w = 1 to get A* back.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="search-astar.html"><span>← Previous</span><b>A*</b></a><a class="pg next" href="search-heuristic-comparison.html"><span>Next →</span><b>Heuristic comparison (A* with h = 0, h, h*)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

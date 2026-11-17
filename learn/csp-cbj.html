@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Conflict-directed backjumping — step by step · Search Studio</title>
+<meta name="description" content="Chronological backtracking returns to the previous variable even when that variable has nothing to do with the failure. Conflict-directed backjumping is a look-back method: it analyses the failure and jumps back to the variable that is actually responsible.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/csp-cbj.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Conflict-directed backjumping — step by step · Search Studio"><meta property="og:description" content="Chronological backtracking returns to the previous variable even when that variable has nothing to do with the failure. Conflict-directed backjumping is a look-back method: it analyses the failure and jumps back to the variable that is actually responsible."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/csp-cbj.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Conflict-directed backjumping","description":"Chronological backtracking returns to the previous variable even when that variable has nothing to do with the failure. Conflict-directed backjumping is a look-back method: it analyses the failure and jumps back to the variable that is actually responsible.","url":"https://1mystic.github.io/SearchStudio/learn/csp-cbj.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Conflict-directed backjumping","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/csp/backjumping.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 12 · Constraint processing · lookback</p><h1>Conflict-directed backjumping</h1></div><a class="btn primary" href="../#try-csp-cbj">Run it step by step</a></div>
+<p class="intro">Chronological backtracking returns to the previous variable even when that variable has nothing to do with the failure. Conflict-directed backjumping is a look-back method: it analyses the failure and jumps back to the variable that is actually responsible.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Each variable Xᵢ carries a conflict set conf(Xᵢ): the earlier variables whose current values rejected some value of Xᵢ. When Xᵢ has no value left, jump to the deepest variable h in conf(Xᵢ), unassign everything in between, merge conf(Xᵢ) − {h} into conf(h), and let h try its next value.</p>
+<h2><small>02</small>Pseudocode</h2><pre>CBJ(i):                                  # variables X₁…Xₙ in a fixed order
+    conf(Xᵢ) ← { }
+    for each value a in D(Xᵢ)
+        if a clashes with an assigned Xⱼ (j &lt; i): add Xⱼ to conf(Xᵢ); try next value
+        else assign Xᵢ = a; r ← CBJ(i + 1); if r = success: return success
+             if r jumps to h &lt; i: unassign Xᵢ; return r        # Xᵢ is skipped
+    h ← deepest variable in conf(Xᵢ)         # no value left
+    conf(h) ← conf(h) ∪ conf(Xᵢ) − {h}
+    return jump to h</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>try a value of Xᵢ</td><td></td></tr><tr><td>clash with an earlier Xⱼ</td><td>Record Xⱼ in conf(Xᵢ): it is a culprit.</td></tr><tr><td>no value left</td><td>Dead end for Xᵢ.</td></tr><tr><td>jump to the deepest variable in conf(Xᵢ)</td><td>Variables between h and Xᵢ are skipped: changing them cannot repair the failure.</td></tr><tr><td>merge the conflict sets</td><td>h inherits the other culprits, so that if h fails too the jump is still correct.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">h = max { j : Xⱼ ∈ conf(Xᵢ) }</div><p class="read">the jump target is the latest culprit</p><p class="why">Every value of Xᵢ clashes with something in conf(Xᵢ); changing a variable outside it cannot help, and the latest culprit is the nearest place where a change might help.</p></div><div class="formula"><div class="f">conf(h) ← conf(h) ∪ conf(Xᵢ) − {h}</div><p class="read">pass the blame on</p><p class="why">If h fails after its other values are tried, the earlier culprits of Xᵢ are also culprits for h.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Finds exactly the same first solution as chronological backtracking, with the same orders, in fewer or equal nodes: jumping over a variable never skips a solution.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>n/a</div><div class="prop"><span>time</span>O(dⁿ) worst case, ≤ backtracking</div><div class="prop"><span>space</span>O(n²) for conflict sets</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Try example 'Backjumping' (D fails because of A alone): CBJ jumps from D over B and C to A, 10 values tried against 24 for chronological backtracking. On example 'Thrashing' it needs 16 against 45, but forward checking (6) still beats it: CBJ is look-back, it reacts only after the failure.</li><li>A jump over a level is only possible when the failing variable has no conflict with the intermediate variables.</li><li>Conflict sets are only extended by the variables that clashed, not by every earlier variable.</li><li>The culprit recorded for each value here is the first clashing variable in the ordering (the usual Prosser formulation); other books record all of them. Both are sound; the choice of culprit is **supplementary** to the lecture.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="csp-lookahead-mac.html"><span>← Previous</span><b>Arc-consistency look-ahead (MAC)</b></a><a class="pg next" href="search-dfbnb.html"><span>Next →</span><b>Depth-First Branch and Bound</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

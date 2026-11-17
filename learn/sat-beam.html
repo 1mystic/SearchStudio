@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Beam search — step by step · Search Studio</title>
+<meta name="description" content="Hill climbing follows a single path and so can be trapped. Beam search keeps a small population of w assignments: the w best of everything reachable in one flip from the current beam. A wider beam explores more routes at the cost of w times more work per level.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-beam.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Beam search — step by step · Search Studio"><meta property="og:description" content="Hill climbing follows a single path and so can be trapped. Beam search keeps a small population of w assignments: the w best of everything reachable in one flip from the current beam. A wider beam explores more routes at the cost of w times more work per level."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-beam.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Beam search","description":"Hill climbing follows a single path and so can be trapped. Beam search keeps a small population of w assignments: the w best of everything reachable in one flip from the current beam. A wider beam explores more routes at the cost of w times more work per level.","url":"https://1mystic.github.io/SearchStudio/learn/sat-beam.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Beam search","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/beam-search.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · SAT · local search</p><h1>Beam search</h1></div><a class="btn primary" href="../#try-sat-beam">Run it step by step</a></div>
+<p class="intro">Hill climbing follows a single path and so can be trapped. Beam search keeps a small population of w assignments: the w best of everything reachable in one flip from the current beam. A wider beam explores more routes at the cost of w times more work per level.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Level 0 is [start]. At each level, generate the N1 neighbours of every assignment in the beam (removing duplicates), sort them by h, and keep the best w. Stop when no solution appears and the best h of the new beam is not higher than that of the old one; return the best assignment seen.</p>
+<h2><small>02</small>Pseudocode</h2><pre>OPEN ← [start]                       # the beam, best first
+loop
+    if some X in OPEN has h(X) = m: return X
+    cand ← distinct N1 neighbours of every X in OPEN
+    OPEN ← the w best of cand by h (ties: order of generation, lowest bit first)
+    if h(head of OPEN) ≤ h(previous head): stop
+return the best assignment seen</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>OPEN ← [start]</td><td>The beam; its first element is the head.</td></tr><tr><td>if some X in OPEN is a solution: return X</td><td>Goal test when the assignment is taken from the beam.</td></tr><tr><td>cand ← distinct neighbours of the beam</td><td>Two beam members can share a neighbour; keep it once.</td></tr><tr><td>OPEN ← the w best of cand</td><td>Ties keep generation order: beam order first, then lowest bit.</td></tr><tr><td>stop if the head did not improve</td><td>Otherwise the next level starts from the new beam.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">|cand| ≤ w · n</div><p class="read">at most w·n candidates per level</p><p class="why">The work per level is linear in the beam width.</p></div><div class="formula"><div class="f">w = 1 ⇒ hill climbing; w ≥ 2ⁿ ⇒ breadth-first over the whole space</div><p class="read">the width interpolates between the two</p><p class="why">The same dial as in graph and TSP beam search.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>The beam lets a runner-up survive. Hill climbing keeps only the single best neighbour, but the second-best string may have a neighbour that beats everything reachable from the best one. On the example 'Local-maximum trap' (sat-local-trap) from 0000: w = 1 is hill climbing and stops at 0100 (h 7); w = 2 also keeps 0001 (h 7), and its neighbour 0011 has h 8, a solution, at level 2. The beam is still incomplete: it stops as soon as the head does not improve, so it cannot cross a plateau, and if all w members fall into the same basin it stalls like hill climbing. On the course example sat-four-var even w = 4 stops at 1000 (h 5), because the head of the beam does not improve at level 2.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no</div><div class="prop"><span>optimal</span>no</div><div class="prop"><span>time</span>O(levels · w · n · m)</div><div class="prop"><span>space</span>O(w · n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>The beam holds the w best of all neighbours together, not w neighbours per member.</li><li>Remove duplicate neighbours, or the beam fills up with copies of the same string.</li><li>Stopping rule: the head not improving. A level whose beam is merely as good as the last one ends the search, so a wider beam does not help on a plateau (try sat-four-var with w = 1 to 4).</li><li>A wider beam is not always better; it costs w times more evaluations and only helps when a runner-up leads somewhere the best member does not.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-greedy.html"><span>← Previous</span><b>Greedy heuristic</b></a><a class="pg next" href="tsp-savings.html"><span>Next →</span><b>Savings heuristic</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

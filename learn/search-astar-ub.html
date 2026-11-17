@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A* with upper-bound pruning of OPEN — step by step · Search Studio</title>
+<meta name="description" content="OPEN is where A* spends much of its memory. If we already know some solution of cost U, any node whose estimate f = g + h exceeds U cannot be on a cheaper solution (with an admissible h), so it is not worth storing. **Supplementary:** this is the bound used in Zhou and Hansen's space-saving A* varia">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/search-astar-ub.html">
+<meta property="og:type" content="article"><meta property="og:title" content="A* with upper-bound pruning of OPEN — step by step · Search Studio"><meta property="og:description" content="OPEN is where A* spends much of its memory. If we already know some solution of cost U, any node whose estimate f = g + h exceeds U cannot be on a cheaper solution (with an admissible h), so it is not worth storing. **Supplementary:** this is the bound used in Zhou and Hansen's space-saving A* varia"><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/search-astar-ub.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"A* with upper-bound pruning of OPEN","description":"OPEN is where A* spends much of its memory. If we already know some solution of cost U, any node whose estimate f = g + h exceeds U cannot be on a cheaper solution (with an admissible h), so it is not worth storing. **Supplementary:** this is the bound used in Zhou and Hansen's space-saving A* varia","url":"https://1mystic.github.io/SearchStudio/learn/search-astar-ub.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"A* with upper-bound pruning of OPEN","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/search/a-star-ub.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 6 · Graph search · space saving</p><h1>A* with upper-bound pruning of OPEN</h1></div><a class="btn primary" href="../#try-search-astar-ub">Run it step by step</a></div>
+<p class="intro">OPEN is where A* spends much of its memory. If we already know some solution of cost U, any node whose estimate f = g + h exceeds U cannot be on a cheaper solution (with an admissible h), so it is not worth storing. **Supplementary:** this is the bound used in Zhou and Hansen's space-saving A* variants; it is not in the lecture slides.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Run A* as usual, but when a child C is generated with f(C) = g(C) + h(C) &gt; U, drop it instead of adding it to OPEN. U can be given or obtained cheaply, for instance from greedy best-first search. If OPEN becomes empty without reaching the goal, the quick solution that produced U is returned.</p>
+<h2><small>02</small>Pseudocode</h2><pre>U ← cost of a quick solution (greedy by h) or a given bound
+OPEN ← [(S, nil, 0)]
+while OPEN not empty
+    N ← node with least f = g + h;  remove it
+    if GoalTest(N): return the path
+    move N to CLOSED
+    for each child C with g' = g(N) + k(N,C)
+        if g' + h(C) &gt; U: discard C  (never enters OPEN)
+        else add / update C exactly as A* does
+return the quick solution if OPEN empties (it was optimal or h was inadmissible)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>U ← greedy solution cost</td><td>Any solution is an upper bound on the optimum.</td></tr><tr><td>N ← least f; goal test</td><td>Same as A*: goal test happens when the node is picked.</td></tr><tr><td>if f(C) &gt; U discard C</td><td>With admissible h no better path goes through C.</td></tr><tr><td>OPEN empty: return the quick solution</td><td>Only happens when U was already optimal, or when h overestimates.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">discard C when g(C) + h(C) &gt; U</div><p class="read">the best possible cost through C is already worse than a known solution</p><p class="why">With h ≤ h*, g(C) + h(C) never overestimates the cheapest solution through C, so such a C cannot improve on U.</p></div><div class="formula"><div class="f">C* ≤ U</div><p class="read">the optimum is at most the bound</p><p class="why">U is the cost of a real solution. A bound below C* would wrongly discard every solution; the run then reports failure.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>A better bound prunes more: on the 'Dijkstra demo' graph the greedy bound U = 9 keeps peak OPEN at 2 where A* needs 3. The saving is on OPEN only: CLOSED is as large as in A*. Combine with CLOSED-pruning methods (BFHS, SMGS) for real savings.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes if U ≥ C*</div><div class="prop"><span>optimal</span>yes with admissible h and U ≥ C*</div><div class="prop"><span>time</span>at most A*'s</div><div class="prop"><span>space</span>OPEN smaller than A*, CLOSED same</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>With an inadmissible h, a node with f &gt; U may still lead to a cheaper path, so pruning can lose the optimum (the search then falls back to the quick solution).</li><li>A bound that is too small yields no solution at all.</li><li>Nodes with f = U are kept: they may still give a solution of cost exactly U.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="align-dp.html"><span>← Previous</span><b>Sequence alignment (dynamic programming)</b></a><a class="pg next" href="align-astar.html"><span>Next →</span><b>Sequence alignment (A*)</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

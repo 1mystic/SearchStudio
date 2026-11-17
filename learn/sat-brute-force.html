@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brute force (truth table) — step by step · Search Studio</title>
+<meta name="description" content="A SAT instance asks for an assignment of true or false to every variable that makes every clause true. With n variables there are 2ⁿ assignments, so the most direct method is to try them all. This is the baseline against which the local-search methods of this week are measured.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/sat-brute-force.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Brute force (truth table) — step by step · Search Studio"><meta property="og:description" content="A SAT instance asks for an assignment of true or false to every variable that makes every clause true. With n variables there are 2ⁿ assignments, so the most direct method is to try them all. This is the baseline against which the local-search methods of this week are measured."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/sat-brute-force.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Brute force (truth table)","description":"A SAT instance asks for an assignment of true or false to every variable that makes every clause true. With n variables there are 2ⁿ assignments, so the most direct method is to try them all. This is the baseline against which the local-search methods of this week are measured.","url":"https://1mystic.github.io/SearchStudio/learn/sat-brute-force.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Brute force (truth table)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/sat/brute-force.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 3 · SAT · exact</p><h1>Brute force (truth table)</h1></div><a class="btn primary" href="../#try-sat-brute-force">Run it step by step</a></div>
+<p class="intro">A SAT instance asks for an assignment of true or false to every variable that makes every clause true. With n variables there are 2ⁿ assignments, so the most direct method is to try them all. This is the baseline against which the local-search methods of this week are measured.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>Treat the assignment as a bit string (bit i = 1 means variable i is true). Enumerate every bit string, evaluate every clause, and record h = the number of satisfied clauses. A string with h = m satisfies the formula.</p>
+<h2><small>02</small>Pseudocode</h2><pre>for each bit string X of length n, in counting order 00…0, 00…1, …
+    h(X) ← number of clauses satisfied by X
+    if h(X) = m: X is a solution
+return the solutions (or, if none, the rows with the largest h)</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>for each bit string X in counting order</td><td>0000, 0001, 0010, … with the first variable as the leftmost bit.</td></tr><tr><td>h(X) ← clauses satisfied by X</td><td>A clause is satisfied when at least one of its literals is true.</td></tr><tr><td>if h(X) = m: X is a solution</td><td>Every clause true. Keep going: there may be more than one solution.</td></tr><tr><td>return the solutions</td><td>If the table has no h = m row, the formula is unsatisfiable and the largest h is the best we can do.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">|search space| = 2ⁿ</div><p class="read">two choices per variable</p><p class="why">This is why n is limited to 6 here: 2⁶ = 64 rows still fit on a screen; 2²⁰ is already a million.</p></div><div class="formula"><div class="f">h(X) = Σᵢ [clauseᵢ satisfied by X]</div><p class="read">the heuristic is the number of true clauses</p><p class="why">The same h guides every local-search method in this section; local search tries to climb to h = m without enumerating the table.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Brute force is complete and exact, which makes it the reference answer: every local-search result can be checked against its truth table. Its cost is the reason local search exists.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>yes</div><div class="prop"><span>optimal</span>yes (finds every solution)</div><div class="prop"><span>time</span>O(2ⁿ · m)</div><div class="prop"><span>space</span>O(n)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>A solution is h = m (all clauses), not just a high h.</li><li>There can be several solutions, or none; do not stop at the first unless asked.</li><li>The truth table grows as 2ⁿ: adding one variable doubles it.</li><li>No row with h = m proves the formula unsatisfiable: on sat-unsat the best rows have h = 4 of 5 clauses, and brute force can say 'none' for certain. Local search failing says nothing of the kind.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="tsp-brute-force.html"><span>← Previous</span><b>Brute force (exact)</b></a><a class="pg next" href="tsp-nearest-neighbour.html"><span>Next →</span><b>Nearest Neighbour</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Path consistency (PC, i-consistency) — step by step · Search Studio</title>
+<meta name="description" content="Arc consistency looks at one constraint at a time. Path consistency looks at a path of two constraints through a third variable, which is the smallest way to notice that constraints interact.">
+<link rel="canonical" href="https://1mystic.github.io/SearchStudio/learn/csp-path-consistency.html">
+<meta property="og:type" content="article"><meta property="og:title" content="Path consistency (PC, i-consistency) — step by step · Search Studio"><meta property="og:description" content="Arc consistency looks at one constraint at a time. Path consistency looks at a path of two constraints through a third variable, which is the smallest way to notice that constraints interact."><meta property="og:url" content="https://1mystic.github.io/SearchStudio/learn/csp-path-consistency.html"><meta property="og:image" content="https://1mystic.github.io/SearchStudio/assets/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="author" content="1mystic">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../src/styles/studio.css">
+<script>try{var t=JSON.parse(localStorage.getItem("search-studio.v1")||"{}").theme;if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Path consistency (PC, i-consistency)","description":"Arc consistency looks at one constraint at a time. Path consistency looks at a path of two constraints through a third variable, which is the smallest way to notice that constraints interact.","url":"https://1mystic.github.io/SearchStudio/learn/csp-path-consistency.html","learningResourceType":"explanation with pseudocode and worked trace","isAccessibleForFree":true,"inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Search Studio","url":"https://1mystic.github.io/SearchStudio/"},"author":{"@type":"Person","name":"1mystic","url":"https://github.com/1mystic"},"teaches":"Path consistency (PC, i-consistency)","educationalLevel":"undergraduate"}</script>
+</head>
+<body>
+<header class="top"><div class="top-in"><a class="brand" href="../"><b>Search</b> Studio <small>AI-SMPS</small></a><nav class="nav"><a href="../#library">Learn</a><a href="../#studio">Studio</a><a href="../#course">Course map</a><a href="../#guide">Guide</a></nav></div></header>
+<main><article class="learn" style="max-width:900px"><div class="filebar"><div class="filecrumb"><span class="fc-ic">▤</span>algorithms/csp/path-consistency.js</div></div>
+<div class="learn-body" style="margin:0 auto">
+<div class="learn-head"><div><p class="eyebrow">Week 11 · Constraint processing</p><h1>Path consistency (PC, i-consistency)</h1></div><a class="btn primary" href="../#try-csp-path-consistency">Run it step by step</a></div>
+<p class="intro">Arc consistency looks at one constraint at a time. Path consistency looks at a path of two constraints through a third variable, which is the smallest way to notice that constraints interact.</p>
+<p class="print-tip no-print"><span class="pt-ic" aria-hidden="true">⎙</span><span>Tip: press <kbd>Ctrl</kbd>+<kbd>P</kbd> to print or save this page as PDF.</span></p>
+<h2><small>01</small>Definition</h2><p>The network is i-consistent if every consistent assignment to any i − 1 variables can be extended to any i-th variable. Arc consistency is 2-consistency; path consistency is 3-consistency: every consistent pair (X = a, Y = b) can be extended to every third variable Z. Enforcing it deletes pairs from the relation R(X,Y), possibly making a new implicit constraint between variables that had none.</p>
+<h2><small>02</small>Pseudocode</h2><pre>PC-1:
+    R(X,Y) ← allowed pairs of the constraint, or all pairs if X and Y are unconstrained
+    repeat
+        for each triangle (X, Z, Y)
+            R(X,Y) ← R(X,Y) ∩ ( R(X,Z) ∘ R(Z,Y) )       # (a,b) needs a witness c in D(Z)
+    until no relation changed
+    if some R(X,Y) is empty: no solution</pre>
+<h2><small>03</small>Line by line</h2><div class="tbl-plain"><table class="steps-tbl"><tbody><tr><td>pick a triangle X, Z, Y</td><td>Only two constraints are used at a time: R(X,Z) and R(Z,Y).</td></tr><tr><td>compose R(X,Z) ∘ R(Z,Y)</td><td>All pairs (a, b) for which some c fits both.</td></tr><tr><td>intersect with R(X,Y)</td><td>Pairs without a witness are deleted.</td></tr><tr><td>repeat until nothing changes</td><td>A deletion can destroy the witness of another pair.</td></tr><tr><td>empty relation</td><td>No solution.</td></tr></tbody></table></div>
+<h2><small>04</small>Formulas and why they hold</h2><div class="formula"><div class="f">R(X,Y) ← R(X,Y) ∩ { (a,b) : ∃ c ∈ D(Z), (a,c) ∈ R(X,Z) ∧ (c,b) ∈ R(Z,Y) }</div><p class="read">keep a pair only if the third variable can be given a value that works with both</p><p class="why">In any solution containing X = a, Y = b, the variable Z has some value c, and that value must satisfy both constraints, so pairs with no such c cannot be in a solution.</p></div><div class="formula"><div class="f">k-consistency: every consistent (k−1)-assignment extends to any k-th variable</div><p class="read">k = 1 node, k = 2 arc, k = 3 path</p><p class="why">Higher k reasons about bigger groups, at a higher cost; k = n gives a backtrack-free search.</p></div>
+<h2><small>05</small>Why it works, and when it does not</h2><p>Two colours on a triangle: each value has a partner on every edge, so arc consistency removes nothing, yet three mutually different variables with two values cannot exist. Path consistency empties a relation and proves it.</p>
+<h2><small>06</small>Properties</h2><div class="props"><div class="prop"><span>complete</span>no (filtering only)</div><div class="prop"><span>optimal</span>n/a</div><div class="prop"><span>time</span>O(n³·d³) per sweep</div><div class="prop"><span>space</span>O(n²·d²)</div></div>
+<h2><small>07</small>Traps</h2><ul class="traps"><li>Try example 'Two colours on a triangle': run Arc consistency first (nothing is deleted), then this algorithm (a relation becomes empty). Path consistency is strictly stronger than arc consistency, and also costlier.</li><li>Path consistency prunes PAIRS (it changes constraints), not just values; domains shrink only afterwards, when arc consistency is run on the tightened relations (done in the last step).</li><li>It can add constraints between variables that had none: unconstrained pairs start as 'all pairs allowed'.</li><li>The i-consistency hierarchy (strong i-consistency for i = n gives backtrack-free search) is shown as background; only the 3-consistency algorithm is traced. The remark on strong k-consistency is **supplementary**.</li></ul>
+<nav class="pager bottom"><a class="pg prev" href="csp-ac3.html"><span>← Previous</span><b>Arc consistency (AC-1, AC-3)</b></a><a class="pg next" href="csp-waltz.html"><span>Next →</span><b>Waltz algorithm</b></a></nav>
+</div></article></main>
+<footer class="foot"><div class="foot-in"><div class="foot-l"><a class="brand small" href="../"><b>Search</b> Studio</a><span>91 algorithms · free and public domain (Unlicense)</span></div><div class="foot-r"><span class="made">made by <a href="https://github.com/1mystic" rel="author noopener">1mystic</a></span></div></div></footer>
+</body>
+</html>
