@@ -68,24 +68,24 @@ DFS(N, g, bound):
   },
   params: [],
   run(P) {
-    const steps = [], summary = [];
+    const steps = [], summary = [], F = Studio.fmt;
     let bound = P.h[P.start], total = 0;
     for (let round = 1; round <= 60; round++) {
       let next = Infinity, expanded = 0, found = null;
       const path = [P.start];
       const snap = (cur, cap, cut = []) => {
         const states = {}; path.forEach(p => (states[p] = "visited")); states[cur] = "current"; cut.forEach(c => (states[c] = states[c] || "closed"));
-        steps.push({ caption: `bound ${bound}: ${cap}`, nodes: Studio.gs.nodes(P, states), edges: Studio.gs.edges(P, path),
+        steps.push({ caption: `bound ${F(bound)}: ${cap}`, nodes: Studio.gs.nodes(P, states), edges: Studio.gs.edges(P, path),
           lists: [{ label: "PATH", items: path.map(p => ({ text: p, state: "open" })) }],
-          table: { title: "rounds", columns: ["bound", "expanded", "next bound", "result"], rows: summary.concat([[bound, expanded, next === Infinity ? "∞" : next, "…"]]), rowStates: summary.map(() => "").concat(["cur"]) },
-          stats: [{ label: "g", value: Studio.gs.pathCost(P, path) }, { label: "f", value: Studio.gs.pathCost(P, path) + P.h[cur] }, { label: "bound", value: bound }] });
+          table: { title: "rounds", columns: ["bound", "expanded", "next bound", "result"], rows: summary.concat([[F(bound), expanded, next === Infinity ? "∞" : F(next), "…"]]), rowStates: summary.map(() => "").concat(["cur"]) },
+          stats: [{ label: "g", value: F(Studio.gs.pathCost(P, path)) }, { label: "f", value: F(Studio.gs.pathCost(P, path) + P.h[cur]) }, { label: "bound", value: F(bound) }] });
       };
       const dfs = (N, g) => {
         const f = g + P.h[N];
-        if (f > bound) { next = Math.min(next, f); snap(N, `f(${N}) = ${g}+${P.h[N]} = ${f} > ${bound}: cut off`); return false; }
+        if (f > bound) { next = Math.min(next, f); snap(N, `f(${N}) = ${F(g)}+${F(P.h[N])} = ${F(f)} > ${F(bound)}: cut off`); return false; }
         if (N === P.goal) { found = path.slice(); return true; }
         expanded++;
-        snap(N, `expand ${N}: g = ${g}, f = ${f} ≤ ${bound}`);
+        snap(N, `expand ${N}: g = ${F(g)}, f = ${F(f)} ≤ ${F(bound)}`);
         for (const [c, w] of P.adj[N]) {
           if (path.includes(c)) continue;
           path.push(c);
@@ -98,14 +98,14 @@ DFS(N, g, bound):
       total += expanded;
       if (found) {
         const cost = Studio.gs.pathCost(P, found);
-        summary.push([bound, expanded, "–", `found ${found.join("–")} = ${cost}`]);
-        steps.push({ caption: `bound ${bound}: goal reached, path ${found.join(" – ")}, cost ${cost}; ${total} expansions over ${round} rounds`,
+        summary.push([F(bound), expanded, "–", `found ${found.join("–")} = ${F(cost)}`]);
+        steps.push({ caption: `bound ${F(bound)}: goal reached, path ${found.join(" – ")}, cost ${F(cost)}; ${total} expansions over ${round} rounds`,
           nodes: Studio.gs.nodes(P, Object.fromEntries(found.map(p => [p, p === P.goal ? "goal" : "path"]))), edges: Studio.gs.edges(P, found),
           table: { title: "rounds", columns: ["bound", "expanded", "next bound", "result"], rows: summary, rowStates: summary.map((_, i) => (i === summary.length - 1 ? "ok" : "")) },
-          stats: [{ label: "path cost", value: cost, state: "ok" }, { label: "total expanded", value: total }] });
+          stats: [{ label: "path cost", value: F(cost), state: "ok" }, { label: "total expanded", value: total }] });
         return { steps, result: { found: true, path: found, cost, expanded: total } };
       }
-      summary.push([bound, expanded, next === Infinity ? "∞" : next, "no path within bound"]);
+      summary.push([F(bound), expanded, next === Infinity ? "∞" : F(next), "no path within bound"]);
       if (next === Infinity) break;
       bound = next;
     }

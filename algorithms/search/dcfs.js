@@ -53,7 +53,7 @@ Studio.register({
   },
   params: [],
   run(P) {
-    const steps = [], log = [];
+    const steps = [], log = [], F = Studio.fmt;
     let peak = 0, totalExp = 0;
     const solve = (s, g, depth, useH) => {
       const h = id => (useH ? P.h[id] : 0);
@@ -77,9 +77,9 @@ Studio.register({
         }
         peak = Math.max(peak, OPEN.size);
         const states = {}; for (const k of OPEN.keys()) states[k] = "open"; states[N.id] = "current"; states[s] = states[s] || "start"; states[g] = states[g] || "goalcand";
-        steps.push({ caption: `${"· ".repeat(depth)}search ${s}→${g}: expand ${N.id} (g=${N.g}); OPEN keeps ${OPEN.size} nodes and no CLOSED list`,
-          nodes: Studio.gs.nodes(P, states, Object.fromEntries([...OPEN.values()].map(x => [x.id, x.g]))), edges: Studio.gs.edges(P),
-          lists: [{ label: "OPEN", items: [...OPEN.values()].map(x => ({ text: `(${x.id}, g=${x.g}, used {${[...x.used].join(",")}}${x.relay ? ", relay " + x.relay : ""})`, state: "open" })) }],
+        steps.push({ caption: `${"· ".repeat(depth)}search ${s}→${g}: expand ${N.id} (g=${F(N.g)}); OPEN keeps ${OPEN.size} nodes and no CLOSED list`,
+          nodes: Studio.gs.nodes(P, states, Object.fromEntries([...OPEN.values()].map(x => [x.id, F(x.g)]))), edges: Studio.gs.edges(P),
+          lists: [{ label: "OPEN", items: [...OPEN.values()].map(x => ({ text: `(${x.id}, g=${F(x.g)}, used {${[...x.used].join(",")}}${x.relay ? ", relay " + x.relay : ""})`, state: "open" })) }],
           table: { title: "sub-problems", columns: ["level", "search", "result"], rows: log.map(l => l.slice()) }, stats: [{ label: "OPEN", value: OPEN.size }, { label: "peak memory", value: peak }] });
       }
       totalExp += exp;
@@ -89,7 +89,7 @@ Studio.register({
       // midpoint relay: with h the relay was set at g ≥ f(S)/2; without h, rerun picking the node on the path with g closest to C/2
       let R = found.relay;
       if (!R || R === s || R === g) {
-        if (found.cnt <= 1) { log.push([depth, `${s}→${g}`, `adjacent, cost ${C}`]); return [s, g]; }
+        if (found.cnt <= 1) { log.push([depth, `${s}→${g}`, `adjacent, cost ${F(C)}`]); return [s, g]; }
         // fallback: second search marking relays at C/2 now that C is known
         const OP2 = new Map([[s, { id: s, g: 0, used: new Set(), relay: null, parent: null }]]); let f2 = null;
         while (OP2.size) {
@@ -101,7 +101,7 @@ Studio.register({
         R = f2 && f2.relay;
         if (!R || R === s || R === g) R = found.parent; // the goal's predecessor is always an interior node here
       }
-      log.push([depth, `${s}→${g}`, `cost ${C}, relay ${R}`]);
+      log.push([depth, `${s}→${g}`, `cost ${F(C)}, relay ${R}`]);
       const left = solve(s, R, depth + 1, false), right = solve(R, g, depth + 1, false);
       if (!left || !right) return null;
       return left.concat(right.slice(1));
@@ -109,9 +109,9 @@ Studio.register({
     const path = solve(P.start, P.goal, 0, true);
     if (!path) { steps.push({ caption: "No path to the goal", nodes: Studio.gs.nodes(P), edges: Studio.gs.edges(P) }); return { steps, result: { found: false, expanded: totalExp } }; }
     const cost = Studio.gs.pathCost(P, path);
-    steps.push({ caption: `Path rebuilt from relays: ${path.join(" – ")}, cost ${cost}. Peak OPEN size ${peak} (no CLOSED list stored)`,
+    steps.push({ caption: `Path rebuilt from relays: ${path.join(" – ")}, cost ${F(cost)}. Peak OPEN size ${peak} (no CLOSED list stored)`,
       nodes: Studio.gs.nodes(P, Object.fromEntries(path.map(p => [p, p === P.goal ? "goal" : "path"]))), edges: Studio.gs.edges(P, path),
-      table: { title: "sub-problems", columns: ["level", "search", "result"], rows: log }, stats: [{ label: "path cost", value: cost, state: "ok" }, { label: "peak OPEN", value: peak }] });
+      table: { title: "sub-problems", columns: ["level", "search", "result"], rows: log }, stats: [{ label: "path cost", value: F(cost), state: "ok" }, { label: "peak OPEN", value: peak }] });
     return { steps, result: { found: true, path, cost, expanded: totalExp } };
   },
 });

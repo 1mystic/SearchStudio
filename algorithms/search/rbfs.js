@@ -7,14 +7,14 @@ Studio.register({
   problem: "graph",
   order: 75,
   summary: "Explore the best child while its f stays below the best alternative elsewhere; when it exceeds that limit, back up its f value and switch. Keeps only the current path and its siblings.",
-  pseudocode: `RBFS(N, F(N), limit):
+  pseudocode: `RBFS(N, fm(N), limit):
     if GoalTest(N): return SUCCESS
     children ← MoveGen(N) not on the current path
-    for each child C: F(C) ← max(g(C) + h(C), F(N))     # inherit a backed-up value
+    for each child C: fm(C) ← max(g(C) + h(C), fm(N))     # inherit a backed-up value
     loop
-        best ← child with least F;  if F(best) > limit: return FAIL, F(best)
+        best ← child with least F;  if fm(best) > limit: return FAIL, fm(best)
         alt ← second least F (∞ if none)
-        result, F(best) ← RBFS(best, F(best), min(limit, alt))
+        result, fm(best) ← RBFS(best, fm(best), min(limit, alt))
         if result = SUCCESS: return SUCCESS
 call RBFS(S, h(S), ∞)`,
   complexity: "Space O(b·d); time can exceed A* because subtrees are re-expanded",
@@ -23,7 +23,7 @@ call RBFS(S, h(S), ∞)`,
     "definition": "At each node, expand the child with the lowest backed-up value F while it stays below a limit (the best alternative higher up). When it exceeds the limit, return and replace the child's F by the best value found below it.",
     "steps": [
       [
-        "F(child) ← max(g + h, F(parent))",
+        "fm(child) ← max(g + h, fm(parent))",
         "A child inherits its parent's backed-up value if that is larger."
       ],
       [
@@ -31,7 +31,7 @@ call RBFS(S, h(S), ∞)`,
         ""
       ],
       [
-        "if F(best) > limit: return F(best)",
+        "if fm(best) > limit: return fm(best)",
         "Report how good this subtree really is, so the parent can compare it with alternatives."
       ],
       [
@@ -41,7 +41,7 @@ call RBFS(S, h(S), ∞)`,
     ],
     "formulas": [
       {
-        "f": "F(N) = backed-up minimum of f over N's explored subtree",
+        "f": "fm(N) = backed-up minimum of f over N's explored subtree",
         "read": "the best f value seen below N",
         "why": "Lets RBFS return to a forgotten subtree knowing exactly how promising it was."
       }
@@ -60,13 +60,13 @@ call RBFS(S, h(S), ∞)`,
   },
   params: [],
   run(P) {
-    const steps = [], path = [P.start];
+    const steps = [], path = [P.start], fm = Studio.fmt;
     let expansions = 0;
     const rows = [];
     const snap = (cur, cap, kids = []) => {
       const states = {}; path.forEach(p => (states[p] = "visited")); kids.forEach(k => (states[k.id] = "open")); states[cur] = "current";
-      steps.push({ caption: cap, nodes: Studio.gs.nodes(P, states, Object.fromEntries(kids.map(k => [k.id, k.F]))), edges: Studio.gs.edges(P, path),
-        lists: [{ label: "PATH", items: path.map(p => ({ text: p, state: "open" })) }, { label: "CHILDREN", items: kids.map(k => ({ text: `${k.id} F=${k.F}`, state: "plain" })) }],
+      steps.push({ caption: cap, nodes: Studio.gs.nodes(P, states, Object.fromEntries(kids.map(k => [k.id, fm(k.F)]))), edges: Studio.gs.edges(P, path),
+        lists: [{ label: "PATH", items: path.map(p => ({ text: p, state: "open" })) }, { label: "CHILDREN", items: kids.map(k => ({ text: `${k.id} F=${fm(k.F)}`, state: "plain" })) }],
         table: { title: "expansions", columns: ["#", "node", "limit", "children F"], rows: rows.slice(-14), rowStates: rows.slice(-14).map((_, i, a) => (i === a.length - 1 ? "cur" : "")) },
         stats: [{ label: "expansions", value: expansions }] });
     };
@@ -74,29 +74,29 @@ call RBFS(S, h(S), ∞)`,
       if (N === P.goal) return [true, FN];
       const kids = P.adj[N].filter(([c]) => !path.includes(c)).map(([c, w]) => ({ id: c, g: g + w, F: Math.max(g + w + P.h[c], FN) }));
       expansions++;
-      rows.push([expansions, N, limit === Infinity ? "∞" : limit, kids.map(k => `${k.id}:${k.F}`).join(" ") || "–"]);
-      snap(N, `Expand ${N} (limit ${limit === Infinity ? "∞" : limit}): children ${kids.map(k => `${k.id} F=${k.F}`).join(", ") || "none"}`, kids);
+      rows.push([expansions, N, limit === Infinity ? "∞" : fm(limit), kids.map(k => `${k.id}:${fm(k.F)}`).join(" ") || "–"]);
+      snap(N, `Expand ${N} (limit ${limit === Infinity ? "∞" : fm(limit)}): children ${kids.map(k => `${k.id} F=${fm(k.F)}`).join(", ") || "none"}`, kids);
       if (!kids.length) return [false, Infinity];
       for (let guard = 0; guard < 500; guard++) {
         kids.sort((a, b) => a.F - b.F || (a.id < b.id ? -1 : 1));
         const best = kids[0];
-        if (best.F > limit) { snap(N, `Best child ${best.id} has F=${best.F} > limit ${limit}: back up ${best.F} to ${N} and return`, kids); return [false, best.F]; }
+        if (best.F > limit) { snap(N, `Best child ${best.id} has F=${fm(best.F)} > limit ${fm(limit)}: back up ${fm(best.F)} to ${N} and return`, kids); return [false, best.F]; }
         const alt = kids.length > 1 ? kids[1].F : Infinity;
         path.push(best.id);
         const [ok, F] = rbfs(best.id, best.g, best.F, Math.min(limit, alt));
         if (ok) return [true, F];
         path.pop();
         best.F = F;
-        snap(N, `Back at ${N}: ${best.id} now has backed-up F=${F === Infinity ? "∞" : F}`, kids);
+        snap(N, `Back at ${N}: ${best.id} now has backed-up F=${F === Infinity ? "∞" : fm(F)}`, kids);
       }
       return [false, Infinity];
     };
     const [ok] = rbfs(P.start, 0, P.h[P.start], Infinity);
     if (!ok) { steps.push({ caption: "No path to the goal", nodes: Studio.gs.nodes(P), edges: Studio.gs.edges(P) }); return { steps, result: { found: false, expanded: expansions } }; }
     const found = path.slice(), cost = Studio.gs.pathCost(P, found);
-    steps.push({ caption: `Goal ${P.goal} reached: path ${found.join(" – ")}, cost ${cost}, ${expansions} expansions`,
+    steps.push({ caption: `Goal ${P.goal} reached: path ${found.join(" – ")}, cost ${fm(cost)}, ${expansions} expansions`,
       nodes: Studio.gs.nodes(P, Object.fromEntries(found.map(p => [p, p === P.goal ? "goal" : "path"]))), edges: Studio.gs.edges(P, found),
-      table: { title: "expansions", columns: ["#", "node", "limit", "children F"], rows: rows.slice(-14) }, stats: [{ label: "path cost", value: cost, state: "ok" }, { label: "expansions", value: expansions }] });
+      table: { title: "expansions", columns: ["#", "node", "limit", "children F"], rows: rows.slice(-14) }, stats: [{ label: "path cost", value: fm(cost), state: "ok" }, { label: "expansions", value: expansions }] });
     return { steps, result: { found: true, path: found, cost, expanded: expansions } };
   },
 });

@@ -61,15 +61,15 @@ monotone everywhere and h(goal) = 0  ⇒  admissible`,
   params: [],
   run(P) {
     const steps = [], hs = Studio.gs.hstar(P, P.goal);
-    const nrows = P.ids.map(i => [i, P.h[i], hs[i] === Infinity ? "∞" : hs[i], P.h[i] <= hs[i] ? "yes" : "NO"]);
+    const nrows = P.ids.map(i => [i, P.h[i], hs[i] === Infinity ? "∞" : Studio.fmt(hs[i]), P.h[i] <= hs[i] ? "yes" : "NO"]);
     const bad = P.ids.filter(i => P.h[i] > hs[i]);
     steps.push({ caption: `h* by Dijkstra from ${P.goal}. ${bad.length ? "Not admissible at " + bad.join(", ") : "h ≤ h* at every node: admissible"}`,
-      nodes: Studio.gs.nodes(P, Object.fromEntries(P.ids.map(i => [i, bad.includes(i) ? "current" : "plain"])), Object.fromEntries(P.ids.map(i => [i, `${P.h[i]}/${hs[i]}`]))), edges: Studio.gs.edges(P),
+      nodes: Studio.gs.nodes(P, Object.fromEntries(P.ids.map(i => [i, bad.includes(i) ? "current" : "plain"])), Object.fromEntries(P.ids.map(i => [i, `${P.h[i]}/${Studio.fmt(hs[i])}`]))), edges: Studio.gs.edges(P),
       table: { title: "admissibility (badge = h / h*)", columns: ["node", "h", "h*", "h ≤ h*"], rows: nrows, rowStates: nrows.map(r => (r[3] === "NO" ? "bad" : "ok")) } });
     const erows = [], viol = [];
     P.edges.forEach(([u, v, w]) => {
       const dirs = P.directed ? [[u, v]] : [[u, v], [v, u]];
-      dirs.forEach(([m, n]) => { const ok = P.h[m] <= w + P.h[n]; erows.push([`${m}→${n}`, P.h[m], `${w} + ${P.h[n]} = ${w + P.h[n]}`, ok ? "yes" : "NO"]); if (!ok) viol.push([m, n]); });
+      dirs.forEach(([m, n]) => { const ok = P.h[m] <= w + P.h[n]; erows.push([`${m}→${n}`, P.h[m], `${Studio.fmt(w)} + ${P.h[n]} = ${Studio.fmt(w + P.h[n])}`, ok ? "yes" : "NO"]); if (!ok) viol.push([m, n]); });
     });
     steps.push({ caption: viol.length ? `Monotone condition fails on ${viol.map(v => v.join("→")).join(", ")}: f can decrease along a path, so A* may need to reopen closed nodes` : "h(m) ≤ k(m,n) + h(n) on every edge: monotone (consistent), so f never decreases along a path",
       nodes: Studio.gs.nodes(P, Object.fromEntries(viol.flat().map(i => [i, "current"])), Object.fromEntries(P.ids.map(i => [i, P.h[i]]))),
