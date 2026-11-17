@@ -803,3 +803,7 @@ button:disabled:hover, .icon-btn:disabled:hover { border-color: var(--rule-2); }
   .studio .stage, .studio .player { border-color: transparent; background: transparent; box-shadow: none; }
   .studio .player { border-top: 1px solid var(--rule); border-radius: 0; }
 }
+
+/* reading pages (guide, about, contribute) use the same width as the learn pages, so every page's content lines up */
+.prose { max-width: 1180px; }
+.prose p, .prose li { max-width: none; }
