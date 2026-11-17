@@ -7,7 +7,7 @@
   <p>Search algorithms are easy to describe and surprisingly easy to trace wrongly. A missed tie-break, a child added twice or a savings pair merged that should have been refused will all give a wrong answer. Seeing every step, with the working table and the OPEN and CLOSED lists side by side, makes those mistakes visible.</p>
 
   <h2>Full syllabus</h2>
-  <p>Weeks 1–11 of the course, with the algorithms you can run for each week. Every week also has its own section on the <a href="#course">course map</a>.</p>
+  <p>Weeks 1–12 of the course, with the algorithms you can run for each week. Every week also has its own section on the <a href="#course">course map</a>.</p>
 
   <h3>Week 1 · Introduction and philosophy</h3>
   <ul>
@@ -23,7 +23,9 @@
     <li>Depth First Search (DFS) and Breadth First Search (BFS), with OPEN and CLOSED as lists of node pairs.</li>
     <li>Depth First Iterative Deepening (DFID).</li>
     <li>Analysis: completeness, the path found, time and space.</li>
-    <li><b>In the studio:</b> <a href="#algo-search-bfs">BFS</a> · <a href="#algo-search-dfs">DFS</a> · <a href="#algo-search-dfid">DFID</a></li>
+    <li>Implicit state spaces with MoveGen in code: the water jug (8, 5, 3), the 8-puzzle, missionaries and cannibals.</li>
+    <li>Depth-bounded DFS, and simple search without node pairs (why the path is lost).</li>
+    <li><b>In the studio:</b> <!--STUDIO:2--></li>
   </ul>
 
   <h3>Week 3 · Heuristic search and local search</h3>
@@ -34,7 +36,10 @@
     <li>Perturbation methods: 2-city exchange, 2-edge exchange (2-opt), Or-opt, 3-edge exchange.</li>
     <li>Escaping local optima: Variable Neighbourhood Descent, Beam Search, Tabu Search.</li>
     <li>Stochastic local search: Iterated Hill Climbing, Random Walk, Simulated Annealing.</li>
-    <li><b>In the studio:</b> <a href="#algo-search-best-first">Best First</a> · <a href="#algo-search-hill-climbing">Hill Climbing</a> · <a href="#algo-search-beam">Beam Search</a> · <a href="#algo-tsp-nearest-neighbour">Nearest Neighbour</a> · <a href="#algo-tsp-greedy">Greedy</a> · <a href="#algo-tsp-savings">Savings</a> · <a href="#algo-tsp-brute-force">Brute force</a> · <a href="#algo-tsp-two-city-exchange">2-city exchange</a> · <a href="#algo-tsp-two-edge-exchange">2-opt</a> · <a href="#algo-tsp-or-opt">Or-opt</a> · <a href="#algo-tsp-three-edge-exchange">3-edge exchange</a> · <a href="#algo-tsp-vnd">VND</a> · <a href="#algo-tsp-beam">Beam (TSP)</a> · <a href="#algo-tsp-tabu">Tabu</a> · <a href="#algo-tsp-ihc">Iterated HC</a> · <a href="#algo-tsp-random-walk">Random walk</a> · <a href="#algo-tsp-sa">Simulated annealing</a></li>
+    <li>Heuristic terrain: blocks-world hill climbing with h1 (local) and h2 (whole structure).</li>
+    <li>Solution space search on SAT: brute force, hill climbing in N1, beam search, VND with N1–2 … N1–n, best neighbour, tabu search.</li>
+    <li>Best neighbour for a fixed number of moves on the TSP (the cycling demo).</li>
+    <li><b>In the studio:</b> <!--STUDIO:3--></li>
   </ul>
 
   <h3>Week 4 · Population based methods</h3>
@@ -43,7 +48,10 @@
     <li>TSP crossovers: cycle (CX), partially mapped (PMX), order (OX), alternating edges (AEX), heuristic (HX) and ordinal.</li>
     <li>Emergent systems.</li>
     <li>Ant Colony Optimisation: pheromone, evaporation and the probabilistic tour rule.</li>
-    <li><b>In the studio:</b> <a href="#algo-tsp-ga">Genetic algorithm</a> · <a href="#algo-tsp-crossover-lab">Crossover lab</a> · <a href="#algo-tsp-aco">Ant colony</a></li>
+    <li>Stochastic hill climbing at a fixed temperature, with the sigmoid P = 1/(1+e^(−ΔE/T)).</li>
+    <li>SAT: iterated hill climbing, random walk, simulated annealing, and a genetic algorithm on bit strings.</li>
+    <li>TSP representations: path, adjacency and ordinal.</li>
+    <li><b>In the studio:</b> <!--STUDIO:4--></li>
   </ul>
 
   <h3>Week 5 · Finding optimal paths</h3>
@@ -51,7 +59,9 @@
     <li>Branch and bound and Uniform Cost Search (UCS).</li>
     <li>Algorithm A*: f(n) = g(n) + h(n), and weighted A*.</li>
     <li>Admissibility of A*: if h never overestimates, the first goal picked is optimal.</li>
-    <li><b>In the studio:</b> <a href="#algo-search-ucs">UCS</a> · <a href="#algo-search-astar">A*</a></li>
+    <li>Dijkstra's algorithm as taught (WHITE/BLACK, relaxation), the British Museum procedure, branch and bound on a state space and for the TSP.</li>
+    <li>Weighted A* (cost ≤ w·C*), and better heuristics giving fewer expansions (effective branching factor b*).</li>
+    <li><b>In the studio:</b> <!--STUDIO:5--></li>
   </ul>
 
   <h3>Week 6 · Monotone condition and saving space</h3>
@@ -59,7 +69,9 @@
     <li>The monotone (consistency) condition: h(n) ≤ k(n, m) + h(m).</li>
     <li>Space-saving versions of A*: IDA*, Recursive Best-First Search, Divide and Conquer Frontier Search.</li>
     <li>Sequence alignment as shortest-path search, by dynamic programming and by A*.</li>
-    <li><b>In the studio:</b> <a href="#algo-search-monotone-check">Admissibility &amp; monotone check</a> · <a href="#algo-search-ida-star">IDA*</a> · <a href="#algo-search-rbfs">RBFS</a> · <a href="#algo-search-dcfs">DCFS</a> · <a href="#algo-align-dp">Alignment (DP)</a> · <a href="#algo-align-astar">Alignment (A*)</a></li>
+    <li>Pruning CLOSED and OPEN: Frontier Search, Smart Memory Graph Search, A* with an upper bound U.</li>
+    <li>Breadth First Heuristic Search, Divide and Conquer BFHS, and Beam Stack Search.</li>
+    <li><b>In the studio:</b> <!--STUDIO:6--></li>
   </ul>
 
   <h3>Week 7 · Game playing</h3>
@@ -68,7 +80,8 @@
     <li>Minimax.</li>
     <li>Alpha-Beta pruning, and why node ordering matters.</li>
     <li>SSS*: best-first search over strategies.</li>
-    <li><b>In the studio:</b> <a href="#algo-game-minimax">Minimax</a> · <a href="#algo-game-alpha-beta">Alpha-Beta</a> · <a href="#algo-game-sss-star">SSS*</a></li>
+    <li>Expectiminimax: chance nodes (supplementary).</li>
+    <li><b>In the studio:</b> <!--STUDIO:7--></li>
   </ul>
 
   <h3>Week 8 · Planning</h3>
@@ -77,7 +90,9 @@
     <li>Forward and backward state-space planning.</li>
     <li>Goal Stack Planning, and the Sussman anomaly.</li>
     <li>Plan Space Planning: Partial Order Planning.</li>
-    <li><b>In the studio:</b> <a href="#algo-plan-forward">Forward planning</a> · <a href="#algo-plan-backward">Backward planning</a> · <a href="#algo-plan-gsp">Goal Stack Planning</a> · <a href="#algo-plan-pop">Partial Order Planning</a></li>
+    <li>Graphplan: the planning graph, no-ops, the four mutex rules, and backward plan extraction.</li>
+    <li>Means-ends analysis: the difference table.</li>
+    <li><b>In the studio:</b> <!--STUDIO:8--></li>
   </ul>
 
   <h3>Week 9 · Problem decomposition</h3>
@@ -85,7 +100,8 @@
     <li>Problem decomposition with goal trees.</li>
     <li>AND–OR graphs: hyper-arcs, solved nodes and futility.</li>
     <li>Algorithm AO*: forward expansion, backward cost revision, the marked solution graph.</li>
-    <li><b>In the studio:</b> <a href="#algo-andor-ao-star">AO*</a></li>
+    <li>Backward chaining: goal trees as AND–OR graphs.</li>
+    <li><b>In the studio:</b> <!--STUDIO:9--></li>
   </ul>
 
   <h3>Week 10 · Rule-based expert systems</h3>
@@ -93,7 +109,7 @@
     <li>Rule-based expert systems and pattern-directed inference.</li>
     <li>The inference engine: match, resolve, execute. Conflict resolution strategies.</li>
     <li>The Rete algorithm: a network that remembers partial matches.</li>
-    <li><b>In the studio:</b> <a href="#algo-rules-forward-chaining">Forward chaining</a> · <a href="#algo-rules-rete">Rete</a></li>
+    <li><b>In the studio:</b> <!--STUDIO:10--></li>
   </ul>
 
   <h3>Week 11 · Constraint processing</h3>
@@ -104,8 +120,21 @@
     <li>Combining search and reasoning.</li>
     <li>The Waltz algorithm: labelling line drawings of trihedral objects.</li>
     <li>Model-based diagnosis: conflicts and minimal diagnoses.</li>
-    <li><b>In the studio:</b> <a href="#algo-csp-backtracking">Backtracking</a> · <a href="#algo-csp-forward-checking">Forward checking</a> · <a href="#algo-csp-ac3">Arc consistency</a> · <a href="#algo-csp-waltz">Waltz</a> · <a href="#algo-csp-diagnosis">Model-based diagnosis</a></li>
+    <li>Path consistency (i-consistency) on triangles; logic as constraint propagation.</li>
+    <li>SAT as a CSP: backtracking with unit propagation (DPLL).</li>
+    <li><b>In the studio:</b> <!--STUDIO:11--></li>
   </ul>
+
+  <h3>Week 12 · Lookahead, lookback and synthesis</h3>
+  <ul>
+    <li>Combining search with reasoning: forward checking, partial lookahead, full lookahead and arc-consistency lookahead (MAC).</li>
+    <li>Lookback: conflict sets and conflict-directed backjumping.</li>
+    <li>Nogood recording (memoising dead ends).</li>
+    <li>Depth-First Branch and Bound.</li>
+    <li>Closing discussion: which algorithm for which kind of problem.</li>
+    <li><b>In the studio:</b> <!--STUDIO:12--></li>
+  </ul>
+
 
   <h2>Notation</h2>
   <p>The site follows the notation of the course and of Prof. Khemani's book <i>A First Course in Artificial Intelligence</i>:</p>

@@ -43,6 +43,11 @@ function build() {
   let tpl = read("src/index.template.html");
   for (const page of ["home", "guide", "about", "contribute"]) tpl = tpl.replace(`<!--PAGE:${page}-->`, () => read(`src/pages/${page}.html`));
   tpl = tpl.replaceAll("<!--COUNT-->", () => String(Studio.algorithms.length));
+  // About page: "In the studio" links per week, from the registry, so the syllabus never drifts
+  const escH = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  tpl = tpl.replace(/<!--STUDIO:(\d+)-->/g, (_, w) => Studio.algorithms.filter(a => a.week === Number(w))
+    .slice().sort((a, b) => (a.family || "").localeCompare(b.family || "") || (a.order ?? 99) - (b.order ?? 99) || a.name.localeCompare(b.name))
+    .map(a => `<a href="#algo-${escH(a.id)}">${escH(a.name)}</a>`).join(" · ") || "nothing to run this week");
   const seo = SEO.build(Studio, owner, SITE, PKG);
   const scriptFiles = [...CORE, ...listTypeFiles(), "src/generated/data.js", ...algoFiles, ...UI];
   // the template is page content; for the real documents everything before the skip link belongs in <head>
