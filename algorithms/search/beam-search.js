@@ -81,7 +81,7 @@ return the goal's path`,
       snap(`Level ${level}: ${kids.length} new children, keep the ${kept.length} with smallest h${dropped.length ? `; ${dropped.join(", ")} discarded for good` : ""}`);
     }
     const path = pathTo(P.goal), cost = Studio.gs.pathCost(P, path);
-    snap(`Goal ${P.goal} is in the beam: path ${path.join(" – ")}, cost ${cost}`, { nodes: Studio.gs.nodes(P, Object.fromEntries(path.map(p => [p, p === P.goal ? "goal" : "path"]))), edges: Studio.gs.edges(P, path) });
+    snap(`Goal ${P.goal} is in the beam: path ${path.join(" – ")}, cost ${Studio.fmt(cost)}`, { nodes: Studio.gs.nodes(P, Object.fromEntries(path.map(p => [p, p === P.goal ? "goal" : "path"]))), edges: Studio.gs.edges(P, path) });
     return { steps, result: { found: true, path, cost, expanded: seen.size } };
   },
 });

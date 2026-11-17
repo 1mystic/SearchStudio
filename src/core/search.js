@@ -6,6 +6,8 @@
 (function (root) {
   "use strict";
   const Studio = root.Studio;
+  /* display rounding: at most 2 decimals, no float noise (results stay exact) */
+  Studio.fmt = v => (typeof v === "number" && isFinite(v) ? String(Math.round(v * 100) / 100) : String(v));
 
   function tieKey(mode) {
     // returns comparator for equal priority: alphabetical, FIFO (older first) or LIFO (newer first)
@@ -19,6 +21,7 @@
     run(P, kind, opts = {}) {
       const steps = [];
       const start = P.start, goal = P.goal;
+      const fmt = Studio.fmt;
       const show = kind === "ucs" || kind === "astar" ? "g" : kind === "best" ? "h" : "depth";
       const W = opts.weight ?? 1;
       let seq = 0;
@@ -28,21 +31,20 @@
       const tree = [];
       const rows = [];
       const pairText = x => {
-        const val = show === "g" ? x.g : show === "h" ? x.h : x.depth;
+        const val = show === "g" ? fmt(x.g) : show === "h" ? fmt(x.h) : x.depth;
         return `(${x.id},${x.parent ?? "nil"},${val}${kind === "astar" ? ",f=" + fmt(x.f) : ""})`;
       };
-      const fmt = v => (Math.round(v * 100) / 100).toString();
       const prio = x => (kind === "ucs" ? x.g : kind === "best" ? x.h : kind === "astar" ? x.f : 0);
       const cmp = tieKey(opts.tie || "alpha");
       const sortOpen = () => { if (["ucs", "best", "astar"].includes(kind)) OPEN.sort((a, b) => prio(a) - prio(b) || cmp(a, b)); };
       const snapshot = (cur, caption, extra = {}) => {
         const nodes = {};
         P.ids.forEach(id => (nodes[id] = { state: "plain" }));
-        CLOSED.forEach(x => (nodes[x.id] = { state: "closed", badge: show === "h" ? x.h : show === "g" ? x.g : x.depth }));
-        OPEN.forEach(x => (nodes[x.id] = { state: "open", badge: show === "h" ? x.h : show === "g" ? x.g : x.depth }));
+        CLOSED.forEach(x => (nodes[x.id] = { state: "closed", badge: show === "h" ? fmt(x.h) : show === "g" ? fmt(x.g) : x.depth }));
+        OPEN.forEach(x => (nodes[x.id] = { state: "open", badge: show === "h" ? fmt(x.h) : show === "g" ? fmt(x.g) : x.depth }));
         if (goal && nodes[goal].state === "plain") nodes[goal].state = "goalcand";
-        if (cur) nodes[cur.id] = { state: "current", badge: show === "h" ? cur.h : show === "g" ? cur.g : cur.depth };
-        const edges = P.edges.map(([u, v, w]) => ({ u, v, state: "faint", label: w, directed: P.directed }));
+        if (cur) nodes[cur.id] = { state: "current", badge: show === "h" ? fmt(cur.h) : show === "g" ? fmt(cur.g) : cur.depth };
+        const edges = P.edges.map(([u, v, w]) => ({ u, v, state: "faint", label: fmt(w), directed: P.directed }));
         tree.forEach(([u, v]) => { const e = edges.find(e => (e.u === u && e.v === v) || (!P.directed && e.u === v && e.v === u)); if (e) e.state = "tree"; });
         if (extra.path) {
           for (let i = 0; i + 1 < extra.path.length; i++) {
@@ -73,7 +75,7 @@
           while (x) { path.unshift(x.id); x = x.parent ? byId(x.parent) : null; }
           rows.push({ cells: [CLOSED.length, N.id, "goal test succeeds", "", OPEN.length], state: "ok" });
           const cost = N.g;
-          snapshot(null, `Goal ${goal} picked from OPEN: path ${path.join(" – ")}, cost ${cost}, ${CLOSED.length} nodes expanded`, { path, final: true, stats: [{ label: "path cost", value: cost, state: "ok" }] });
+          snapshot(null, `Goal ${goal} picked from OPEN: path ${path.join(" – ")}, cost ${fmt(cost)}, ${CLOSED.length} nodes expanded`, { path, final: true, stats: [{ label: "path cost", value: fmt(cost), state: "ok" }] });
           return { steps, result: { found: true, path, cost, expanded: CLOSED.length } };
         }
         CLOSED.push(N);
@@ -88,7 +90,7 @@
           if (!inOpen && !inClosed) { const k = mk(c, N.id, N.depth + 1, g); added.push(k); tree.push([N.id, c]); }
           else if ((kind === "ucs" || kind === "astar") && g < (inOpen || inClosed).g) {
             const old = inOpen || inClosed;
-            notes.push(`${c}: cheaper path via ${N.id} (g ${old.g} → ${g})`);
+            notes.push(`${c}: cheaper path via ${N.id} (g ${fmt(old.g)} → ${fmt(g)})`);
             const ti = tree.findIndex(([, v]) => v === c); if (ti >= 0) tree.splice(ti, 1); tree.push([N.id, c]);
             old.parent = N.id; old.g = g; old.depth = N.depth + 1; old.f = g + W * old.h;
             if (inClosed) { CLOSED.splice(CLOSED.indexOf(inClosed), 1); OPEN.push(inClosed); notes[notes.length - 1] += ", reopened"; }
@@ -149,9 +151,10 @@
   "use strict";
   const Studio = root.Studio;
   Studio.gs = {
+    fmt: Studio.fmt,
     nodes(P, states = {}, badges = {}) { const n = {}; P.ids.forEach(id => (n[id] = { state: states[id] || "plain", badge: badges[id] })); return n; },
     edges(P, path = [], extra = []) {
-      const E = P.edges.map(([u, v, w]) => ({ u, v, state: "faint", label: w, directed: P.directed }));
+      const E = P.edges.map(([u, v, w]) => ({ u, v, state: "faint", label: Studio.fmt(w), directed: P.directed }));
       for (let i = 0; i + 1 < path.length; i++) { const e = E.find(e => (e.u === path[i] && e.v === path[i + 1]) || (!P.directed && e.u === path[i + 1] && e.v === path[i])); if (e) e.state = "path"; }
       extra.forEach(x => { const e = E.find(e => (e.u === x.u && e.v === x.v) || (!P.directed && e.u === x.v && e.v === x.u)); if (e) Object.assign(e, x, { u: e.u, v: e.v }); });
       return E;
