@@ -5,6 +5,7 @@ Studio.register({
   family: "Game playing",
   week: 7,
   problem: "game",
+  check: P => (P.hasChance ? "This algorithm is limited to trees without chance nodes (MAX/MIN only): with chance nodes its answer would be wrong. Use Expectiminimax." : ""),
   order: 20,
   summary: "Carry a window (α, β): α is the best value MAX can already guarantee, β the best MIN can guarantee. When α ≥ β at a node, the remaining children cannot matter and are pruned.",
   pseudocode: `AlphaBeta(N, α, β):
